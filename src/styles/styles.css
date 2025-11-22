@@ -8,6 +8,10 @@
 body {
   margin: 0;
   padding: 0;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  min-height: 100vh;
+  color: #f1f5f9;
+  font-family: 'Outfit', sans-serif;
 }
 
 html,

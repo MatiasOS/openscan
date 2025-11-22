@@ -67,7 +67,7 @@ export default function Address() {
     <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
       {addressData ? (
         <>
-          <AddressDisplay address={addressData} addressHash={address} />
+          <AddressDisplay address={addressData} addressHash={address} chainId={chainId} />
         </>
       ) : (
         <p>Address data not found</p>

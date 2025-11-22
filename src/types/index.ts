@@ -108,6 +108,7 @@ export interface Address {
   code: string
   txCount: string
   storeageAt: StoreageAt
+  recentTransactions?: Transaction[]
 }
 
 export type StoreageAt = Record<string, string> 
