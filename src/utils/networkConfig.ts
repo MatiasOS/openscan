@@ -7,7 +7,7 @@ const supportedChains = getSupportedChains();
 const chains = supportedChains.length > 0 ? supportedChains : [hardhat];
 
 export const networkConfig = getDefaultConfig({
-  appName: 'ERC20 Flash Lender',
+  appName: 'Open Scan',
   projectId: '2b05839e1b9385420e43ffd8d982cb04',
   chains: chains as [any, ...any[]],
   ssr: false
