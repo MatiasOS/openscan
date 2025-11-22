@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Transaction } from '../../types';
+import LongString from './LongString';
 
 interface TransactionDisplayProps {
     transaction: Transaction;
@@ -56,7 +57,9 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({ transaction, ch
         <div className="block-display-card">
             <div className="block-display-header">
                 <span className="block-label">Transaction:</span>
-                <span className="block-number">{truncate(transaction.hash, 10, 8)}</span>
+                <span className="block-number">
+                    <LongString value={transaction.hash} start={10} end={8} />
+                </span>
             </div>
 
             {/* Basic Transaction Info */}
@@ -308,10 +311,9 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({ transaction, ch
                                                     <div key={i} style={{ 
                                                         fontFamily: 'monospace', 
                                                         fontSize: '0.85rem',
-                                                        marginLeft: '10px',
-                                                        wordBreak: 'break-all'
+                                                        marginLeft: '10px'
                                                     }}>
-                                                        [{i}] {topic}
+                                                        [{i}] <LongString value={topic} start={10} end={8} />
                                                     </div>
                                                 ))}
                                             </div>
@@ -322,10 +324,9 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({ transaction, ch
                                                 <div style={{ 
                                                     fontFamily: 'monospace', 
                                                     fontSize: '0.85rem',
-                                                    wordBreak: 'break-all',
                                                     marginTop: '4px'
                                                 }}>
-                                                    {log.data}
+                                                    <LongString value={log.data} start={20} end={20} />
                                                 </div>
                                             </div>
                                         )}

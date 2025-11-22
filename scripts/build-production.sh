@@ -7,9 +7,6 @@ export NODE_OPTIONS="--max-old-space-size=4096"
 
 echo "Building production version..."
 
-# Change to app directory
-cd app
-
 # Install dependencies
 echo "Installing dependencies..."
 npm ci

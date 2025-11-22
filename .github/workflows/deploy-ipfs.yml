@@ -42,4 +42,4 @@ jobs:
         with:
           pinata-jwt: ${{ secrets.PINATA_JWT }}
           source-dir: './dist'
-          pin-name: 'flashlender - ${{ github.sha }}'
+          pin-name: 'openscan - ${{ github.sha }}'

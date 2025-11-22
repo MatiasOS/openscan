@@ -5,10 +5,7 @@ export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export NODE_OPTIONS="--max-old-space-size=4096"
 
-echo "Building production version..."
-
-# Change to app directory
-cd app
+echo "Building staging version..."
 
 # Install dependencies
 echo "Installing dependencies..."

@@ -14,7 +14,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: isGhPages ? '/erc20-flash-lender/' : '/', // key for GH Pages
+    publicPath: isGhPages ? '/openscan/' : '/', // key for GH Pages
     clean: true,
     charset: false
   },
