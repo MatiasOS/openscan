@@ -5,7 +5,8 @@ import { Block } from '../../types';
 
 export default function Blocks() {
   const { chainId } = useParams<{ chainId?: string }>();
-  const dataService = useDataService(Number(chainId) || 1);
+  const numericChainId = Number(chainId) || 1;
+  const dataService = useDataService(numericChainId);
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -16,7 +17,7 @@ export default function Blocks() {
       return;
     }
 
-    console.log('Fetching latest 10 blocks for chain:', chainId);
+    console.log('Fetching latest 10 blocks for chain:', numericChainId);
     setLoading(true);
     setError(null);
 
@@ -31,7 +32,7 @@ export default function Blocks() {
         setError(err.message || 'Failed to fetch blocks');
       })
       .finally(() => setLoading(false));
-  }, [dataService, chainId]);
+  }, [dataService, numericChainId]);
 
   const truncate = (str: string, start = 10, end = 8) => {
     if (!str) return '';

@@ -6,7 +6,8 @@ import AddressDisplay from '../common/AddressDisplay';
 
 export default function Address() {
   const { chainId, address } = useParams<{ chainId?: string; address?: string }>();
-  const dataService = useDataService(Number(chainId) || 1);
+  const numericChainId = Number(chainId) || 1;
+  const dataService = useDataService(numericChainId);
   const [addressData, setAddressData] = useState<AddressType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,7 +18,7 @@ export default function Address() {
       return;
     }
 
-    console.log('Fetching address data for:', address);
+    console.log('Fetching address data for:', address, 'on chain:', numericChainId);
     setLoading(true);
     setError(null);
 
@@ -32,7 +33,7 @@ export default function Address() {
         setError(err.message || 'Failed to fetch address data');
       })
       .finally(() => setLoading(false));
-  }, [dataService, address, chainId]);
+  }, [dataService, address, numericChainId]);
 
   if (loading) {
     return (

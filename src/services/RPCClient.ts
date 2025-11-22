@@ -106,6 +106,7 @@ export class RPCClient {
   }
 
   async call<T = any>(method: string, params: any[] = []): Promise<T> {
+    console.log(`RPCClient.call: ${method}`, 'params:', params, 'using URLs:', this.rpcUrls);
     // Start with the current working URL, then try others if it fails
     const orderedIndices = [
       this.currentUrlIndex,

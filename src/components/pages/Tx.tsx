@@ -8,8 +8,9 @@ export default function Tx() {
   const { chainId, filter } = useParams<{ chainId?: string; filter?: string }>();
   
   const txHash = filter;
+  const numericChainId = Number(chainId) || 1;
   
-  const dataService = useDataService(Number(chainId) || 1);
+  const dataService = useDataService(numericChainId);
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +21,7 @@ export default function Tx() {
       return;
     }
     
-    console.log('Fetching transaction:', txHash);
+    console.log('Fetching transaction:', txHash, 'for chain:', numericChainId);
     setLoading(true);
     setError(null);
     
@@ -35,7 +36,7 @@ export default function Tx() {
         setError(err.message || 'Failed to fetch transaction');
       })
       .finally(() => setLoading(false));
-  }, [dataService, txHash]);
+  }, [dataService, txHash, numericChainId]);
 
   if (loading) {
     return (

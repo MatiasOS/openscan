@@ -12,8 +12,9 @@ export default function Block() {
   }>();
   
   const blockNumber = filter == "latest" ? "latest" : Number(filter);
+  const numericChainId = Number(chainId) || 1;
   
-  const dataService = useDataService(Number(chainId) || 1);
+  const dataService = useDataService(numericChainId);
   const [block, setBlock] = useState<Block | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +25,7 @@ export default function Block() {
       return;
     }
     
-    console.log('Fetching block:', blockNumber);
+    console.log('Fetching block:', blockNumber, 'for chain:', numericChainId);
     setLoading(true);
     setError(null);
     
@@ -39,7 +40,7 @@ export default function Block() {
         setError(err.message || 'Failed to fetch block');
       })
       .finally(() => setLoading(false));
-  }, [dataService, blockNumber]);
+  }, [dataService, blockNumber, numericChainId]);
 
   if (loading) {
     return (

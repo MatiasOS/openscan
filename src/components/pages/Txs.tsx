@@ -5,7 +5,8 @@ import { Transaction } from '../../types';
 
 export default function Txs() {
   const { chainId } = useParams<{ chainId?: string }>();
-  const dataService = useDataService(Number(chainId) || 1);
+  const numericChainId = Number(chainId) || 1;
+  const dataService = useDataService(numericChainId);
   const [transactions, setTransactions] = useState<Array<Transaction & { blockNumber: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -16,7 +17,7 @@ export default function Txs() {
       return;
     }
 
-    console.log('Fetching transactions from latest 10 blocks for chain:', chainId);
+    console.log('Fetching transactions from latest 10 blocks for chain:', numericChainId);
     setLoading(true);
     setError(null);
 
@@ -31,7 +32,7 @@ export default function Txs() {
         setError(err.message || 'Failed to fetch transactions');
       })
       .finally(() => setLoading(false));
-  }, [dataService, chainId]);
+  }, [dataService, numericChainId]);
 
   const truncate = (str: string, start = 10, end = 8) => {
     if (!str) return '';

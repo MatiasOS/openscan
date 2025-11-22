@@ -15,7 +15,7 @@ export const RPC_ENDPOINTS: Record<number, string[]> = {
   
   // Sepolia - with fallback URLs
   11155111: [
-    process.env.REACT_APP_SEPOLIA_RPC || 'https://rpc.sepolia.org',
+    process.env.REACT_APP_SEPOLIA_RPC || 'https://sepolia.infura.io','https://rpc.sepolia.org',
     'https://rpc2.sepolia.org',
     'https://ethereum-sepolia.publicnode.com',
   ].filter(Boolean),

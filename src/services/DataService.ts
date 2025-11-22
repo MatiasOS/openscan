@@ -25,7 +25,9 @@ export class DataService {
   private cacheTimeout = 30000; // 30 seconds
 
   constructor(private chainId: number) {
+    console.log('DataService constructor called with chainId:', chainId);
     const rpcUrls = getRPCUrls(chainId);
+    console.log('RPC URLs for chain', chainId, ':', rpcUrls);
     this.rpcClient = new RPCClient(rpcUrls);
     this.blockFetcher = new BlockFetcher(this.rpcClient, chainId);
     this.transactionFetcher = new TransactionFetcher(this.rpcClient, chainId);
