@@ -185,6 +185,33 @@ export class DataService {
       ? AddressAdapterOptimism.fromRawData(address, balance, code, txCount, this.chainId)
       : AddressAdapter.fromRawData(address, balance, code, txCount, this.chainId);
     
+    // Fetch recent transactions for this address
+    try {
+      const latestBlockNumber = await this.getLatestBlockNumber();
+      const recentTransactions: Transaction[] = [];
+      const blocksToCheck = 10; // Check last 10 blocks
+      
+      for (let i = 0; i < blocksToCheck && recentTransactions.length < 10; i++) {
+        const blockNum = latestBlockNumber - i;
+        if (blockNum < 0) break;
+        
+        const block = await this.getBlockWithTransactions(blockNum);
+        if (block.transactionDetails) {
+          const addressTxs = block.transactionDetails.filter(tx => 
+            tx.from?.toLowerCase() === address.toLowerCase() || 
+            tx.to?.toLowerCase() === address.toLowerCase()
+          );
+          recentTransactions.push(...addressTxs);
+          if (recentTransactions.length >= 10) break;
+        }
+      }
+      
+      addressData.recentTransactions = recentTransactions.slice(0, 10);
+    } catch (error) {
+      console.error('Error fetching recent transactions:', error);
+      addressData.recentTransactions = [];
+    }
+    
     this.setCache(cacheKey, addressData);
     return addressData;
   }
