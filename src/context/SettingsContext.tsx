@@ -20,7 +20,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(
 	undefined,
 );
 
-const SETTINGS_STORAGE_KEY = "flashlender_user_settings";
+const SETTINGS_STORAGE_KEY = "openScan_user_settings";
 
 interface SettingsProviderProps {
 	children: ReactNode;
