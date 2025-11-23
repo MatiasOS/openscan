@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import arbitrumLogo from "../../assets/arbitrum-logo.svg";
 import optimismLogo from "../../assets/optimism-logo.svg";
+import baseLogo from "../../assets/base-logo.svg";
 import hardhatLogo from "../../assets/hardhat-logo.svg";
 
 interface NetworkCardProps {
@@ -154,6 +155,14 @@ export default function Home() {
 			chainId: "10",
 			color: "#FF0420",
 			icon: <img src={optimismLogo} alt="Optimism" width="32" height="32" />,
+		},
+		{
+			to: "/8453",
+			name: "Base",
+			description: "Coinbase's Ethereum Layer 2",
+			chainId: "8453",
+			color: "#0052FF",
+			icon: <img src={baseLogo} alt="Base" width="32" height="32" />,
 		},
 	];
 

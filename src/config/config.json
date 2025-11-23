@@ -11,6 +11,21 @@
 			"currency": "ETH"
 		},
 		{
+			"chainId": 42161,
+			"name": "Arbitrum One",
+			"currency": "ETH"
+		},
+		{
+			"chainId": 10,
+			"name": "Optimism",
+			"currency": "ETH"
+		},
+		{
+			"chainId": 8453,
+			"name": "Base",
+			"currency": "ETH"
+		},
+		{
 			"chainId": 31337,
 			"name": "Localhost",
 			"currency": "ETH"

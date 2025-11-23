@@ -200,7 +200,8 @@ export type supportedChainsIds =
 	| 31337 // local node (hardhat, anvil, aztec)
 	| 677868 // aztec sandobx
 	| 42161 // arbitrum one
-	| 10; // optimism mainnet
+	| 10 // optimism mainnet
+	| 8453; // base mainnet
 
 export type RpcUrlsContextType = Record<supportedChainsIds, RPCUrls>;
 

@@ -46,6 +46,13 @@ export const RPC_ENDPOINTS: RpcUrlsContextType = {
 		"https://optimism.llamarpc.com",
 		"https://optimism.publicnode.com",
 	].filter(Boolean) as string[],
+
+	// Base Mainnet
+	8453: [
+		process.env.REACT_APP_BASE_RPC || "https://mainnet.base.org",
+		"https://base.llamarpc.com",
+		"https://base.publicnode.com",
+	].filter(Boolean) as string[],
 };
 type RpcMap = Record<number, string[]>;
 
