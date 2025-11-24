@@ -58,6 +58,12 @@ body {
   box-shadow: 0 6px 24px rgba(16, 185, 129, 0.15);
 }
 
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .navbar ul {
   list-style: none;
   display: flex;

@@ -1090,3 +1090,76 @@
 	font-weight: 600;
 	font-family: "Outfit", sans-serif;
 }
+
+/* Network Block Indicator */
+.network-block-indicator {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 12px;
+	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	border-radius: 8px;
+	transition: all 0.2s ease;
+}
+
+.network-block-indicator:hover {
+	background: rgba(255, 255, 255, 0.08);
+}
+
+.network-block-pulse {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	animation: network-pulse 2s ease-in-out infinite;
+}
+
+@keyframes network-pulse {
+	0%,
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+	50% {
+		opacity: 0.4;
+		transform: scale(0.85);
+	}
+}
+
+.network-block-logo {
+	width: 20px;
+	height: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.network-block-logo img {
+	width: 20px;
+	height: 20px;
+	border-radius: 4px;
+	object-fit: contain;
+}
+
+.network-block-info {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+}
+
+.network-block-label {
+	font-size: 0.65rem;
+	color: #e5e7eb;
+	font-family: "Outfit", sans-serif;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	line-height: 1;
+}
+
+.network-block-number {
+	font-size: 0.8rem;
+	font-family: "JetBrains Mono", monospace;
+	color: var(--text-color, #e5e7eb);
+	font-weight: 500;
+	line-height: 1.2;
+}
