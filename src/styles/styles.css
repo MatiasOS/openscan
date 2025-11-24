@@ -4421,6 +4421,32 @@ code {
   text-decoration: none;
 }
 
+.github-btn-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-sec);
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.github-btn-footer svg {
+  width: 12px;
+  height: 12px;
+}
+
+.github-btn-footer:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
 .light-theme .app-footer {
   background: rgba(240, 240, 240, 0.8);
 }
