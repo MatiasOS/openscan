@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 
 // Network colors matching the logo - Ethereum weighted more heavily
 const NETWORKS = [
@@ -96,7 +96,7 @@ export const IsometricBlocks: React.FC<IsometricBlocksProps> = ({
 	spawnInterval = 150,
 }) => {
 	const [cubes, setCubes] = useState<CubeData[]>([]);
-	const [nextId, setNextId] = useState(0);
+	const nextIdRef = useRef(0);
 
 	// Calculate grid positions for isometric layout
 	const gridPositions = useMemo(() => {
@@ -123,8 +123,9 @@ export const IsometricBlocks: React.FC<IsometricBlocksProps> = ({
 		const network = WEIGHTED_COLORS[Math.floor(Math.random() * WEIGHTED_COLORS.length)];
 		if (!network) return;
 
+		const cubeId = nextIdRef.current++;
 		const newCube: CubeData = {
-			id: nextId,
+			id: cubeId,
 			x: pos.x,
 			y: pos.y,
 			color: network,
@@ -139,8 +140,7 @@ export const IsometricBlocks: React.FC<IsometricBlocksProps> = ({
 			}
 			return updated;
 		});
-		setNextId((prev) => prev + 1);
-	}, [gridPositions, nextId, maxCubes]);
+	}, [gridPositions, maxCubes]);
 
 	// Fade in animation
 	useEffect(() => {
