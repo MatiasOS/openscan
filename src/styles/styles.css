@@ -107,23 +107,31 @@ body {
 }
 
 .navbar a.home-cube-link {
-  padding: 6px 10px;
+  padding: 0 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding-top: 10px;
 }
 
 .navbar a.home-cube-link:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: inherit;
+  transform: none;
 }
 
-.home-cube {
-  transition: transform 0.2s ease;
+.navbar a.home-cube-link svg polygon {
+  transition: fill 0.2s ease;
 }
 
-.navbar a.home-cube-link:hover .home-cube {
-  transform: scale(1.1) rotate(-5deg);
+.navbar a.home-cube-link:hover svg polygon:nth-child(1) {
+  fill: #ffffff;
+}
+
+.navbar a.home-cube-link:hover svg polygon:nth-child(2) {
+  fill: #d1fae5;
+}
+
+.navbar a.home-cube-link:hover svg polygon:nth-child(3) {
+  fill: #a7f3d0;
 }
 
 .navbar a:hover {

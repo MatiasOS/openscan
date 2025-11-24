@@ -66,7 +66,31 @@ const Navbar = () => {
 			<div className="navbar-inner">
 				<ul>
 					<li>
-						<Link to="/">Home</Link>
+						<Link to="/" className="home-cube-link" title="Home">
+							<svg
+								width="32"
+								height="32"
+								viewBox="0 0 36 36"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								{/* Top face - brightest */}
+								<polygon
+									points="20,6 34,14 20,22 6,14"
+									fill="#067455ff"
+								/>
+								{/* Left face - medium */}
+								<polygon
+									points="6,14 20,22 20,36 6,28"
+									fill="#07634aff"
+								/>
+								{/* Right face - darkest */}
+								<polygon
+									points="20,22 34,14 34,28 20,36"
+									fill="#065743ff"
+								/>
+							</svg>
+						</Link>
 					</li>
 					{chainId && (
 						<>
