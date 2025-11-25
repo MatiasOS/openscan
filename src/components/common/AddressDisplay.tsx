@@ -309,47 +309,6 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 			addressHash,
 		]);
 
-		// Debug: Log ABI information
-		if (contractData && contractData.abi) {
-			const allTypes = contractData.abi.map((item: any) => item.type);
-			const uniqueTypes = Array.from(new Set(allTypes));
-			const functionNames = contractData.abi
-				.filter((item: any) => item.type === "function")
-				.map((f: any) => f.name);
-			console.log("Contract ABI Info:", {
-				source: isVerified && sourcifyData ? "Sourcify" : "Local Artifact",
-				totalItems: contractData.abi.length,
-				functions: contractData.abi.filter(
-					(item: any) => item.type === "function",
-				).length,
-				events: contractData.abi.filter((item: any) => item.type === "event")
-					.length,
-				constructor: contractData.abi.filter(
-					(item: any) => item.type === "constructor",
-				).length,
-				fallback: contractData.abi.filter(
-					(item: any) => item.type === "fallback",
-				).length,
-				receive: contractData.abi.filter((item: any) => item.type === "receive")
-					.length,
-				other: contractData.abi.filter(
-					(item: any) =>
-						![
-							"function",
-							"event",
-							"constructor",
-							"fallback",
-							"receive",
-						].includes(item.type),
-				).length,
-				allTypes: uniqueTypes,
-				allFunctionNames: functionNames,
-				hasTransfer: functionNames.includes("transfer"),
-				hasTransferFrom: functionNames.includes("transferFrom"),
-				hasApprove: functionNames.includes("approve"),
-			});
-		}
-
 		return (
 			<div className="block-display-card">
 				<div className="block-display-header">
