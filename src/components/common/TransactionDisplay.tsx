@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+	useState,
+	useEffect,
+	useRef,
+	useMemo,
+	useCallback,
+} from "react";
 import { Link } from "react-router-dom";
 import {
 	Transaction,
@@ -76,58 +82,61 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
 		}, []);
 
 		// Check if this is an Arbitrum transaction
-		const isArbitrumTx = (
-			tx: Transaction | TransactionArbitrum,
-		): tx is TransactionArbitrum => {
-			return "requestId" in tx;
-		};
+		const isArbitrumTx = useCallback(
+			(tx: Transaction | TransactionArbitrum): tx is TransactionArbitrum => {
+				return "requestId" in tx;
+			},
+			[],
+		);
 
 		// Check if receipt is Arbitrum receipt
-		const isArbitrumReceipt = (
-			receipt: any,
-		): receipt is TransactionReceiptArbitrum => {
-			return receipt && "l1BlockNumber" in receipt;
-		};
+		const isArbitrumReceipt = useCallback(
+			(receipt: any): receipt is TransactionReceiptArbitrum => {
+				return receipt && "l1BlockNumber" in receipt;
+			},
+			[],
+		);
 
 		// Check if receipt is Optimism receipt
-		const isOptimismReceipt = (
-			receipt: any,
-		): receipt is TransactionReceiptOptimism => {
-			return receipt && "l1Fee" in receipt;
-		};
+		const isOptimismReceipt = useCallback(
+			(receipt: any): receipt is TransactionReceiptOptimism => {
+				return receipt && "l1Fee" in receipt;
+			},
+			[],
+		);
 
-		const truncate = (str: string, start = 6, end = 4) => {
+		const truncate = useCallback((str: string, start = 6, end = 4) => {
 			if (!str) return "";
 			if (str.length <= start + end) return str;
 			return `${str.slice(0, start)}...${str.slice(-end)}`;
-		};
+		}, []);
 
-		const formatValue = (value: string) => {
+		const formatValue = useCallback((value: string) => {
 			try {
 				const eth = Number(value) / 1e18;
 				return `${eth.toFixed(6)} ETH`;
 			} catch (e) {
 				return value;
 			}
-		};
+		}, []);
 
-		const formatGwei = (value: string) => {
+		const formatGwei = useCallback((value: string) => {
 			try {
 				const gwei = Number(value) / 1e9;
 				return `${gwei.toFixed(2)} Gwei`;
 			} catch (e) {
 				return value;
 			}
-		};
+		}, []);
 
-		const parseTimestampToMs = (timestamp?: string) => {
+		const parseTimestampToMs = useCallback((timestamp?: string) => {
 			if (!timestamp) return null;
 			const parsed = parseInt(timestamp, timestamp.startsWith("0x") ? 16 : 10);
 			if (Number.isNaN(parsed)) return null;
 			return parsed * 1000;
-		};
+		}, []);
 
-		const formatAbsoluteTimestamp = (timestampMs: number) => {
+		const formatAbsoluteTimestamp = useCallback((timestampMs: number) => {
 			try {
 				return new Intl.DateTimeFormat(undefined, {
 					year: "numeric",
@@ -141,9 +150,9 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
 			} catch (error) {
 				return new Date(timestampMs).toISOString();
 			}
-		};
+		}, []);
 
-		const formatTimeAgo = (timestampMs: number) => {
+		const formatTimeAgo = useCallback((timestampMs: number) => {
 			const diffMs = Date.now() - timestampMs;
 			const diffSeconds = Math.floor(Math.abs(diffMs) / 1000);
 			if (diffSeconds < 5) {
@@ -169,15 +178,22 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
 			return diffMs >= 0
 				? `${diffSeconds} second${diffSeconds === 1 ? "" : "s"} ago`
 				: `in ${diffSeconds} second${diffSeconds === 1 ? "" : "s"}`;
-		};
+		}, []);
 
-		const timestampMs = parseTimestampToMs(transaction.timestamp);
-		const formattedTimestamp = timestampMs
-			? formatAbsoluteTimestamp(timestampMs)
-			: null;
-		const timestampAge = timestampMs ? formatTimeAgo(timestampMs) : null;
+		const timestampMs = useMemo(
+			() => parseTimestampToMs(transaction.timestamp),
+			[parseTimestampToMs, transaction.timestamp],
+		);
+		const formattedTimestamp = useMemo(
+			() => (timestampMs ? formatAbsoluteTimestamp(timestampMs) : null),
+			[timestampMs, formatAbsoluteTimestamp],
+		);
+		const timestampAge = useMemo(
+			() => (timestampMs ? formatTimeAgo(timestampMs) : null),
+			[timestampMs, formatTimeAgo],
+		);
 
-		const getStatusBadge = (status?: string) => {
+		const getStatusBadge = useCallback((status?: string) => {
 			if (!status) return null;
 			const isSuccess = status === "0x1" || status === "1";
 			return (
@@ -187,11 +203,15 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
 					{isSuccess ? "Success" : "Failed"}
 				</span>
 			);
-		};
+		}, []);
 
-		const confirmations = currentBlockNumber
-			? currentBlockNumber - Number(transaction.blockNumber)
-			: null;
+		const confirmations = useMemo(
+			() =>
+				currentBlockNumber
+					? currentBlockNumber - Number(transaction.blockNumber)
+					: null,
+			[currentBlockNumber, transaction.blockNumber],
+		);
 
 		return (
 			<div className="block-display-card">
