@@ -86,15 +86,15 @@ export default function Address() {
 
 	if (loading) {
 		return (
-			<div className="container-wide" style={{ padding: "20px" }}>
+			<div className="container-wide container-padded">
 				<div className="block-display-card">
 					<div className="block-display-header">
 						<span className="block-label">Address</span>
-						<span className="tx-mono" style={{ fontSize: "0.9rem", color: "#9ca3af" }}>
+						<span className="tx-mono header-subtitle">
 							{address}
 						</span>
 					</div>
-					<div style={{ padding: "48px 24px", display: "flex", justifyContent: "center", alignItems: "center" }}>
+					<div className="card-content-loading">
 						<Loader text="Loading address data..." />
 					</div>
 				</div>
@@ -104,16 +104,16 @@ export default function Address() {
 
 	if (error) {
 		return (
-			<div className="container-wide" style={{ padding: "20px" }}>
+			<div className="container-wide container-padded">
 				<div className="block-display-card">
 					<div className="block-display-header">
 						<span className="block-label">Address</span>
-						<span className="tx-mono" style={{ fontSize: "0.9rem", color: "#9ca3af" }}>
+						<span className="tx-mono header-subtitle">
 							{address}
 						</span>
 					</div>
-					<div style={{ padding: "24px" }}>
-						<p style={{ color: "#ef4444", margin: 0 }}>Error: {error}</p>
+					<div className="card-content">
+						<p className="text-error margin-0">Error: {error}</p>
 					</div>
 				</div>
 			</div>
@@ -122,13 +122,13 @@ export default function Address() {
 
 	if (!address) {
 		return (
-			<div className="container-wide" style={{ padding: "20px" }}>
+			<div className="container-wide container-padded">
 				<div className="block-display-card">
 					<div className="block-display-header">
 						<span className="block-label">Address</span>
 					</div>
-					<div style={{ padding: "24px" }}>
-						<p style={{ color: "#9ca3af", margin: 0 }}>No address provided</p>
+					<div className="card-content">
+						<p className="text-muted margin-0">No address provided</p>
 					</div>
 				</div>
 			</div>
@@ -136,7 +136,7 @@ export default function Address() {
 	}
 
 	return (
-		<div className="container-wide" style={{ padding: "20px" }}>
+		<div className="container-wide container-padded">
 			{addressData ? (
 				<>
 					<AddressDisplay

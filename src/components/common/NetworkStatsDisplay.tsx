@@ -16,15 +16,9 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = ({
 }) => {
 	if (loading) {
 		return (
-			<div
-				className="container-wide"
-				style={{ margin: "40px auto 0", padding: "0 24px" }}
-			>
+			<div className="container-wide network-stats-container">
 				<div className="block-display-card">
-					<div
-						className="text-center"
-						style={{ padding: "20px", color: "#10b981" }}
-					>
+					<div className="text-center network-stats-loading">
 						Loading network statistics...
 					</div>
 				</div>
@@ -34,15 +28,9 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = ({
 
 	if (error) {
 		return (
-			<div
-				className="container-wide"
-				style={{ margin: "40px auto 0", padding: "0 24px" }}
-			>
+			<div className="container-wide network-stats-container">
 				<div className="block-display-card">
-					<div
-						className="text-center"
-						style={{ padding: "20px", color: "#ef4444" }}
-					>
+					<div className="text-center network-stats-error">
 						Error loading network stats: {error}
 					</div>
 				</div>
@@ -118,22 +106,9 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = ({
 	const forkedNetwork = getForkedNetworkInfo();
 
 	return (
-		<div
-			className="container-wide"
-			style={{ margin: "40px auto 0", padding: "0 24px" }}
-		>
+		<div className="container-wide network-stats-container">
 			<div className="block-display-card">
-				<h2
-					style={{
-						fontSize: "clamp(1.2rem, 3vw, 1.5rem)",
-						fontWeight: "600",
-						color: "#10b981",
-						marginBottom: "20px",
-						fontFamily: "'Outfit', sans-serif",
-						textTransform: "uppercase",
-						letterSpacing: "0.5px",
-					}}
-				>
+				<h2 className="network-stats-title">
 					Network Statistics
 				</h2>
 
@@ -155,24 +130,8 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = ({
 					<div className="block-detail-item">
 						<span className="detail-label">Sync Status</span>
 						<span className="detail-value">
-							<span
-								style={{
-									display: "inline-flex",
-									alignItems: "center",
-									gap: "8px",
-								}}
-							>
-								<span
-									style={{
-										width: "10px",
-										height: "10px",
-										borderRadius: "50%",
-										backgroundColor: networkStats.isSyncing
-											? "#f59e0b"
-											: "#10b981",
-										display: "inline-block",
-									}}
-								/>
+							<span className="sync-status-indicator">
+								<span className={`sync-dot ${networkStats.isSyncing ? "sync-dot-warning" : "sync-dot-success"}`} />
 								{networkStats.isSyncing ? "Syncing" : "Synced"}
 							</span>
 						</span>
@@ -201,19 +160,9 @@ const NetworkStatsDisplay: React.FC<NetworkStatsDisplayProps> = ({
 								</span>
 							</div>
 
-							<div
-								className="block-detail-item"
-								style={{ gridColumn: "1 / -1" }}
-							>
+							<div className="block-detail-item network-stat-full-width">
 								<span className="detail-label">Fork Block Hash</span>
-								<span
-									className="detail-value"
-									style={{
-										fontFamily: "monospace",
-										fontSize: "0.85rem",
-										wordBreak: "break-all",
-									}}
-								>
+								<span className="detail-value tx-mono fork-hash-value">
 									{forkedNetwork.blockHash}
 								</span>
 							</div>

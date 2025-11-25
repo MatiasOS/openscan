@@ -4550,19 +4550,12 @@ code {
   padding: 0px 12px;
 }
 
-.home-content {
-  text-align: center;
-  width: 100%;
-  max-width: 800px;
-  padding: 20px;
-}
-
 .home-title {
   font-family: 'Outfit', sans-serif;
   font-size: 4.5rem;
   font-weight: 800;
-  margin-top: 1rem;
-  margin-bottom: 1.5rem;
+  margin-top: 12px;
+  margin-bottom: 12px;
   letter-spacing: -2px;
   background: linear-gradient(135deg, #10b981 0%, #047857 100%);
   -webkit-background-clip: text;
@@ -4670,19 +4663,11 @@ code {
 /* Block Display Component */
 .block-display-card {
   background: #ffffff;
-  border: 1px solid #10b981;
-  border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
   max-width: 100%;
   width: 100%;
   margin: 0;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.block-display-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.15);
 }
 
 .block-display-header {
@@ -4822,7 +4807,6 @@ code {
 }
 
 .storage-input:focus {
-  border-color: #059669;
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 

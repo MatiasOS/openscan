@@ -244,8 +244,6 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({
 					</div>
 				)}
 
-				<div className="tx-separator" />
-
 				{/* From */}
 				<div className="tx-row">
 					<span className="tx-label">From:</span>
@@ -294,8 +292,6 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({
 					</div>
 				)}
 
-				<div className="tx-separator" />
-
 				{/* Value */}
 				<div className="tx-row">
 					<span className="tx-label">Value:</span>
@@ -322,8 +318,6 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({
 					<span className="tx-label">Gas Price:</span>
 					<span className="tx-value">{formatGwei(transaction.gasPrice)}</span>
 				</div>
-
-				<div className="tx-separator" />
 
 				{/* Gas Limit & Usage */}
 				<div className="tx-row">
@@ -395,8 +389,6 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({
 						<span className="tx-attr">Type: {transaction.type}</span>
 					</span>
 				</div>
-
-				<div className="tx-separator" />
 
 				{/* Input Data */}
 				<div className="tx-row tx-row-vertical">
@@ -561,7 +553,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({
 											</div>
 										)}
 										{callTrace.calls && callTrace.calls.length > 0 && (
-											<div style={{ marginTop: "10px" }}>
+											<div className="margin-top-10">
 												<div className="trace-calls-header">
 													Internal Calls ({callTrace.calls.length}):
 												</div>
@@ -578,10 +570,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = ({
 							{traceData && (
 								<div className="trace-container">
 									<div className="trace-title">Execution Trace</div>
-									<div
-										className="trace-details"
-										style={{ marginBottom: "15px" }}
-									>
+									<div className="trace-details margin-bottom-15">
 										<div>
 											<span className="log-label">Total Gas Used:</span>{" "}
 											{traceData.gas}

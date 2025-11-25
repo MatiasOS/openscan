@@ -316,12 +316,12 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 		<div className="block-display-card">
 			<div className="block-display-header">
 				<span className="block-label">Address</span>
-				<span className="tx-mono" style={{ fontSize: "0.9rem", color: "#9ca3af" }}>
+				<span className="tx-mono header-subtitle">
 					{addressHash}
 				</span>
 			</div>
 
-			<div style={{ display: "flex", flexDirection: "column", gap: "24px", padding: "0" }}>
+			<div className="address-section-content">
 				{/* Address Details Section */}
 				<div className="tx-details">
 					<div className="tx-section">
@@ -333,7 +333,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 						<span className="tx-label">Type:</span>
 						<span className="tx-value">
 							{isContract ? (
-								<span className="tx-value-highlight" style={{ color: "#3b82f6" }}>
+								<span className="tx-value-highlight text-blue">
 									📄 Contract
 								</span>
 							) : (
@@ -343,8 +343,6 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 							)}
 						</span>
 					</div>
-
-					<div className="tx-separator" />
 
 					{/* Balance */}
 					<div className="tx-row">
@@ -363,26 +361,16 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 					{/* Verification Status (only for contracts) */}
 					{isContract && (
 						<>
-							<div className="tx-separator" />
 							<div className="tx-row">
 								<span className="tx-label">Contract Verified:</span>
 								<span className="tx-value">
 									{sourcifyLoading ? (
-										<span style={{ color: "#6b7280" }}>Checking Sourcify...</span>
+										<span className="verification-checking">Checking Sourcify...</span>
 									) : isVerified || parsedLocalData ? (
-										<span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+										<span className="flex-align-center-gap-8">
 											<span className="tx-value-highlight">✓ Verified</span>
 											{contractData?.match && (
-												<span 
-													style={{
-														fontSize: "0.75rem",
-														padding: "2px 8px",
-														background: "rgba(16, 185, 129, 0.15)",
-														borderRadius: "4px",
-														color: "#10b981",
-														fontWeight: "600",
-													}}
-												>
+												<span className="match-badge match-badge-full">
 													{contractData.match === "perfect"
 														? parsedLocalData
 															? "Local JSON"
@@ -392,7 +380,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 											)}
 										</span>
 									) : (
-										<span style={{ color: "#6b7280" }}>Not Verified</span>
+										<span className="verification-not-verified">Not Verified</span>
 									)}
 								</span>
 							</div>
@@ -420,12 +408,11 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 				{isContract && (isVerified || parsedLocalData) && contractData && (
 					<div className="tx-details">
 						<div
-							className="tx-section"
-							style={{ cursor: "pointer" }}
+							className="tx-section cursor-pointer"
 							onClick={() => setShowContractDetails(!showContractDetails)}
 						>
 							<span className="tx-section-title">Contract Details</span>
-							<span style={{ fontSize: "1rem", color: "#10b981", marginLeft: "8px" }}>
+							<span className="contract-section-toggle">
 								{showContractDetails ? " ▼" : " ▶"}
 						</span>
 					</div>
@@ -435,7 +422,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 							{contractData.name && (
 								<div className="tx-row">
 									<span className="tx-label">Contract Name</span>
-									<span className="tx-value" style={{ color: "#10b981", fontWeight: "600" }}>
+									<span className="tx-value tx-value-success">
 										{contractData.name}
 									</span>
 								</div>
@@ -477,14 +464,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 								<div className="tx-row">
 									<span className="tx-label">Match Type</span>
 									<span
-										className="tx-value"
-										style={{
-											color:
-												contractData.match === "perfect"
-													? "#10b981"
-													: "#f59e0b",
-											fontWeight: "600",
-										}}
+										className={`tx-value font-weight-600 ${contractData.match === "perfect" ? "text-success" : "text-warning"}`}
 									>
 										{contractData.match.toUpperCase()}
 									</span>
@@ -504,14 +484,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 								<div className="tx-row">
 									<span className="tx-label">Creation Match</span>
 									<span
-										className="tx-value"
-										style={{
-											color:
-												contractData.creation_match === "perfect"
-													? "#10b981"
-													: "#f59e0b",
-											fontWeight: "600",
-										}}
+										className={`tx-value font-weight-600 ${contractData.creation_match === "perfect" ? "text-success" : "text-warning"}`}
 									>
 										{contractData.creation_match.toUpperCase()}
 									</span>
@@ -522,14 +495,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 								<div className="tx-row">
 									<span className="tx-label">Runtime Match</span>
 									<span
-										className="tx-value"
-										style={{
-											color:
-												contractData.runtime_match === "perfect"
-													? "#10b981"
-													: "#f59e0b",
-											fontWeight: "600",
-										}}
+										className={`tx-value font-weight-600 ${contractData.runtime_match === "perfect" ? "text-success" : "text-warning"}`}
 									>
 										{contractData.runtime_match.toUpperCase()}
 									</span>
@@ -539,13 +505,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 							{/* Contract Bytecode */}
 							<div className="tx-row-vertical">
 								<div
-									style={{
-										display: "flex",
-										alignItems: "center",
-										gap: "8px",
-										cursor: "pointer",
-										userSelect: "none",
-									}}
+									className="source-toggle-container"
 									onClick={() => {
 										const elem = document.getElementById("bytecode-content");
 										const icon = document.getElementById("bytecode-icon");
@@ -559,7 +519,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 									<span className="tx-label">Contract Bytecode</span>
 									<span
 										id="bytecode-icon"
-										style={{ fontSize: "0.9rem", color: "#10b981" }}
+										className="source-toggle-icon"
 									>
 										▶
 									</span>
@@ -567,9 +527,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 								<div
 									id="bytecode-content"
 									className="tx-input-data"
-									style={{
-										display: "none",
-									}}
+									style={{ display: "none" }}
 								>
 									<code>{address.code}</code>
 								</div>
@@ -597,13 +555,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 									return sourceFiles.length > 0 ? (
 										<div className="tx-row-vertical">
 											<div
-												style={{
-													display: "flex",
-													alignItems: "center",
-													gap: "8px",
-													cursor: "pointer",
-													userSelect: "none",
-												}}
+												className="source-toggle-container"
 												onClick={() => {
 													const elem = document.getElementById(
 														"source-code-content",
@@ -620,51 +572,22 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 												<span className="tx-label">Source Code</span>
 												<span
 													id="source-code-icon"
-													style={{ fontSize: "0.9rem", color: "#10b981" }}
+													className="source-toggle-icon"
 												>
 													▶
 												</span>
 											</div>
 											<div
 												id="source-code-content"
-												style={{
-													marginTop: "8px",
-													display: "none",
-												}}
+												className="margin-top-8"
+												style={{ display: "none" }}
 											>
 												{sourceFiles.map((file: any, idx: number) => (
-													<div key={idx} style={{ marginBottom: "16px" }}>
-														<div
-															style={{
-																padding: "8px 12px",
-																background: "rgba(16, 185, 129, 0.08)",
-																border: "1px solid rgba(16, 185, 129, 0.2)",
-																borderRadius: "6px 6px 0 0",
-																fontFamily: "monospace",
-																fontSize: "0.85rem",
-																color: "#10b981",
-																fontWeight: "600",
-															}}
-														>
+													<div key={idx} className="source-file-container">
+														<div className="source-file-header">
 															📄 {file.name || file.path}
 														</div>
-														<pre
-															style={{
-																margin: 0,
-																padding: "16px",
-																background: "rgba(0, 0, 0, 0.3)",
-																border: "1px solid rgba(16, 185, 129, 0.2)",
-																borderTop: "none",
-																borderRadius: "0 0 6px 6px",
-																fontFamily: "monospace",
-																fontSize: "0.75rem",
-																color: "#e5e7eb",
-																maxHeight: "400px",
-																overflowY: "auto",
-																overflowX: "auto",
-																whiteSpace: "pre",
-															}}
-														>
+														<pre className="source-file-code">
 															{file.content}
 														</pre>
 													</div>
@@ -678,13 +601,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 							{contractData.abi && contractData.abi.length > 0 && (
 								<div className="tx-row-vertical">
 									<div
-										style={{
-											display: "flex",
-											alignItems: "center",
-											gap: "8px",
-											cursor: "pointer",
-											userSelect: "none",
-										}}
+										className="source-toggle-container"
 										onClick={() => {
 											const elem = document.getElementById("raw-abi-content");
 											const icon = document.getElementById("raw-abi-icon");
@@ -698,7 +615,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 										<span className="tx-label">Raw ABI</span>
 										<span
 											id="raw-abi-icon"
-											style={{ fontSize: "0.9rem", color: "#10b981" }}
+											className="source-toggle-icon"
 										>
 											▶
 										</span>
@@ -706,9 +623,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 									<div
 										id="raw-abi-content"
 										className="tx-input-data"
-										style={{
-											display: "none",
-										}}
+										style={{ display: "none" }}
 									>
 										<code>{JSON.stringify(contractData.abi, null, 2)}</code>
 									</div>
@@ -1666,7 +1581,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 
 				{/* Loading state */}
 				{loadingTxDetails && (
-					<div style={{ padding: "24px", textAlign: "center", color: "#6b7280" }}>
+					<div className="tx-history-empty">
 						Loading transaction details...
 					</div>
 				)}
@@ -1758,7 +1673,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 
 				{/* Empty state */}
 				{!loadingTxDetails && transactionDetails.length === 0 && !transactionsResult?.message && (
-					<div style={{ padding: "24px", textAlign: "center", color: "#6b7280" }}>
+					<div className="tx-history-empty">
 						No transactions found for this address
 					</div>
 				)}
@@ -1770,60 +1685,35 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
 					<div className="block-display-header">
 						<span className="block-label">Contract Storage</span>
 					</div>
-					<div style={{ padding: "16px" }}>
-						<div style={{ display: "flex", gap: "12px", marginBottom: "12px" }}>
-							<input
-								type="text"
-								placeholder="Storage slot (e.g., 0x0)"
-								value={storageSlot}
-								onChange={(e) => setStorageSlot(e.target.value)}
-								style={{
-									flex: 1,
-									padding: "10px 14px",
-									background: "rgba(255, 255, 255, 0.05)",
-									border: "1px solid rgba(255, 255, 255, 0.1)",
-									borderRadius: "8px",
-									color: "#1f2937",
-									fontFamily: "monospace",
-									fontSize: "0.9rem",
-								}}
-							/>
-							<button
-								onClick={handleGetStorage}
-								style={{
-									padding: "10px 24px",
-									background: "#10b981",
-									border: "none",
-									borderRadius: "8px",
-									color: "#ffffff",
-									fontWeight: "600",
-									cursor: "pointer",
-									transition: "background 0.2s",
-								}}
-								onMouseEnter={(e) =>
-									(e.currentTarget.style.background = "#059669")
-								}
-								onMouseLeave={(e) =>
-									(e.currentTarget.style.background = "#10b981")
-								}
-							>
-								Get
-							</button>
+					<div className="tx-details">
+						<div className="tx-row">
+							<span className="tx-label">Storage Slot:</span>
+							<span className="tx-value">
+								<div className="storage-input-row">
+									<input
+										type="text"
+										placeholder="e.g., 0x0"
+										value={storageSlot}
+										onChange={(e) => setStorageSlot(e.target.value)}
+										className="storage-input"
+									/>
+									<button
+										onClick={handleGetStorage}
+										className="storage-button"
+									>
+										Get
+									</button>
+								</div>
+							</span>
 						</div>
 						{storageValue && (
-							<div
-								style={{
-									padding: "12px",
-									background: "rgba(16, 185, 129, 0.1)",
-									border: "1px solid rgba(16, 185, 129, 0.3)",
-									borderRadius: "8px",
-									fontFamily: "monospace",
-									fontSize: "0.85rem",
-									wordBreak: "break-all",
-									color: "#10b981",
-								}}
-							>
-								{storageValue}
+							<div className="tx-row">
+								<span className="tx-label">Value:</span>
+								<span className="tx-value">
+									<div className="storage-value-display">
+										{storageValue}
+									</div>
+								</span>
 							</div>
 						)}
 					</div>

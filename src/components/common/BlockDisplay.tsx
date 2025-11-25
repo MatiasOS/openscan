@@ -153,8 +153,6 @@ const BlockDisplay: React.FC<BlockDisplayProps> = ({ block, chainId }) => {
 					</div>
 				)}
 
-				<div className="tx-separator" />
-
 				{/* Fee Recipient (Miner) */}
 				<div className="tx-row">
 					<span className="tx-label">Fee Recipient:</span>
@@ -168,8 +166,6 @@ const BlockDisplay: React.FC<BlockDisplayProps> = ({ block, chainId }) => {
 						)}
 					</span>
 				</div>
-
-				<div className="tx-separator" />
 
 				{/* Gas Used */}
 				<div className="tx-row">
@@ -203,8 +199,6 @@ const BlockDisplay: React.FC<BlockDisplayProps> = ({ block, chainId }) => {
 						</span>
 					</div>
 				)}
-
-				<div className="tx-separator" />
 
 				{/* Extra Data */}
 				{block.extraData && block.extraData !== "0x" && (
@@ -255,8 +249,6 @@ const BlockDisplay: React.FC<BlockDisplayProps> = ({ block, chainId }) => {
 						</div>
 					</>
 				)}
-
-				<div className="tx-separator" />
 
 				{/* More Details (collapsible) */}
 				<div className="tx-row tx-row-vertical">

@@ -49,8 +49,7 @@ const IsometricCube: React.FC<IsometricCubeProps> = ({
 
 	return (
 		<g 
-			className="isometric-cube"
-			style={{ willChange: "opacity" }}
+			className="isometric-cube isometric-blocks-container"
 		>
 			{/* Right face - darkest */}
 			<polygon
