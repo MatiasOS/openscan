@@ -27,6 +27,7 @@ export interface Block {
 	size: string;
 	stateRoot: string;
 	timestamp: string;
+	baseFeePerGas?: string;
 	totalDifficulty: string;
 	transactions: string[];
 	transactionsRoot: string;
@@ -54,6 +55,8 @@ export interface Transaction {
 	from: string;
 	gas: string;
 	gasPrice: string;
+	maxFeePerGas?: string;
+	maxPriorityFeePerGas?: string;
 	hash: string;
 	nonce: string;
 	to: string;
@@ -64,6 +67,8 @@ export interface Transaction {
 	v: string;
 	r: string;
 	s: string;
+	timestamp?: string;
+	blockBaseFeePerGas?: string;
 	receipt?: TransactionReceipt;
 }
 
@@ -367,4 +372,59 @@ export interface ErrorABI extends BaseABI {
 	type: "error";
 	name: string;
 	inputs: ABIParameter[];
+}
+
+// ==================== ADDRESS TRANSACTION TYPES ====================
+
+/**
+ * Result from trace_filter RPC call
+ */
+export interface TraceFilterResult {
+	action: {
+		callType?: string;
+		from: string;
+		to?: string;
+		gas: string;
+		input?: string;
+		value: string;
+		init?: string; // For contract creation
+	};
+	blockHash: string;
+	blockNumber: number;
+	result?: {
+		gasUsed: string;
+		output?: string;
+		address?: string; // Created contract address
+	};
+	subtraces: number;
+	traceAddress: number[];
+	transactionHash: string;
+	transactionPosition: number;
+	type: "call" | "create" | "suicide" | "reward";
+	error?: string;
+}
+
+/**
+ * Result from eth_getLogs RPC call
+ */
+export interface LogEntry {
+	address: string;
+	topics: string[];
+	data: string;
+	blockNumber: string;
+	transactionHash: string;
+	transactionIndex: string;
+	blockHash: string;
+	logIndex: string;
+	removed: boolean;
+}
+
+/**
+ * Address transactions result with metadata about data source
+ */
+export interface AddressTransactionsResult {
+	transactions: string[]; // Transaction hashes
+	source: "trace_filter" | "logs" | "none";
+	isComplete: boolean; // true if we have full history (trace_filter)
+	message?: string; // Optional message about limitations
 }

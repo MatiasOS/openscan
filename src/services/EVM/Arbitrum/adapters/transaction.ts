@@ -17,7 +17,13 @@ export class TransactionArbitrumAdapter {
 			to: rpcTx.to,
 			value: BigInt(rpcTx.value).toString(),
 			gas: BigInt(rpcTx.gas).toString(),
-			gasPrice: BigInt(rpcTx.gasPrice).toString(),
+			gasPrice: rpcTx.gasPrice ? BigInt(rpcTx.gasPrice).toString() : "0",
+			maxFeePerGas: rpcTx.maxFeePerGas
+				? BigInt(rpcTx.maxFeePerGas).toString()
+				: undefined,
+			maxPriorityFeePerGas: rpcTx.maxPriorityFeePerGas
+				? BigInt(rpcTx.maxPriorityFeePerGas).toString()
+				: undefined,
 			nonce: parseInt(rpcTx.nonce, 16).toString(),
 			data: rpcTx.input,
 			blockNumber: parseInt(rpcTx.blockNumber, 16).toString(),

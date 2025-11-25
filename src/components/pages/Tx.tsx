@@ -51,24 +51,42 @@ export default function Tx() {
 
 	if (loading) {
 		return (
-			<div className="container-wide page-container-padded text-center">
-				<h1 className="page-title-small">Transaction</h1>
-				<Loader text="Loading transaction..." />
+			<div className="container-wide container-padded">
+				<div className="block-display-card">
+					<div className="block-display-header">
+						<span className="block-label">Transaction</span>
+						<span className="tx-mono header-subtitle">
+							{txHash}
+						</span>
+					</div>
+					<div className="card-content-loading">
+						<Loader text="Loading transaction..." />
+					</div>
+				</div>
 			</div>
 		);
 	}
 
 	if (error) {
 		return (
-			<div className="container-wide page-container-padded text-center">
-				<h1 className="page-title-small">Transaction</h1>
-				<p className="error-text">Error: {error}</p>
+			<div className="container-wide container-padded">
+				<div className="block-display-card">
+					<div className="block-display-header">
+						<span className="block-label">Transaction</span>
+						<span className="tx-mono header-subtitle">
+							{txHash}
+						</span>
+					</div>
+					<div className="card-content">
+						<p className="error-text margin-0">Error: {error}</p>
+					</div>
+				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="container-wide page-container-padded">
+		<div className="container-wide container-padded">
 			{transaction ? (
 				<>
 					<TransactionDisplay
@@ -79,7 +97,14 @@ export default function Tx() {
 					/>
 				</>
 			) : (
-				<p>Transaction not found</p>
+				<div className="block-display-card">
+					<div className="block-display-header">
+						<span className="block-label">Transaction</span>
+					</div>
+					<div className="card-content">
+						<p className="text-muted margin-0">Transaction not found</p>
+					</div>
+				</div>
 			)}
 		</div>
 	);

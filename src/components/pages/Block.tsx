@@ -3,6 +3,7 @@ import { useDataService } from "../../hooks/useDataService";
 import { useEffect, useState } from "react";
 import { Block } from "../../types";
 import BlockDisplay from "../common/BlockDisplay";
+import Loader from "../common/Loader";
 
 export default function Block() {
 	const { chainId, filter } = useParams<{
@@ -47,30 +48,55 @@ export default function Block() {
 
 	if (loading) {
 		return (
-			<div className="container-wide page-container-padded text-center">
-				<h1 className="page-title-small">Block</h1>
-				<p className="table-cell-muted">Loading...</p>
+			<div className="container-wide container-padded">
+				<div className="block-display-card">
+					<div className="block-display-header">
+						<span className="block-label">Block</span>
+						<span className="tx-mono header-subtitle">
+							#{filter}
+						</span>
+					</div>
+					<div className="card-content-loading">
+						<Loader text="Loading block data..." />
+					</div>
+				</div>
 			</div>
 		);
 	}
 
 	if (error) {
 		return (
-			<div className="container-wide page-container-padded text-center">
-				<h1 className="page-title-small">Block</h1>
-				<p className="error-text">Error: {error}</p>
+			<div className="container-wide container-padded">
+				<div className="block-display-card">
+					<div className="block-display-header">
+						<span className="block-label">Block</span>
+						<span className="tx-mono header-subtitle">
+							#{filter}
+						</span>
+					</div>
+					<div className="card-content">
+						<p className="text-error margin-0">Error: {error}</p>
+					</div>
+				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="container-wide page-container-padded">
+		<div className="container-wide container-padded">
 			{block ? (
 				<>
 					<BlockDisplay block={block} chainId={chainId} />
 				</>
 			) : (
-				<p>Block not found</p>
+				<div className="block-display-card">
+					<div className="block-display-header">
+						<span className="block-label">Block</span>
+					</div>
+					<div className="card-content">
+						<p className="text-muted margin-0">Block not found</p>
+					</div>
+				</div>
 			)}
 		</div>
 	);
