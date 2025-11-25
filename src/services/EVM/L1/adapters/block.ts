@@ -5,11 +5,20 @@ import type { Block } from "../../../../types";
 export class BlockAdapter {
 	static fromRPCBlock(rpcBlock: RPCBlock, chainId: number): Block {
 		console.log(rpcBlock);
+		const timestamp = rpcBlock.timestamp
+			? parseInt(
+					rpcBlock.timestamp,
+					rpcBlock.timestamp.startsWith("0x") ? 16 : 10,
+				).toString()
+			: "0";
 		return {
 			number: rpcBlock.number,
 			hash: rpcBlock.hash,
 			parentHash: rpcBlock.parentHash,
-			timestamp: rpcBlock.timestamp,
+			timestamp,
+			baseFeePerGas: rpcBlock.baseFeePerGas
+				? BigInt(rpcBlock.baseFeePerGas).toString()
+				: undefined,
 			nonce: rpcBlock.nonce,
 			difficulty: BigInt(rpcBlock.difficulty).toString(),
 			gasLimit: BigInt(rpcBlock.gasLimit).toString(),

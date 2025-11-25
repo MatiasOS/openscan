@@ -27,6 +27,7 @@ export interface Block {
 	size: string;
 	stateRoot: string;
 	timestamp: string;
+	baseFeePerGas?: string;
 	totalDifficulty: string;
 	transactions: string[];
 	transactionsRoot: string;
@@ -54,6 +55,8 @@ export interface Transaction {
 	from: string;
 	gas: string;
 	gasPrice: string;
+	maxFeePerGas?: string;
+	maxPriorityFeePerGas?: string;
 	hash: string;
 	nonce: string;
 	to: string;
@@ -64,6 +67,8 @@ export interface Transaction {
 	v: string;
 	r: string;
 	s: string;
+	timestamp?: string;
+	blockBaseFeePerGas?: string;
 	receipt?: TransactionReceipt;
 }
 

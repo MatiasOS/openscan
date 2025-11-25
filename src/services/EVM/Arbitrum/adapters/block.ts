@@ -5,11 +5,20 @@ import type { BlockArbitrum } from "../../../../types";
 export class BlockArbitrumAdapter {
 	static fromRPCBlock(rpcBlock: any, chainId: number): BlockArbitrum {
 		console.log("Arbitrum block:", rpcBlock);
+		const timestamp = rpcBlock.timestamp
+			? parseInt(
+					rpcBlock.timestamp,
+					rpcBlock.timestamp.startsWith("0x") ? 16 : 10,
+				).toString()
+			: "0";
 		return {
 			number: rpcBlock.number,
 			hash: rpcBlock.hash,
 			parentHash: rpcBlock.parentHash,
-			timestamp: rpcBlock.timestamp,
+			timestamp,
+			baseFeePerGas: rpcBlock.baseFeePerGas
+				? BigInt(rpcBlock.baseFeePerGas).toString()
+				: undefined,
 			nonce: rpcBlock.nonce,
 			difficulty: BigInt(rpcBlock.difficulty || 0).toString(),
 			gasLimit: BigInt(rpcBlock.gasLimit).toString(),

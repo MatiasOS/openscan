@@ -76,7 +76,8 @@ export class DataService {
 
 		// Check which network we're on
 		this.isArbitrum = chainId === 42161;
-		this.isOptimism = chainId === 10;
+		// OP Stack chains: Optimism (10), Base (8453)
+		this.isOptimism = chainId === 10 || chainId === 8453;
 		this.isLocalhost = chainId === 31337;
 
 		// Initialize trace fetcher for all networks (will check availability when used)
@@ -207,9 +208,11 @@ export class DataService {
 
 		// Get timestamp from block if available
 		let timestamp: string = "";
+		let baseFeePerGas: string | undefined;
 		if (rpcTx.blockNumber) {
 			const block = await this.getBlock(parseInt(rpcTx.blockNumber, 16));
 			timestamp = block.timestamp.toString();
+			baseFeePerGas = block.baseFeePerGas;
 		}
 
 		const transaction = this.isArbitrum
@@ -225,7 +228,12 @@ export class DataService {
 						receipt,
 					)
 				: TransactionAdapter.fromRPCTransaction(rpcTx, this.chainId, receipt);
-		// transaction.timestamp = timestamp;
+		if (timestamp) {
+			transaction.timestamp = timestamp;
+		}
+		if (baseFeePerGas) {
+			transaction.blockBaseFeePerGas = baseFeePerGas;
+		}
 
 		this.setCache(cacheKey, transaction);
 		return transaction;
