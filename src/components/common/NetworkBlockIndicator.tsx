@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { AppContext } from "../../context/AppContext";
-import { RPCClient } from "../../services/EVM/common/RPCClient";
+import { RPCClient } from "../../services/common/RPCClient";
 import { getRPCUrls } from "../../config/rpcConfig";
 
 // Network configuration with logos

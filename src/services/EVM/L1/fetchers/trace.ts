@@ -1,5 +1,5 @@
 // src/services/EVM/L1/fetchers/trace.ts
-import { RPCClient } from "../../common/RPCClient";
+import { RPCClient } from "../../../common/RPCClient";
 
 export interface TraceLog {
 	pc: number;

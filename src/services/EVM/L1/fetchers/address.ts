@@ -1,5 +1,5 @@
 // src/services/EVM/L1/fetchers/mainnet/address.ts
-import { RPCClient } from "../../common/RPCClient";
+import { RPCClient } from "../../../common/RPCClient";
 import {
 	TraceFilterResult,
 	LogEntry,

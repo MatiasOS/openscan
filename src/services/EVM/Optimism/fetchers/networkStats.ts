@@ -1,5 +1,5 @@
 // src/services/EVM/Optimism/fetchers/networkStats.ts
-import { RPCClient } from "../../common/RPCClient";
+import { RPCClient } from "../../../common/RPCClient";
 import type { NetworkStats } from "../../../../types";
 
 export class NetworkStatsFetcher {

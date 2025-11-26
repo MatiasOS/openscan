@@ -1,5 +1,5 @@
 // src/services/DataService.ts
-import { RPCClient } from "./EVM/common/RPCClient";
+import { RPCClient } from "./common/RPCClient";
 import { getRPCUrls } from "../config/rpcConfig";
 import { BlockFetcher } from "./EVM/L1/fetchers/block";
 import { TransactionFetcher } from "./EVM/L1/fetchers/transaction";
@@ -25,6 +25,14 @@ import { NetworkStatsFetcher as NetworkStatsFetcherOptimism } from "./EVM/Optimi
 import { BlockOptimismAdapter } from "./EVM/Optimism/adapters/block";
 import { TransactionOptimismAdapter } from "./EVM/Optimism/adapters/transaction";
 import { AddressAdapter as AddressAdapterOptimism } from "./EVM/Optimism/adapters/address";
+// Aztec imports
+import { BlockFetcherAztec } from "./Aztec/fetchers/block";
+import { TransactionFetcherAztec } from "./Aztec/fetchers/transaction";
+import { AddressFetcherAztec } from "./Aztec/fetchers/address";
+import { NetworkStatsFetcherAztec } from "./Aztec/fetchers/networkStats";
+import { BlockAztecAdapter } from "./Aztec/adapters/block";
+import { TransactionAztecAdapter } from "./Aztec/adapters/transaction";
+import { AddressAdapterAztec } from "./Aztec/adapters/address";
 import type {
 	Block,
 	Transaction,
@@ -44,22 +52,27 @@ export class DataService {
 	private blockFetcher:
 		| BlockFetcher
 		| BlockFetcherArbitrum
-		| BlockFetcherOptimism;
+		| BlockFetcherOptimism
+		| BlockFetcherAztec;
 	private transactionFetcher:
 		| TransactionFetcher
 		| TransactionFetcherArbitrum
-		| TransactionFetcherOptimism;
+		| TransactionFetcherOptimism
+		| TransactionFetcherAztec;
 	private addressFetcher:
 		| AddressFetcher
 		| AddressFetcherArbitrum
-		| AddressFetcherOptimism;
+		| AddressFetcherOptimism
+		| AddressFetcherAztec;
 	private networkStatsFetcher:
 		| NetworkStatsFetcher
 		| NetworkStatsFetcherArbitrum
-		| NetworkStatsFetcherOptimism;
+		| NetworkStatsFetcherOptimism
+		| NetworkStatsFetcherAztec;
 	private traceFetcher: TraceFetcher;
 	private isArbitrum: boolean;
 	private isOptimism: boolean;
+	private isAztec: boolean;
 	private isLocalhost: boolean;
 
 	// Simple in-memory cache with chainId in key
@@ -79,12 +92,25 @@ export class DataService {
 		this.isArbitrum = chainId === 42161;
 		// OP Stack chains: Optimism (10), Base (8453)
 		this.isOptimism = chainId === 10 || chainId === 8453;
+		// Aztec networks: Aztec Sandbox (677868)
+		this.isAztec = chainId === 677868;
 		this.isLocalhost = chainId === 31337;
 
 		// Initialize trace fetcher for all networks (will check availability when used)
 		this.traceFetcher = new TraceFetcher(this.rpcClient);
 
-		if (this.isArbitrum) {
+		if (this.isAztec) {
+			this.blockFetcher = new BlockFetcherAztec(this.rpcClient, chainId);
+			this.transactionFetcher = new TransactionFetcherAztec(
+				this.rpcClient,
+				chainId,
+			);
+			this.addressFetcher = new AddressFetcherAztec(this.rpcClient, chainId);
+			this.networkStatsFetcher = new NetworkStatsFetcherAztec(
+				this.rpcClient,
+				chainId,
+			);
+		} else if (this.isArbitrum) {
 			this.blockFetcher = new BlockFetcherArbitrum(this.rpcClient, chainId);
 			this.transactionFetcher = new TransactionFetcherArbitrum(
 				this.rpcClient,
@@ -146,11 +172,13 @@ export class DataService {
 		const rpcBlock = await this.blockFetcher.getBlock(blockNumber);
 		if (!rpcBlock) throw new Error("Block not found");
 
-		const block = this.isArbitrum
-			? BlockArbitrumAdapter.fromRPCBlock(rpcBlock, this.chainId)
-			: this.isOptimism
-				? BlockOptimismAdapter.fromRPCBlock(rpcBlock, this.chainId)
-				: BlockAdapter.fromRPCBlock(rpcBlock, this.chainId);
+		const block = this.isAztec
+			? BlockAztecAdapter.fromRPCBlock(rpcBlock, this.chainId)
+			: this.isArbitrum
+				? BlockArbitrumAdapter.fromRPCBlock(rpcBlock, this.chainId)
+				: this.isOptimism
+					? BlockOptimismAdapter.fromRPCBlock(rpcBlock, this.chainId)
+					: BlockAdapter.fromRPCBlock(rpcBlock, this.chainId);
 
 		// Only cache non-latest blocks
 		if (blockNumber !== "latest") {
@@ -167,29 +195,27 @@ export class DataService {
 			await this.blockFetcher.getBlockWithTransactions(blockNumber);
 		if (!rpcBlock) throw new Error("Block not found");
 
-		const block = this.isArbitrum
-			? BlockArbitrumAdapter.fromRPCBlock(rpcBlock, this.chainId)
-			: this.isOptimism
-				? BlockOptimismAdapter.fromRPCBlock(rpcBlock, this.chainId)
-				: BlockAdapter.fromRPCBlock(rpcBlock, this.chainId);
+		const block = this.isAztec
+			? BlockAztecAdapter.fromRPCBlock(rpcBlock, this.chainId)
+			: this.isArbitrum
+				? BlockArbitrumAdapter.fromRPCBlock(rpcBlock, this.chainId)
+				: this.isOptimism
+					? BlockOptimismAdapter.fromRPCBlock(rpcBlock, this.chainId)
+					: BlockAdapter.fromRPCBlock(rpcBlock, this.chainId);
 
 		// Transform transaction objects
 		const transactionDetails = (
 			Array.isArray(rpcBlock.transactions) ? rpcBlock.transactions : []
 		)
-			.filter((tx) => typeof tx !== "string")
-			.map((tx) =>
-				this.isArbitrum
-					? TransactionArbitrumAdapter.fromRPCTransaction(
-							tx as any,
-							this.chainId,
-						)
-					: this.isOptimism
-						? TransactionOptimismAdapter.fromRPCTransaction(
-								tx as any,
-								this.chainId,
-							)
-						: TransactionAdapter.fromRPCTransaction(tx as any, this.chainId),
+			.filter((tx: any) => typeof tx !== "string")
+			.map((tx: any) =>
+				this.isAztec
+					? TransactionAztecAdapter.fromRPCTransaction(tx, this.chainId)
+					: this.isArbitrum
+						? TransactionArbitrumAdapter.fromRPCTransaction(tx, this.chainId)
+						: this.isOptimism
+							? TransactionOptimismAdapter.fromRPCTransaction(tx, this.chainId)
+							: TransactionAdapter.fromRPCTransaction(tx, this.chainId),
 			);
 
 		return { ...block, transactionDetails };
@@ -216,19 +242,21 @@ export class DataService {
 			baseFeePerGas = block.baseFeePerGas;
 		}
 
-		const transaction = this.isArbitrum
-			? TransactionArbitrumAdapter.fromRPCTransaction(
-					rpcTx,
-					this.chainId,
-					receipt,
-				)
-			: this.isOptimism
-				? TransactionOptimismAdapter.fromRPCTransaction(
+		const transaction = this.isAztec
+			? TransactionAztecAdapter.fromRPCTransaction(rpcTx, this.chainId, receipt)
+			: this.isArbitrum
+				? TransactionArbitrumAdapter.fromRPCTransaction(
 						rpcTx,
 						this.chainId,
 						receipt,
 					)
-				: TransactionAdapter.fromRPCTransaction(rpcTx, this.chainId, receipt);
+				: this.isOptimism
+					? TransactionOptimismAdapter.fromRPCTransaction(
+							rpcTx,
+							this.chainId,
+							receipt,
+						)
+					: TransactionAdapter.fromRPCTransaction(rpcTx, this.chainId, receipt);
 		if (timestamp) {
 			transaction.timestamp = timestamp;
 		}
@@ -251,29 +279,48 @@ export class DataService {
 			this.addressFetcher.getTransactionCount(address),
 		]);
 
-		const addressData = this.isArbitrum
-			? AddressAdapterArbitrum.fromRawData(
+		// For Aztec, also fetch contract instance if it exists
+		let contractInstance;
+		if (
+			this.isAztec &&
+			this.addressFetcher instanceof AddressFetcherAztec &&
+			code !== "0x"
+		) {
+			contractInstance = await this.addressFetcher.getContract(address);
+		}
+
+		const addressData = this.isAztec
+			? AddressAdapterAztec.fromRawData(
 					address,
 					balance,
 					code,
 					txCount,
 					this.chainId,
+					contractInstance,
 				)
-			: this.isOptimism
-				? AddressAdapterOptimism.fromRawData(
+			: this.isArbitrum
+				? AddressAdapterArbitrum.fromRawData(
 						address,
 						balance,
 						code,
 						txCount,
 						this.chainId,
 					)
-				: AddressAdapter.fromRawData(
-						address,
-						balance,
-						code,
-						txCount,
-						this.chainId,
-					);
+				: this.isOptimism
+					? AddressAdapterOptimism.fromRawData(
+							address,
+							balance,
+							code,
+							txCount,
+							this.chainId,
+						)
+					: AddressAdapter.fromRawData(
+							address,
+							balance,
+							code,
+							txCount,
+							this.chainId,
+						);
 
 		// Fetch recent transactions for this address
 		try {

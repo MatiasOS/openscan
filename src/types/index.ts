@@ -113,6 +113,7 @@ export interface Address {
 	txCount: string;
 	storeageAt: StoreageAt;
 	recentTransactions?: Transaction[];
+	metadata?: any; // For network-specific metadata (e.g., Aztec contract info)
 }
 
 export type StoreageAt = Record<string, string>;
@@ -430,4 +431,209 @@ export interface AddressTransactionsResult {
 	source: "trace_filter" | "logs" | "none";
 	isComplete: boolean; // true if we have full history (trace_filter)
 	message?: string; // Optional message about limitations
+}
+
+// ==================== AZTEC NETWORK TYPES ====================
+
+/**
+ * Aztec L2 Block extends base Block with L2-specific fields
+ */
+export interface BlockAztec extends Block {
+	// L2-specific fields
+	archive?: string; // Archive tree root
+	noteHashRoot?: string; // Note hash tree root
+	nullifierRoot?: string; // Nullifier tree root
+	publicDataRoot?: string; // Public data tree root
+	globalVariablesHash?: string; // Global variables hash
+
+	// Proving status
+	provenBlock?: number; // Latest proven block number
+	pendingBlock?: number; // Pending block number
+
+	// L1 integration
+	l1BlockNumber?: string; // Corresponding L1 block
+
+	// Privacy-related
+	bodyHash?: string; // Block body hash
+
+	// Totals
+	totalFees?: string; // Total fees in block
+	totalManaUsed?: string; // Total mana (gas) used
+}
+
+/**
+ * Aztec Transaction extends base Transaction with privacy fields
+ */
+export interface TransactionAztec extends Transaction {
+	// Privacy fields
+	privateCallRequests?: any[]; // Private function calls
+	publicCallRequests?: any[]; // Public function calls
+
+	// Execution
+	txEffect?: IndexedTxEffect; // Transaction effect
+
+	// Status
+	status: "pending" | "mined" | "proven" | "dropped";
+
+	// Mana (Aztec's gas concept)
+	manaUsed?: string;
+
+	// Nullifiers created
+	nullifiers?: string[];
+
+	// Notes created
+	noteHashes?: string[];
+
+	// L2→L1 messages
+	l2ToL1Messages?: string[][];
+}
+
+/**
+ * Aztec Transaction Receipt with extended status info
+ */
+export interface TransactionReceiptAztec extends TransactionReceipt {
+	// Extended status info
+	status: string; // success | app_logic_reverted | teardown_reverted | both_reverted
+
+	// Revert reason if failed
+	revertReason?: string;
+
+	// Block proving status
+	blockProvenStatus?: "pending" | "proven";
+
+	// Transaction effect
+	txEffect?: {
+		revertCode: number;
+		transactionFee: string;
+		noteHashes: string[];
+		nullifiers: string[];
+		l2ToL1Msgs: string[][];
+		publicDataWrites: Array<{
+			leafSlot: string;
+			value: string;
+		}>;
+	};
+}
+
+/**
+ * Aztec Transaction Effect - execution result
+ */
+export interface IndexedTxEffect {
+	txHash: string;
+	data: {
+		revertCode: number;
+		transactionFee: string;
+		noteHashes: string[];
+		nullifiers: string[];
+		l2ToL1Msgs: string[][];
+		publicDataWrites: Array<{ leafSlot: string; value: string }>;
+		privateLogs?: any[];
+		publicLogs?: any[];
+	};
+}
+
+/**
+ * Private Log (encrypted)
+ */
+export interface PrivateLog {
+	data: string; // Encrypted log data
+	txHash: string;
+}
+
+/**
+ * Public Log
+ */
+export interface PublicLog {
+	address: string;
+	selector: string;
+	data: string[];
+	txHash: string;
+}
+
+/**
+ * L2 Tips - latest, pending, and proven blocks
+ */
+export interface L2Tips {
+	latest: { number: number; hash: string };
+	pending: { number: number; hash: string };
+	proven: { number: number; hash: string };
+}
+
+/**
+ * Aztec Node Information
+ */
+export interface NodeInfo {
+	nodeVersion: string;
+	protocolVersion: number;
+	chainId: number;
+	enr?: string;
+	l1ContractAddresses: L1ContractAddresses;
+	protocolContractAddresses: ProtocolContractAddresses;
+}
+
+/**
+ * L1 Contract Addresses
+ */
+export interface L1ContractAddresses {
+	rollupAddress: string;
+	registryAddress: string;
+	inboxAddress: string;
+	outboxAddress: string;
+	feeJuiceAddress: string;
+	stakingAssetAddress: string;
+	feeJuicePortalAddress: string;
+}
+
+/**
+ * Protocol Contract Addresses
+ */
+export interface ProtocolContractAddresses {
+	classRegisterer: string;
+	feeJuice: string;
+	instanceDeployer: string;
+	multiCallEntrypoint: string;
+}
+
+/**
+ * Gas Fees for Aztec
+ */
+export interface GasFees {
+	feePerDaGas: string;
+	feePerL2Gas: string;
+}
+
+/**
+ * World State Sync Status
+ */
+export interface WorldStateSyncStatus {
+	syncedToBlock: number;
+	isSyncing: boolean;
+}
+
+/**
+ * Contract Instance with Address
+ */
+export interface ContractInstanceWithAddress {
+	address: string;
+	version: number;
+	salt: string;
+	contractClassId: string;
+	initializationHash: string;
+	publicKeysHash: string;
+	deployer: string;
+}
+
+/**
+ * Contract Class Public
+ */
+export interface ContractClassPublic {
+	id: string;
+	version: number;
+	artifactHash: string;
+	privateFunctionsRoot: string;
+	publicFunctions: Array<{
+		selector: string;
+		bytecode: string;
+	}>;
+	packedBytecode: string;
 }

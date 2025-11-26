@@ -1,5 +1,5 @@
 // src/services/EVM/Optimism/fetchers/address.ts
-import { RPCClient } from "../../common/RPCClient";
+import { RPCClient } from "../../../common/RPCClient";
 import {
 	TraceFilterResult,
 	LogEntry,
