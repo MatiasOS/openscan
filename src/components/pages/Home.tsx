@@ -4,6 +4,7 @@ import arbitrumLogo from "../../assets/arbitrum-logo.svg";
 import optimismLogo from "../../assets/optimism-logo.svg";
 import baseLogo from "../../assets/base-logo.svg";
 import hardhatLogo from "../../assets/hardhat-logo.svg";
+import aztecLogo from "../../assets/Aztec_Symbol_Dark.png";
 
 interface NetworkCardProps {
 	to: string;
@@ -199,6 +200,14 @@ export default function Home() {
 					/>
 				</svg>
 			),
+		},
+		{
+			to: "/aztec",
+			name: "Aztec Testnet",
+			description: "Privacy-focused Layer 2 with encrypted contracts",
+			chainId: "aztec",
+			color: "#9D5CFF",
+			icon: <img src={aztecLogo} alt="Aztec" width="32" height="32" />,
 		},
 		{
 			to: "/31337",
