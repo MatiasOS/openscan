@@ -1,5 +1,5 @@
 // src/services/EVM/Aztec/fetchers/address.ts
-import { RPCClient } from "../../common/RPCClient";
+import { RPCClient, RPCResponse } from "../../common/RPCClient";
 import type { AddressTransactionsResult } from "../../../types";
 
 export class AddressFetcherAztec {
@@ -10,38 +10,28 @@ export class AddressFetcherAztec {
 
 	// Standard Ethereum methods still work for EOAs
 	async getBalance(address: string): Promise<bigint> {
-		const result = await this.rpcClient.call<string>("eth_getBalance", [
-			address,
-			"latest",
-		]);
-		return BigInt(result);
+		return BigInt(0);
 	}
 
 	// Get contract code (if deployed)
 	async getCode(address: string): Promise<string> {
-		return await this.rpcClient.call<string>("eth_getCode", [
+		const contractClass: RPCResponse = await this.rpcClient.call<RPCResponse>("node_getContractClass", [
 			address,
 			"latest",
 		]);
+
+		if (!contractClass || contractClass?.result) return "0x";
+		return contractClass.result;
+
 	}
 
 	// Get transaction count (nonce)
 	async getTransactionCount(address: string): Promise<number> {
-		const result = await this.rpcClient.call<string>(
-			"eth_getTransactionCount",
-			[address, "latest"],
-		);
-		return parseInt(result, 16);
-	}
-
-	// Aztec-specific: Get contract instance
-	async getContract(address: string): Promise<any> {
-		try {
-			return await this.rpcClient.call("node_getContract", [address]);
-		} catch (error) {
-			// Contract might not exist or not be an Aztec contract
-			return null;
-		}
+		// const result = await this.rpcClient.call<string>(
+		// 	"eth_getTransactionCount",
+		// 	[address, "latest"],
+		// );
+		return 0;
 	}
 
 	// Get public storage at slot

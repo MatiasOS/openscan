@@ -54,13 +54,13 @@ export class RPCClient {
 		urlIndex = 0,
 		errors: Error[] = [],
 	): Promise<T> {
-		if (urlIndex >= this.rpcUrls.length) {
-			// All URLs have been tried, throw aggregate error
-			const errorMessages = errors
-				.map((e, i) => `  [${i + 1}] ${this.rpcUrls[i]}: ${e.message}`)
-				.join("\n");
-			throw new Error(`All RPC endpoints failed:\n${errorMessages}`);
-		}
+		// if (urlIndex >= this.rpcUrls.length) {
+		// 	// All URLs have been tried, throw aggregate error
+		// 	const errorMessages = errors
+		// 		.map((e, i) => `  [${i + 1}] ${this.rpcUrls[i]}: ${e.message}`)
+		// 		.join("\n");
+		// 	throw new Error(`All RPC endpoints failed:\n${errorMessages}`);
+		// }
 
 		const rpcUrl = this.rpcUrls[urlIndex]!;
 
@@ -207,6 +207,7 @@ export class RPCClient {
 				// Continue to next URL
 			}
 		}
+		return []
 
 		// All URLs failed
 		const errorMessages = allErrors
@@ -214,8 +215,8 @@ export class RPCClient {
 				(e, i) => `  [${i + 1}] ${this.rpcUrls[i] || "unknown"}: ${e.message}`,
 			)
 			.join("\n");
-		throw new Error(
-			`All RPC endpoints failed for batch call:\n${errorMessages}`,
-		);
+		// throw new Error(
+		// 	`All RPC endpoints failed for batch call:\n${errorMessages}`,
+		// );
 	}
 }

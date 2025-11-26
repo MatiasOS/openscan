@@ -202,10 +202,10 @@ export default function Home() {
 			),
 		},
 		{
-			to: "/aztec",
+			to: "/677868",
 			name: "Aztec Testnet",
 			description: "Privacy-focused Layer 2 with encrypted contracts",
-			chainId: "aztec",
+			chainId: "677868",
 			color: "#9D5CFF",
 			icon: <img src={aztecLogo} alt="Aztec" width="32" height="32" />,
 		},

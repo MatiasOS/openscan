@@ -49,6 +49,7 @@ const Settings: React.FC = () => {
 		{ id: 56, name: "BSC Mainnet" },
 		{ id: 97, name: "BSC Testnet" },
 		{ id: 137, name: "Polygon POS" },
+		{ id: 677868, name: "Aztec Testnet" },
 		{ id: 31337, name: "Local Hardhat" },
 	];
 
@@ -124,6 +125,22 @@ const Settings: React.FC = () => {
 									}
 									placeholder="https://eth-mainnet.g.alchemy.com/v2/YOUR-API-KEY"
 								/>
+
+								{/* Help text for Aztec testnet */}
+								{chain.id === 677868 && (
+									<div className="settings-help-text">
+										💡 Running Aztec Sandbox locally? Default URL is{" "}
+										<code>http://localhost:8080</code>. For remote access,{" "}
+										<a
+											href="https://docs.aztec.network/guides/developer_guides/getting_started"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="settings-link"
+										>
+											see Aztec documentation
+										</a>
+									</div>
+								)}
 
 								{/* Help text for localhost network */}
 								{chain.id === 31337 && (

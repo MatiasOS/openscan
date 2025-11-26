@@ -286,7 +286,7 @@ export class DataService {
 			this.addressFetcher instanceof AddressFetcherAztec &&
 			code !== "0x"
 		) {
-			contractInstance = await this.addressFetcher.getContract(address);
+			contractInstance = await this.addressFetcher.getCode(address);
 		}
 
 		const addressData = this.isAztec
