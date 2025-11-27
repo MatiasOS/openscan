@@ -4,7 +4,6 @@ import {
 	formatEther,
 	encodeFunctionData,
 	Hash,
-	Abi,
 } from "viem";
 
 /**
