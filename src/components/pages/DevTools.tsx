@@ -505,6 +505,12 @@ const DevTools: React.FC = () => {
 			{/* Section Tabs */}
 			<div className="devtools-tabs">
 				<button
+					className={`devtools-tab ${activeSection === "utils" ? "active" : ""}`}
+					onClick={() => setActiveSection("utils")}
+				>
+					Utils
+				</button>
+				<button
 					className={`devtools-tab ${activeSection === "transactions" ? "active" : ""}`}
 					onClick={() => setActiveSection("transactions")}
 				>
@@ -521,12 +527,6 @@ const DevTools: React.FC = () => {
 					onClick={() => setActiveSection("contracts")}
 				>
 					Contracts
-				</button>
-				<button
-					className={`devtools-tab ${activeSection === "utils" ? "active" : ""}`}
-					onClick={() => setActiveSection("utils")}
-				>
-					Utils
 				</button>
 				<button
 					className={`devtools-tab ${activeSection === "development" ? "active" : ""}`}
