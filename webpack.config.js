@@ -22,7 +22,7 @@ module.exports = {
 	output: {
 		path: path.resolve(__dirname, "dist"),
 		filename: "bundle.js",
-		publicPath: isGhPages ? "/openscan/" : "/", // key for GH Pages
+		publicPath: isGhPages ? "/explorer/" : "/", // key for GH Pages
 		clean: true,
 		charset: false,
 	},
