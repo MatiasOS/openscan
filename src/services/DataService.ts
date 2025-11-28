@@ -615,8 +615,14 @@ export class DataService {
 					this.rpcClient.parallelCall<string>("web3_clientVersion", []),
 				]);
 
-			// Hardhat metadata (only for local testing)
-			let metadataResults: Array<{ url: string; status: "fulfilled" | "rejected"; response?: string; error?: Error }> = [];
+			// Hardhat metadata (only for localhost)
+			let metadataResults: Array<{
+				url: string;
+				status: "fulfilled" | "rejected";
+				response?: string;
+				error?: Error;
+			}> = [];
+
 			if (this.chainId === 31337) {
 				metadataResults = await this.rpcClient.parallelCall<string>(
 					"hardhat_metadata",
@@ -624,59 +630,63 @@ export class DataService {
 				);
 			}
 
-			// Create metadata from the combined results
-			const combinedResults = [
-				...gasPriceResults.map((r) => ({ ...r, method: "eth_gasPrice" })),
-				...syncingResults.map((r) => ({ ...r, method: "eth_syncing" })),
-				...blockNumberResults.map((r) => ({ ...r, method: "eth_blockNumber" })),
-				...clientVersionResults.map((r) => ({
-					...r,
-					method: "web3_clientVersion",
-				})),
-				...metadataResults.map((r) => ({ ...r, method: "hardhat_metadata" })),
-			];
+			// Build complete NetworkStats objects for EACH provider
+			const enrichedResults = gasPriceResults.map((gasPriceResult, index) => {
+				if (gasPriceResult.status === "fulfilled" && gasPriceResult.response) {
+					const syncingResult = syncingResults[index];
+					const blockNumberResult = blockNumberResults[index];
+					const clientVersionResult = clientVersionResults[index];
+
+					// Verify all calls from same provider succeeded
+					if (
+						syncingResult?.status === "fulfilled" &&
+						blockNumberResult?.status === "fulfilled" &&
+						blockNumberResult.response
+					) {
+						// Get hardhat metadata for this provider (localhost only)
+						const hardhatMetadata =
+							this.chainId === 31337
+								? metadataResults[index]?.status === "fulfilled"
+									? metadataResults[index].response || ""
+									: ""
+								: "";
+
+						// Build complete NetworkStats object for this provider
+						const networkStats: NetworkStats = {
+							currentGasPrice: gasPriceResult.response,
+							isSyncing: typeof syncingResult.response === "object",
+							currentBlockNumber: blockNumberResult.response,
+							clientVersion: clientVersionResult?.response || "Unknown",
+							metadata: hardhatMetadata,
+						};
+
+						return {
+							...gasPriceResult,
+							response: networkStats, // Now contains complete domain object
+						};
+					}
+				}
+				// If any call failed for this provider, preserve the error
+				return gasPriceResult;
+			});
+
+			// Create metadata with enriched NetworkStats objects
 			metadata = RPCMetadataService.createMetadata(
-				combinedResults,
+				enrichedResults,
 				"parallel",
 			);
 
-			// Extract successful results
-			const successfulGasPrice = gasPriceResults.find(
-				(r) => r.status === "fulfilled",
-			);
-			const successfulSyncing = syncingResults.find(
-				(r) => r.status === "fulfilled",
-			);
-			const successfulBlockNumber = blockNumberResults.find(
-				(r) => r.status === "fulfilled",
-			);
-			const successfulClientVersion = clientVersionResults.find(
-				(r) => r.status === "fulfilled",
-			);
+			// Extract default stats (first successful provider)
+			const defaultStats = enrichedResults.find(
+				(r) => r.status === "fulfilled" && r.response,
+			)?.response as NetworkStats | undefined;
 
-			if (
-				!successfulGasPrice?.response ||
-				!successfulSyncing?.response ||
-				!successfulBlockNumber?.response
-			) {
+			if (!defaultStats) {
 				throw new Error("Failed to fetch network stats from all providers");
 			}
 
-			const hardhatMetadata =
-				this.chainId === 31337
-					? metadataResults.find((r) => r.status === "fulfilled")?.response || ""
-					: "";
-
-			const stats: NetworkStats = {
-				currentGasPrice: successfulGasPrice.response,
-				isSyncing: typeof successfulSyncing.response === "object",
-				currentBlockNumber: successfulBlockNumber.response,
-				clientVersion: successfulClientVersion?.response || "Unknown",
-				metadata: hardhatMetadata,
-			};
-
-			this.cache.set(cacheKey, { data: stats, timestamp: Date.now() });
-			return { data: stats, metadata };
+			this.cache.set(cacheKey, { data: defaultStats, timestamp: Date.now() });
+			return { data: defaultStats, metadata };
 		} else {
 			// Fallback strategy: use sequential fetching
 			const stats = await this.networkStatsFetcher.getNetworkStats();
