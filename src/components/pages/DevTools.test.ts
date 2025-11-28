@@ -165,7 +165,6 @@ describe('DevTools Utils', () => {
 	// ================================================
 
 	// Test data from real signatures
-	const TEST_PRIVATE_KEY = '0x59c6995e998f97a5a0044976f61d9e7e3a22c3f842dbe2bcb87f5f3afc5fdf26';
 	const TEST_ADDRESS = '0x8ba1f109551bD432803012645Ac136ddd64DBA72';
 
 	// Test case 1: Simple string message (eth_sign style)
@@ -378,8 +377,6 @@ describe('DevTools Utils', () => {
 	const BAD_V_SIGNATURE = '0xf4a45954390e10d2db95527ecfaca14adfd74127e5a885fcaaaed2a1b5bd73254f82e26a591778e44c23bda32a0bc89a8a066e3884b27f4f449ac1f51eb2f9d835';
 	
 	// 3) Signature that recovers to wrong address
-	const WRONG_SIGNER_MESSAGE = 'Wrong signer test';
-	const WRONG_SIGNER_HASH = '0x1a1dc91c907325c69271ddf0c944bc72a58a2e1718c6eab84eaca8fdda4633a0';
 	const WRONG_SIGNER_SIGNATURE = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1b';
 	
 	// 4) Incomplete / malformed signatures

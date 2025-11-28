@@ -12,7 +12,7 @@ import {
 } from "ethers";
 
 const NETWORKS: Record<number, { name: string; rpc: string }> = {
-	1: { name: "Ethereum Mainnet", rpc: "https://mainnet.infura.io/v3/" },
+	1: { name: "Ethereum Mainnet", rpc: "https://eth.llamarpc.com" },
 	10: { name: "Optimism", rpc: "https://mainnet.optimism.io" },
 	42161: { name: "Arbitrum One", rpc: "https://arb1.arbitrum.io/rpc" },
 	8453: { name: "Base", rpc: "https://mainnet.base.org" },
@@ -157,11 +157,22 @@ const TransactionsSection: React.FC = () => {
 			if (!net) throw new Error("Unknown network");
 			const provider = new JsonRpcProvider(net.rpc);
 
+			// Validate gasLimit is a valid number
+			let gasLimit: bigint | undefined;
+			if (txGasLimit) {
+				if (!/^\d+$/.test(txGasLimit.trim())) {
+					throw new Error("Gas limit must be a valid number");
+				}
+				gasLimit = BigInt(txGasLimit.trim());
+			} else if (estimatedGas) {
+				gasLimit = BigInt(estimatedGas);
+			}
+
 			const txRequest: TransactionRequest = {
 				to: txTo || undefined,
 				value: parseEtherSafe(txValue),
 				data: txData || undefined,
-				gasLimit: txGasLimit ? BigInt(txGasLimit) : (estimatedGas ? BigInt(estimatedGas) : undefined),
+				gasLimit,
 			};
 
 			if (txType === 2) {

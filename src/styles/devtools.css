@@ -263,22 +263,10 @@
    Utils Section - Unit Converter
    ================================================ */
 
-.unit-converter-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-	gap: 12px;
-}
-
 .unit-converter-item {
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
-}
-
-.unit-converter-label {
-	font-size: 0.85rem;
-	font-weight: 600;
-	color: #6b7280;
 }
 
 /* ================================================

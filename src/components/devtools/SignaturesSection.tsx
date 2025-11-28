@@ -15,7 +15,7 @@ const SignaturesSection: React.FC = () => {
 	// Signature Inspector state
 	const [sigMessage, setSigMessage] = useState("");
 	const [sigSignature, setSigSignature] = useState("");
-	const [sigExpectedAddress, setSigExpectedAddress] = useState("");
+	const [sigExpectedAddress] = useState("");
 	const [sigResults, setSigResults] = useState<{
 		format?: string;
 		messageFormat?: string;
@@ -105,7 +105,7 @@ const SignaturesSection: React.FC = () => {
 
 			// Determine message hash based on input format
 			let messageHash: string = "";
-			let detectedMessageFormat: string = "Unknown";
+			let detectedMessageFormat: string;
 			
 			if (sigMessage.startsWith("0x") && sigMessage.length === 66) {
 				// Already a hash

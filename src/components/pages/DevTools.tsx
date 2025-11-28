@@ -16,7 +16,8 @@ const DevTools: React.FC = () => {
 
   useEffect(() => {
     const newSection = searchParams.get('section') || 'transactions';
-    setActiveSection(newSection);
+    const validSections = ['transactions', 'signatures', 'utils', 'contracts', 'development'];
+    setActiveSection(validSections.includes(newSection) ? newSection : 'transactions');
   }, [location.search]);
 
   const tabs = [

@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-	keccak256,
-	toUtf8Bytes,
-	hexlify,
-	AbiCoder,
-	solidityPackedKeccak256,
-} from "ethers";
-import { convertEthUnits, type EthUnit } from "../../utils/devtools";
+import { convertEthUnits, computeKeccak, stringToHex, hexToString, type EthUnit } from "../../utils/devtools";
 
 type SolidityType = "string" | "bytes" | "address" | "uint256" | "uint128" | "uint64" | "uint32" | "uint8" | "int256" | "bool" | "bytes32" | "bytes4";
 
@@ -55,92 +48,15 @@ const UtilsSection: React.FC = () => {
 		if (from !== "wei") setWeiAmount(result.wei);
 	};
 
-	const parseInputValue = (input: string, type: SolidityType): any => {
-		const trimmed = input.trim();
-		switch (type) {
-			case "string":
-				return trimmed;
-			case "bytes":
-			case "bytes32":
-			case "bytes4":
-				return trimmed.startsWith("0x") ? trimmed : `0x${trimmed}`;
-			case "address":
-				if (!/^0x[0-9a-fA-F]{40}$/i.test(trimmed) && !/^[0-9a-fA-F]{40}$/i.test(trimmed)) {
-					throw new Error("Invalid address format (expected 40 hex chars)");
-				}
-				return trimmed.startsWith("0x") ? trimmed : `0x${trimmed}`;
-			case "uint256":
-			case "uint128":
-			case "uint64":
-			case "uint32":
-			case "uint8":
-			case "int256":
-				return BigInt(trimmed);
-			case "bool":
-				return trimmed.toLowerCase() === "true" || trimmed === "1";
-			default:
-				return trimmed;
-		}
-	};
-
-	const computeKeccak = () => {
-		if (!keccakInput.trim()) {
-			setKeccakResults(null);
-			return;
-		}
-
-		try {
-			const abiCoder = AbiCoder.defaultAbiCoder();
-			
-			const parsedValue = parseInputValue(keccakInput, keccakInputType);
-			
-			let encodedHex: string;
-			if (keccakInputType === "string") {
-				encodedHex = hexlify(toUtf8Bytes(keccakInput));
-			} else if (typeof parsedValue === "bigint") {
-				encodedHex = "0x" + parsedValue.toString(16).padStart(64, "0");
-			} else {
-				encodedHex = parsedValue;
-			}
-
-			const rawBytes = toUtf8Bytes(keccakInput);
-			const rawHash = keccak256(rawBytes);
-
-			const solidityEncodePacked = solidityPackedKeccak256([keccakInputType], [parsedValue]);
-
-			const abiEncoded = abiCoder.encode([keccakInputType], [parsedValue]);
-			const solidityEncode = keccak256(abiEncoded);
-
-			const functionSigPattern = /^[a-zA-Z_][a-zA-Z0-9_]*\([^)]*\)$/;
-			const isFunctionSignature = keccakInputType === "string" && functionSigPattern.test(keccakInput.trim());
-			const functionSelector = isFunctionSignature ? rawHash.slice(0, 10) : null;
-
-			setKeccakResults({
-				encodedBytes: encodedHex,
-				rawHash,
-				solidityEncodePacked,
-				solidityEncode,
-				functionSelector,
-				isFunctionSignature,
-			});
-		} catch (err: any) {
-			setKeccakResults({ error: err.message || "Failed to compute hash" });
-		}
+	const handleComputeKeccak = () => {
+		const results = computeKeccak(keccakInput, keccakInputType);
+		setKeccakResults(results);
 	};
 
 	const convertToHex = (data: string) => {
 		try {
-			if (data.startsWith("0x")) {
-				setDecodedData(data);
-				return;
-			}
-
-			const hex =
-				"0x" +
-				Array.from(data)
-					.map((c) => c.charCodeAt(0).toString(16).padStart(2, "0"))
-					.join("");
-			setDecodedData(hex);
+			const result = stringToHex(data);
+			setDecodedData(result);
 		} catch (err: any) {
 			setDecodedData("Error: " + err.message);
 		}
@@ -148,18 +64,8 @@ const UtilsSection: React.FC = () => {
 
 	const convertFromHex = (hexData: string) => {
 		try {
-			if (!hexData.startsWith("0x")) {
-				setDecodedData("Error: Invalid hex format (must start with 0x)");
-				return;
-			}
-
-			const hex = hexData.slice(2);
-			const str =
-				hex
-					.match(/.{1,2}/g)
-					?.map((byte) => String.fromCharCode(parseInt(byte, 16)))
-					.join("") || "";
-			setDecodedData(str);
+			const result = hexToString(hexData);
+			setDecodedData(result);
 		} catch (err: any) {
 			setDecodedData("Error: " + err.message);
 		}
@@ -333,7 +239,7 @@ const UtilsSection: React.FC = () => {
 						</div>
 
 						<button
-							onClick={computeKeccak}
+							onClick={handleComputeKeccak}
 							className="devtools-button"
 						>
 							Hash
