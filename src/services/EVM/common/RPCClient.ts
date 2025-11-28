@@ -24,14 +24,32 @@ export interface ParallelRequestResult<T = any> {
 	error?: any;
 }
 
+export type RPCStrategy = "fallback" | "parallel";
+
+export interface RPCClientConfig {
+	rpcUrls: string | string[];
+	strategy?: RPCStrategy;
+}
+
 export class RPCClient {
 	private requestId = 0;
 	private rpcUrls: string[];
 	private currentUrlIndex = 0;
+	private strategy: RPCStrategy = "fallback";
 
-	constructor(rpcUrls: string | string[]) {
-		// Support both single URL (backwards compatibility) and array of URLs
-		this.rpcUrls = Array.isArray(rpcUrls) ? rpcUrls : [rpcUrls];
+	constructor(config: string | string[] | RPCClientConfig) {
+		// Support multiple constructor signatures for backwards compatibility
+		if (typeof config === "string" || Array.isArray(config)) {
+			// Legacy: just URLs provided
+			this.rpcUrls = Array.isArray(config) ? config : [config];
+			this.strategy = "fallback";
+		} else {
+			// New config object
+			this.rpcUrls = Array.isArray(config.rpcUrls)
+				? config.rpcUrls
+				: [config.rpcUrls];
+			this.strategy = config.strategy || "fallback";
+		}
 
 		if (this.rpcUrls.length === 0) {
 			throw new Error("At least one RPC URL must be provided");
@@ -50,6 +68,21 @@ export class RPCClient {
 	 */
 	getAllUrls(): string[] {
 		return [...this.rpcUrls];
+	}
+
+	/**
+	 * Get the current request strategy
+	 */
+	getStrategy(): RPCStrategy {
+		return this.strategy;
+	}
+
+	/**
+	 * Set the request strategy
+	 * @param strategy - "fallback" for sequential fallback or "parallel" for parallel requests
+	 */
+	setStrategy(strategy: RPCStrategy): void {
+		this.strategy = strategy;
 	}
 
 	/**
@@ -138,9 +171,37 @@ export class RPCClient {
 			`RPCClient.call: ${method}`,
 			"params:",
 			params,
+			"strategy:",
+			this.strategy,
 			"using URLs:",
 			this.rpcUrls,
 		);
+
+		// Use parallel strategy if configured
+		if (this.strategy === "parallel") {
+			const results = await this.parallelCall<T>(method, params);
+
+			// Find the first successful result
+			const successful = results.find((r) => r.status === "fulfilled");
+			if (successful && successful.response !== undefined) {
+				return successful.response;
+			}
+
+			// All failed - throw error with details
+			const errorMessages = results
+				.map((r) =>
+					r.status === "rejected"
+						? `  ${r.url}: ${r.error?.message || "Unknown error"}`
+						: null,
+				)
+				.filter(Boolean)
+				.join("\n");
+			throw new Error(
+				`All RPC endpoints failed (parallel strategy):\n${errorMessages}`,
+			);
+		}
+
+		// Use fallback strategy (default)
 		// Start with the current working URL, then try others if it fails
 		const orderedIndices = [
 			this.currentUrlIndex,

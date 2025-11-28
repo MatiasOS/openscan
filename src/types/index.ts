@@ -222,6 +222,7 @@ export type RpcUrlsContextType = Record<supportedChainsIds, RPCUrls>;
 export interface UserSettings {
 	theme?: "light" | "dark" | "auto";
 	showBackgroundBlocks?: boolean;
+	rpcStrategy?: "fallback" | "parallel";
 }
 
 /**
@@ -230,7 +231,43 @@ export interface UserSettings {
 export const DEFAULT_SETTINGS: UserSettings = {
 	theme: "auto",
 	showBackgroundBlocks: true,
+	rpcStrategy: "fallback",
 };
+
+/**
+ * RPC strategy type - re-exported from RPCClient
+ */
+export type RPCStrategy = "fallback" | "parallel";
+
+/**
+ * Metadata about RPC request when using parallel strategy
+ */
+export interface RPCMetadata {
+	strategy: "parallel";
+	timestamp: number;
+	responses: RPCProviderResponse[];
+	hasInconsistencies: boolean;
+}
+
+/**
+ * Individual provider response in parallel mode
+ */
+export interface RPCProviderResponse {
+	url: string;
+	status: "success" | "error";
+	responseTime: number;
+	data?: any;
+	error?: string;
+	hash?: string;
+}
+
+/**
+ * Wrapper type for data + metadata from RPC calls
+ */
+export interface DataWithMetadata<T> {
+	data: T;
+	metadata?: RPCMetadata;
+}
 
 // src/services/rpc/types.ts
 export interface RPCBlock {
