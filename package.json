@@ -27,7 +27,8 @@
 		"format": "npx @biomejs/biome format",
 		"format:fix": "npx @biomejs/biome format --write",
 		"lint": "npx @biomejs/biome lint",
-		"lint:fix": "npx @biomejs/biome lint --write --max-diagnostics 1024"
+		"lint:fix": "npx @biomejs/biome lint --write --max-diagnostics 1024",
+		"check": "npx @biomejs/biome check --max-diagnostics 1024"
 	},
 	"eslintConfig": {
 		"extends": [
