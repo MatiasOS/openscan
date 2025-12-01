@@ -193,6 +193,35 @@ export interface IAppContext {
   jsonFiles: Record<string, any>;
   // biome-ignore lint/suspicious/noExplicitAny: <TODO>
   setJsonFiles: (jsonFiles: Record<string, any>) => void;
+  // Network-related fields
+  networks: NetworkConfig[];
+  enabledNetworks: NetworkConfig[];
+  networksLoading: boolean;
+  networksError: string | null;
+  getNetwork: (chainId: number) => NetworkConfig | undefined;
+  reloadNetworks: () => Promise<void>;
+}
+
+/**
+ * Network configuration interface
+ */
+export interface NetworkConfig {
+  chainId: number;
+  name: string;
+  shortName: string;
+  description: string;
+  color: string;
+  currency: string;
+  isTestnet: boolean;
+  logo: string;
+  rpc: {
+    public: string[];
+  };
+  links: {
+    name: string;
+    url: string;
+    description: string;
+  }[];
 }
 
 /**
@@ -201,18 +230,8 @@ export interface IAppContext {
 
 export type RPCUrls = string[];
 
-export type supportedChainsIds =
-  | 1 // mainnet
-  | 11155111 // sepolia testnet
-  | 31337 // local node (hardhat, anvil, aztec)
-  | 42161 // arbitrum one
-  | 10 // optimism mainnet
-  | 8453 // base mainnet
-  | 56 // bsc mainnet
-  | 97 // bsc testnet
-  | 137; // polygon pos
-
-export type RpcUrlsContextType = Record<supportedChainsIds, RPCUrls>;
+// RPC URLs are now dynamically loaded from metadata, so we use a flexible Record type
+export type RpcUrlsContextType = Record<number, RPCUrls>;
 
 // ==================== SETTINGS TYPES ====================
 

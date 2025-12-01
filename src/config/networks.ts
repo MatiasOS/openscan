@@ -1,112 +1,65 @@
 /**
  * Network configuration for OpenScan
- * Controls which networks are displayed based on REACT_APP_OPENSCAN_NETWORKS env variable
+ * Networks are fetched from the explorer-metadata repository
  */
 
-export interface NetworkConfig {
-  chainId: number;
-  name: string;
-  shortName: string;
-  description: string;
-  color: string;
-  currency: string;
-  isTestnet: boolean;
-  logoType: "ethereum" | "bsc" | "polygon" | "arbitrum" | "optimism" | "base" | "hardhat";
+import {
+  fetchNetworks,
+  getNetworkLogoUrl,
+  type NetworkMetadata,
+  type NetworksResponse,
+} from "../services/MetadataService";
+import type { NetworkConfig } from "../types";
+
+export type { NetworkConfig };
+
+// Cache for loaded networks
+let loadedNetworks: NetworkConfig[] | null = null;
+let networksUpdatedAt: string | null = null;
+
+/**
+ * Convert metadata network to NetworkConfig
+ */
+function metadataToNetworkConfig(network: NetworkMetadata): NetworkConfig {
+  return {
+    chainId: network.chainId,
+    name: network.name,
+    shortName: network.shortName,
+    description: network.description,
+    color: network.color,
+    currency: network.currency,
+    isTestnet: network.isTestnet,
+    logo: network.logo,
+    rpc: network.rpc,
+    links: network.links,
+  };
 }
 
-// All available networks
-export const ALL_NETWORKS: NetworkConfig[] = [
-  {
-    chainId: 1,
-    name: "Ethereum Mainnet",
-    shortName: "Ethereum",
-    description: "The main Ethereum network",
-    color: "#627EEA",
-    currency: "ETH",
-    isTestnet: false,
-    logoType: "ethereum",
-  },
-  {
-    chainId: 42161,
-    name: "Arbitrum One",
-    shortName: "Arbitrum",
-    description: "Ethereum Layer 2 scaling solution",
-    color: "#28A0F0",
-    currency: "ETH",
-    isTestnet: false,
-    logoType: "arbitrum",
-  },
-  {
-    chainId: 10,
-    name: "Optimism",
-    shortName: "Optimism",
-    description: "Ethereum Layer 2 with low fees",
-    color: "#FF0420",
-    currency: "ETH",
-    isTestnet: false,
-    logoType: "optimism",
-  },
-  {
-    chainId: 8453,
-    name: "Base",
-    shortName: "Base",
-    description: "Coinbase's Ethereum Layer 2",
-    color: "#0052FF",
-    currency: "ETH",
-    isTestnet: false,
-    logoType: "base",
-  },
-  {
-    chainId: 56,
-    name: "BSC",
-    shortName: "BSC",
-    description: "Binance Smart Chain mainnet",
-    color: "#F0B90B",
-    currency: "BNB",
-    isTestnet: false,
-    logoType: "bsc",
-  },
-  {
-    chainId: 137,
-    name: "Polygon",
-    shortName: "Polygon",
-    description: "Polygon POS mainnet",
-    color: "#8247E5",
-    currency: "POL",
-    isTestnet: false,
-    logoType: "polygon",
-  },
-  {
-    chainId: 31337,
-    name: "Localhost",
-    shortName: "Localhost",
-    description: "Local development network",
-    color: "#FFF100",
-    currency: "ETH",
-    isTestnet: true,
-    logoType: "hardhat",
-  },
-  {
-    chainId: 97,
-    name: "BSC Testnet",
-    shortName: "BSC Testnet",
-    description: "Binance Smart Chain testnet",
-    color: "#F0B90B",
-    currency: "tBNB",
-    isTestnet: true,
-    logoType: "bsc",
-  },
-  {
-    chainId: 11155111,
-    name: "Sepolia Testnet",
-    shortName: "Sepolia",
-    description: "Ethereum test network for development",
-    color: "#F0CDC2",
-    currency: "ETH",
-    isTestnet: true,
-    logoType: "ethereum",
-  },
-];
+/**
+ * Load networks from metadata repository
+ * Returns cached networks if already loaded
+ */
+export async function loadNetworks(): Promise<NetworkConfig[]> {
+  if (loadedNetworks) {
+    return loadedNetworks;
+  }
+
+  const response: NetworksResponse = await fetchNetworks();
+  loadedNetworks = response.networks.map(metadataToNetworkConfig);
+  networksUpdatedAt = response.updatedAt;
+  console.log(
+    `Loaded ${loadedNetworks.length} networks from metadata (updated: ${networksUpdatedAt})`,
+  );
+  return loadedNetworks;
+}
+
+/**
+ * Get all networks (sync version, returns cached or empty array)
+ * Use loadNetworks() for async loading with fresh data
+ */
+export function getAllNetworks(): NetworkConfig[] {
+  return loadedNetworks ?? [];
+}
 
 /**
  * Get the list of enabled networks based on environment variable
@@ -114,14 +67,11 @@ export const ALL_NETWORKS: NetworkConfig[] = [
  * If not set, all networks are enabled
  */
 export function getEnabledNetworks(): NetworkConfig[] {
+  const allNetworks = getAllNetworks();
   const envNetworks = process.env.REACT_APP_OPENSCAN_NETWORKS;
 
-  console.log("REACT_APP_OPENSCAN_NETWORKS:", envNetworks);
-
   if (!envNetworks || envNetworks.trim() === "") {
-    // Return all networks if env var not set
-    console.log("No networks env var set, returning all networks");
-    return ALL_NETWORKS;
+    return allNetworks;
   }
 
   // Parse comma-separated chain IDs
@@ -130,22 +80,20 @@ export function getEnabledNetworks(): NetworkConfig[] {
     .map((id) => parseInt(id.trim(), 10))
     .filter((id) => !Number.isNaN(id));
 
-  console.log("Enabled chain IDs:", enabledChainIds);
-
   if (enabledChainIds.length === 0) {
-    return ALL_NETWORKS;
+    return allNetworks;
   }
 
   // Filter networks by enabled chain IDs, maintaining order from env var
   const enabledNetworks: NetworkConfig[] = [];
   for (const chainId of enabledChainIds) {
-    const network = ALL_NETWORKS.find((n) => n.chainId === chainId);
+    const network = allNetworks.find((n) => n.chainId === chainId);
     if (network) {
       enabledNetworks.push(network);
     }
   }
 
-  return enabledNetworks.length > 0 ? enabledNetworks : ALL_NETWORKS;
+  return enabledNetworks.length > 0 ? enabledNetworks : allNetworks;
 }
 
 /**
@@ -166,5 +114,30 @@ export function isChainEnabled(chainId: number): boolean {
  * Get network config by chain ID
  */
 export function getNetworkByChainId(chainId: number): NetworkConfig | undefined {
-  return ALL_NETWORKS.find((n) => n.chainId === chainId);
+  return getAllNetworks().find((n) => n.chainId === chainId);
+}
+
+/**
+ * Get the full URL for a network logo
+ */
+export function getNetworkLogoUrlByChainId(chainId: number): string | undefined {
+  const network = getNetworkByChainId(chainId);
+  if (!network) return undefined;
+  return getNetworkLogoUrl(network.logo);
+}
+
+/**
+ * Get the timestamp when networks were last updated
+ */
+export function getNetworksUpdatedAt(): string | null {
+  return networksUpdatedAt;
+}
+
+/**
+ * Force reload networks from metadata
+ */
+export async function reloadNetworks(): Promise<NetworkConfig[]> {
+  loadedNetworks = null;
+  networksUpdatedAt = null;
+  return loadNetworks();
 }

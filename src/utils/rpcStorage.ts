@@ -1,73 +1,27 @@
+import { getAllNetworks } from "../config/networks";
 import type { RpcUrlsContextType } from "../types";
 
 const STORAGE_KEY = "OPENSCAN_RPC_URLS_V1";
+
 /**
- * RPC endpoint configuration for different networks
- * In production, consider using environment variables for API keys
- * Multiple URLs per network are supported for fallback functionality
+ * Get default RPC endpoints from loaded network metadata
+ * Returns RPC URLs for all networks that have been loaded from metadata
  */
-export const RPC_ENDPOINTS: RpcUrlsContextType = {
-  // Mainnet
-  1: ["https://eth.llamarpc.com", "https://ethereum.publicnode.com", "https://1rpc.io/eth"].filter(
-    Boolean,
-  ) as string[],
+export function getDefaultRpcEndpoints(): RpcUrlsContextType {
+  const networks = getAllNetworks();
+  const endpoints: RpcUrlsContextType = {};
 
-  // Sepolia
-  11155111: [
-    "https://sepolia.infura.io",
-    "https://rpc.sepolia.org",
-    "https://rpc2.sepolia.org",
-    "https://ethereum-sepolia.publicnode.com",
-  ].filter(Boolean) as string[],
+  for (const network of networks) {
+    if (network.rpc?.public && network.rpc.public.length > 0) {
+      endpoints[network.chainId] = network.rpc.public;
+    }
+  }
 
-  // Hardhat/Localhost
-  31337: ["http://127.0.0.1:8545"].filter(Boolean) as string[],
-
-  // Arbitrum One
-  42161: [
-    "https://arb1.arbitrum.io/rpc",
-    "https://arbitrum.llamarpc.com",
-    "https://arbitrum-one.publicnode.com",
-  ].filter(Boolean) as string[],
-
-  // Optimism Mainnet
-  10: [
-    "https://mainnet.optimism.io",
-    "https://optimism.llamarpc.com",
-    "https://optimism.publicnode.com",
-  ].filter(Boolean) as string[],
-
-  // Base Mainnet
-  8453: [
-    "https://mainnet.base.org",
-    "https://base.llamarpc.com",
-    "https://base.publicnode.com",
-  ].filter(Boolean) as string[],
-
-  // BSC Mainnet
-  56: [
-    "https://bsc-dataseed.binance.org",
-    "https://bsc.publicnode.com",
-    "https://binance.llamarpc.com",
-  ].filter(Boolean) as string[],
-
-  // BSC Testnet
-  97: [
-    "https://data-seed-prebsc-1-s1.binance.org:8545",
-    "https://bsc-testnet.publicnode.com",
-  ].filter(Boolean) as string[],
-
-  // Polygon POS
-  137: [
-    "https://polygon-rpc.com",
-    "https://polygon.llamarpc.com",
-    "https://polygon-bor.publicnode.com",
-  ].filter(Boolean) as string[],
-};
-type RpcMap = Record<number, string[]>;
+  return endpoints;
+}
 
 // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-function isValidRpcMap(obj: any): obj is RpcMap {
+function isValidRpcMap(obj: any): obj is RpcUrlsContextType {
   if (!obj || typeof obj !== "object") return false;
   for (const k of Object.keys(obj)) {
     const val = obj[k];
@@ -79,14 +33,14 @@ function isValidRpcMap(obj: any): obj is RpcMap {
 /**
  * Load RPC urls from localStorage. Returns null if nothing found or invalid.
  */
-export function loadRpcUrlsFromStorage(): RpcMap | null {
+export function loadRpcUrlsFromStorage(): RpcUrlsContextType | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Record<string, string[]>;
     if (!isValidRpcMap(parsed)) return null;
     // keys are strings from JSON -> convert to numbers
-    const result: RpcMap = {};
+    const result: RpcUrlsContextType = {};
     for (const k of Object.keys(parsed)) {
       const n = Number(k);
       if (Number.isNaN(n)) continue;
@@ -104,7 +58,7 @@ export function loadRpcUrlsFromStorage(): RpcMap | null {
 /**
  * Save RPC urls to localStorage. Keys should be numeric chain ids.
  */
-export function saveRpcUrlsToStorage(map: RpcMap): void {
+export function saveRpcUrlsToStorage(map: RpcUrlsContextType): void {
   try {
     // convert keys to strings for JSON
     const serialized: Record<string, string[]> = {};
@@ -123,13 +77,14 @@ export function saveRpcUrlsToStorage(map: RpcMap): void {
 /**
  * Return the effective rpc urls by merging defaults with any stored overrides.
  * Stored values override default for a chainId; missing chains fall back to defaults.
+ * Defaults are fetched from loaded network metadata.
  */
 export function getEffectiveRpcUrls(): RpcUrlsContextType {
-  const defaults: RpcMap = RPC_ENDPOINTS as unknown as RpcMap;
+  const defaults = getDefaultRpcEndpoints();
   const stored = loadRpcUrlsFromStorage();
-  if (!stored) return defaults as RpcUrlsContextType;
+  if (!stored) return defaults;
   // merge copy
-  const merged: RpcMap = { ...defaults };
+  const merged: RpcUrlsContextType = { ...defaults };
   for (const k of Object.keys(stored)) {
     const n = Number(k);
     if (Number.isNaN(n)) continue;
@@ -137,7 +92,7 @@ export function getEffectiveRpcUrls(): RpcUrlsContextType {
     if (!val || !Array.isArray(val) || val.length === 0) continue;
     merged[n] = val;
   }
-  return merged as RpcUrlsContextType;
+  return merged;
 }
 
 export { STORAGE_KEY };
