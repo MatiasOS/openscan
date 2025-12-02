@@ -1,6 +1,6 @@
 import type React from "react";
 import { useState } from "react";
-import type { ENSRecords, ENSReverseResult, DecodedContenthash } from "../../types";
+import type { DecodedContenthash, ENSRecords, ENSReverseResult } from "../../types";
 
 interface ENSRecordsDisplayProps {
   ensName: string | null;
@@ -211,18 +211,18 @@ const ENSRecordsDisplay: React.FC<ENSRecordsDisplayProps> = ({
       {/* Text Records */}
       {hasTextRecords && (
         <>
-          <div
-            className="tx-row"
-            style={{ cursor: "pointer" }}
+          <button
+            type="button"
+            className="tx-row btn-ens-toggle cursor-pointer"
             onClick={() => setShowAllRecords(!showAllRecords)}
           >
             <span className="tx-label">
               Text Records ({Object.keys(records.textRecords).length}):
             </span>
-            <span className="tx-value" style={{ color: "#3b82f6" }}>
+            <span className="tx-value text-blue">
               {showAllRecords ? "Hide" : "Show"} {showAllRecords ? "▼" : "▶"}
             </span>
-          </div>
+          </button>
 
           {showAllRecords && (
             <div

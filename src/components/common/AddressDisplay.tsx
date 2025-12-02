@@ -6,11 +6,15 @@ import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { AppContext } from "../../context";
 import { useSourcify } from "../../hooks/useSourcify";
 import type {
+  ABI,
+  ABIParameter,
   Address,
   AddressTransactionsResult,
   DecodedContenthash,
   ENSRecords,
   ENSReverseResult,
+  EventABI,
+  FunctionABI,
   RPCMetadata,
   Transaction,
 } from "../../types";
@@ -57,10 +61,10 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
     const [storageSlot, setStorageSlot] = useState("");
     const [storageValue, setStorageValue] = useState("");
     const [showContractDetails, setShowContractDetails] = useState(false);
-    const [selectedWriteFunction, setSelectedWriteFunction] = useState<any>(null);
-    const [selectedReadFunction, setSelectedReadFunction] = useState<any>(null);
+    const [selectedWriteFunction, setSelectedWriteFunction] = useState<FunctionABI | null>(null);
+    const [selectedReadFunction, setSelectedReadFunction] = useState<FunctionABI | null>(null);
     const [functionInputs, setFunctionInputs] = useState<Record<string, string>>({});
-    const [readFunctionResult, setReadFunctionResult] = useState<any>(null);
+    const [readFunctionResult, setReadFunctionResult] = useState<string | null>(null);
     const [isReadingFunction, setIsReadingFunction] = useState(false);
     const { jsonFiles, rpcUrls } = useContext(AppContext);
 
@@ -167,7 +171,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
       try {
         // Prepare function arguments
-        const args: any[] = [];
+        const args: unknown[] = [];
         if (selectedWriteFunction.inputs && selectedWriteFunction.inputs.length > 0) {
           for (const input of selectedWriteFunction.inputs) {
             const paramName = input.name || `param${selectedWriteFunction.inputs.indexOf(input)}`;
@@ -232,7 +236,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
         }
 
         // Prepare function arguments
-        const args: any[] = [];
+        const args: unknown[] = [];
         if (selectedReadFunction.inputs && selectedReadFunction.inputs.length > 0) {
           for (const input of selectedReadFunction.inputs) {
             const paramName = input.name || `param${selectedReadFunction.inputs.indexOf(input)}`;
@@ -415,13 +419,14 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
           {/* Contract Verification Details */}
           {isContract && (isVerified || parsedLocalData) && contractData && (
             <div className="tx-details">
-              <div
-                className="tx-section cursor-pointer"
+              <button
+                type="button"
+                className="tx-section btn-toggle-section"
                 onClick={() => setShowContractDetails(!showContractDetails)}
               >
                 <span className="tx-section-title">Contract Details</span>
                 <span className="contract-section-toggle">{showContractDetails ? " ▼" : " ▶"}</span>
-              </div>
+              </button>
 
               {showContractDetails && (
                 <>
@@ -506,8 +511,9 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
                   {/* Contract Bytecode */}
                   <div className="tx-row-vertical">
-                    <div
-                      className="source-toggle-container"
+                    <button
+                      type="button"
+                      className="source-toggle-container btn-reset-block"
                       onClick={() => {
                         const elem = document.getElementById("bytecode-content");
                         const icon = document.getElementById("bytecode-icon");
@@ -522,7 +528,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                       <span id="bytecode-icon" className="source-toggle-icon">
                         ▶
                       </span>
-                    </div>
+                    </button>
                     <div
                       id="bytecode-content"
                       className="tx-input-data"
@@ -534,15 +540,15 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
                   {/* Source Code */}
                   {((contractData.files && contractData.files.length > 0) ||
-                    (contractData as any).sources) &&
+                    ("sources" in contractData && contractData.sources)) &&
                     (() => {
                       // Prepare source files array - either from files or sources object
-                      const sources = (contractData as any).sources;
+                      const sources = "sources" in contractData ? contractData.sources : undefined;
                       const sourceFiles =
                         contractData.files && contractData.files.length > 0
                           ? contractData.files
                           : sources
-                            ? Object.entries(sources).map(([path, source]: [string, any]) => ({
+                            ? Object.entries(sources).map(([path, source]) => ({
                                 name: path,
                                 path: path,
                                 content: source.content || "",
@@ -551,8 +557,9 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
                       return sourceFiles.length > 0 ? (
                         <div className="tx-row-vertical">
-                          <div
-                            className="source-toggle-container"
+                          <button
+                            type="button"
+                            className="source-toggle-container btn-reset-block"
                             onClick={() => {
                               const elem = document.getElementById("source-code-content");
                               const icon = document.getElementById("source-code-icon");
@@ -567,14 +574,14 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                             <span id="source-code-icon" className="source-toggle-icon">
                               ▶
                             </span>
-                          </div>
+                          </button>
                           <div
                             id="source-code-content"
                             className="margin-top-8"
                             style={{ display: "none" }}
                           >
-                            {sourceFiles.map((file: any, idx: number) => (
-                              <div key={idx} className="source-file-container">
+                            {sourceFiles.map((file) => (
+                              <div key={file.path} className="source-file-container">
                                 <div className="source-file-header">
                                   📄 {file.name || file.path}
                                 </div>
@@ -589,8 +596,9 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                   {/* Raw ABI */}
                   {contractData.abi && contractData.abi.length > 0 && (
                     <div className="tx-row-vertical">
-                      <div
-                        className="source-toggle-container"
+                      <button
+                        type="button"
+                        className="source-toggle-container btn-reset-block"
                         onClick={() => {
                           const elem = document.getElementById("raw-abi-content");
                           const icon = document.getElementById("raw-abi-icon");
@@ -605,7 +613,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                         <span id="raw-abi-icon" className="source-toggle-icon">
                           ▶
                         </span>
-                      </div>
+                      </button>
                       <div
                         id="raw-abi-content"
                         className="tx-input-data"
@@ -637,7 +645,9 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                             openConnectModal,
                             authenticationStatus,
                             mounted,
-                          }: any) => {
+                          }: Parameters<
+                            Parameters<typeof ConnectButton.Custom>[0]["children"]
+                          >[0]) => {
                             const ready = mounted && authenticationStatus !== "loading";
                             const connected =
                               ready &&
@@ -773,9 +783,10 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                         {/* Read Functions (view/pure) */}
                         {(() => {
                           const readFunctions = contractData.abi.filter(
-                            (item: any) =>
+                            (item: ABI): item is FunctionABI =>
                               item.type === "function" &&
-                              (item.stateMutability === "view" || item.stateMutability === "pure"),
+                              ((item as FunctionABI).stateMutability === "view" ||
+                                (item as FunctionABI).stateMutability === "pure"),
                           );
                           return (
                             readFunctions.length > 0 && (
@@ -797,9 +808,10 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                     gap: "8px",
                                   }}
                                 >
-                                  {readFunctions.map((func: any, idx: number) => (
+                                  {readFunctions.map((func: FunctionABI) => (
                                     <button
-                                      key={idx}
+                                      type="button"
+                                      key={func.name}
                                       onClick={() => {
                                         setSelectedReadFunction(func);
                                         setSelectedWriteFunction(null);
@@ -848,11 +860,11 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                         {/* Write Functions (payable/nonpayable) */}
                         {(() => {
                           const writeFunctions = contractData.abi.filter(
-                            (item: any) =>
+                            (item: ABI): item is FunctionABI =>
                               item.type === "function" &&
-                              (item.stateMutability === "payable" ||
-                                item.stateMutability === "nonpayable" ||
-                                !item.stateMutability),
+                              ((item as FunctionABI).stateMutability === "payable" ||
+                                (item as FunctionABI).stateMutability === "nonpayable" ||
+                                !(item as FunctionABI).stateMutability),
                           );
                           return (
                             writeFunctions.length > 0 && (
@@ -874,9 +886,10 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                     gap: "8px",
                                   }}
                                 >
-                                  {writeFunctions.map((func: any, idx: number) => (
+                                  {writeFunctions.map((func: FunctionABI) => (
                                     <button
-                                      key={idx}
+                                      type="button"
+                                      key={func.name}
                                       onClick={() => {
                                         setSelectedWriteFunction(func);
                                         setSelectedReadFunction(null);
@@ -923,7 +936,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                         })()}
 
                         {/* Events */}
-                        {contractData.abi.filter((item: any) => item.type === "event").length >
+                        {contractData.abi.filter((item: ABI) => item.type === "event").length >
                           0 && (
                           <div style={{ marginBottom: "12px" }}>
                             <div
@@ -935,7 +948,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                               }}
                             >
                               Events (
-                              {contractData.abi.filter((item: any) => item.type === "event").length}
+                              {contractData.abi.filter((item: ABI) => item.type === "event").length}
                               )
                             </div>
                             <div
@@ -946,11 +959,11 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                               }}
                             >
                               {contractData.abi
-                                .filter((item: any) => item.type === "event")
+                                .filter((item: ABI): item is EventABI => item.type === "event")
                                 .slice(0, 10)
-                                .map((event: any, idx: number) => (
+                                .map((event: EventABI) => (
                                   <span
-                                    key={idx}
+                                    key={event.name}
                                     style={{
                                       padding: "4px 10px",
                                       background: "rgba(139, 92, 246, 0.15)",
@@ -963,7 +976,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                     {event.name}
                                   </span>
                                 ))}
-                              {contractData.abi.filter((item: any) => item.type === "event")
+                              {contractData.abi.filter((item: ABI) => item.type === "event")
                                 .length > 10 && (
                                 <span
                                   style={{
@@ -973,7 +986,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                   }}
                                 >
                                   +
-                                  {contractData.abi.filter((item: any) => item.type === "event")
+                                  {contractData.abi.filter((item: ABI) => item.type === "event")
                                     .length - 10}{" "}
                                   more
                                 </span>
@@ -1008,42 +1021,50 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                             {selectedReadFunction.inputs &&
                             selectedReadFunction.inputs.length > 0 ? (
                               <div style={{ marginBottom: "12px" }}>
-                                {selectedReadFunction.inputs.map((input: any, idx: number) => (
-                                  <div key={idx} style={{ marginBottom: "10px" }}>
+                                {selectedReadFunction.inputs.map(
+                                  (input: ABIParameter, idx: number) => (
                                     <label
+                                      key={`${input.name || idx}-${input.type}`}
                                       style={{
                                         display: "block",
-                                        fontSize: "0.8rem",
-                                        color: "rgba(255, 255, 255, 0.7)",
-                                        marginBottom: "4px",
-                                        fontFamily: "monospace",
+                                        marginBottom: "10px",
                                       }}
                                     >
-                                      {input.name || `param${idx}`} ({input.type})
+                                      <span
+                                        style={{
+                                          display: "block",
+                                          fontSize: "0.8rem",
+                                          color: "rgba(255, 255, 255, 0.7)",
+                                          marginBottom: "4px",
+                                          fontFamily: "monospace",
+                                        }}
+                                      >
+                                        {input.name || `param${idx}`} ({input.type})
+                                      </span>
+                                      <input
+                                        type="text"
+                                        value={functionInputs[input.name || `param${idx}`] || ""}
+                                        onChange={(e) =>
+                                          setFunctionInputs({
+                                            ...functionInputs,
+                                            [input.name || `param${idx}`]: e.target.value,
+                                          })
+                                        }
+                                        placeholder={`Enter ${input.type}`}
+                                        style={{
+                                          width: "100%",
+                                          padding: "8px 12px",
+                                          background: "rgba(0, 0, 0, 0.3)",
+                                          border: "1px solid rgba(59, 130, 246, 0.3)",
+                                          borderRadius: "6px",
+                                          color: "#fff",
+                                          fontSize: "0.85rem",
+                                          fontFamily: "monospace",
+                                        }}
+                                      />
                                     </label>
-                                    <input
-                                      type="text"
-                                      value={functionInputs[input.name || `param${idx}`] || ""}
-                                      onChange={(e) =>
-                                        setFunctionInputs({
-                                          ...functionInputs,
-                                          [input.name || `param${idx}`]: e.target.value,
-                                        })
-                                      }
-                                      placeholder={`Enter ${input.type}`}
-                                      style={{
-                                        width: "100%",
-                                        padding: "8px 12px",
-                                        background: "rgba(0, 0, 0, 0.3)",
-                                        border: "1px solid rgba(59, 130, 246, 0.3)",
-                                        borderRadius: "6px",
-                                        color: "#fff",
-                                        fontSize: "0.85rem",
-                                        fontFamily: "monospace",
-                                      }}
-                                    />
-                                  </div>
-                                ))}
+                                  ),
+                                )}
                               </div>
                             ) : (
                               <div
@@ -1097,6 +1118,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
                             <div style={{ display: "flex", gap: "8px" }}>
                               <button
+                                type="button"
                                 onClick={handleReadFunction}
                                 disabled={isReadingFunction}
                                 style={{
@@ -1128,6 +1150,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                 {isReadingFunction ? "Reading..." : "Query"}
                               </button>
                               <button
+                                type="button"
                                 onClick={() => {
                                   setSelectedReadFunction(null);
                                   setReadFunctionResult(null);
@@ -1196,42 +1219,50 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                             {selectedWriteFunction.inputs &&
                             selectedWriteFunction.inputs.length > 0 ? (
                               <div style={{ marginBottom: "12px" }}>
-                                {selectedWriteFunction.inputs.map((input: any, idx: number) => (
-                                  <div key={idx} style={{ marginBottom: "10px" }}>
+                                {selectedWriteFunction.inputs.map(
+                                  (input: ABIParameter, idx: number) => (
                                     <label
+                                      key={`${input.name || idx}-${input.type}`}
                                       style={{
                                         display: "block",
-                                        fontSize: "0.8rem",
-                                        color: "rgba(255, 255, 255, 0.7)",
-                                        marginBottom: "4px",
-                                        fontFamily: "monospace",
+                                        marginBottom: "10px",
                                       }}
                                     >
-                                      {input.name || `param${idx}`} ({input.type})
+                                      <span
+                                        style={{
+                                          display: "block",
+                                          fontSize: "0.8rem",
+                                          color: "rgba(255, 255, 255, 0.7)",
+                                          marginBottom: "4px",
+                                          fontFamily: "monospace",
+                                        }}
+                                      >
+                                        {input.name || `param${idx}`} ({input.type})
+                                      </span>
+                                      <input
+                                        type="text"
+                                        value={functionInputs[input.name || `param${idx}`] || ""}
+                                        onChange={(e) =>
+                                          setFunctionInputs({
+                                            ...functionInputs,
+                                            [input.name || `param${idx}`]: e.target.value,
+                                          })
+                                        }
+                                        placeholder={`Enter ${input.type}`}
+                                        style={{
+                                          width: "100%",
+                                          padding: "8px 12px",
+                                          background: "rgba(0, 0, 0, 0.3)",
+                                          border: "1px solid rgba(245, 158, 11, 0.3)",
+                                          borderRadius: "6px",
+                                          color: "#fff",
+                                          fontSize: "0.85rem",
+                                          fontFamily: "monospace",
+                                        }}
+                                      />
                                     </label>
-                                    <input
-                                      type="text"
-                                      value={functionInputs[input.name || `param${idx}`] || ""}
-                                      onChange={(e) =>
-                                        setFunctionInputs({
-                                          ...functionInputs,
-                                          [input.name || `param${idx}`]: e.target.value,
-                                        })
-                                      }
-                                      placeholder={`Enter ${input.type}`}
-                                      style={{
-                                        width: "100%",
-                                        padding: "8px 12px",
-                                        background: "rgba(0, 0, 0, 0.3)",
-                                        border: "1px solid rgba(245, 158, 11, 0.3)",
-                                        borderRadius: "6px",
-                                        color: "#fff",
-                                        fontSize: "0.85rem",
-                                        fontFamily: "monospace",
-                                      }}
-                                    />
-                                  </div>
-                                ))}
+                                  ),
+                                )}
                               </div>
                             ) : (
                               <div
@@ -1247,8 +1278,13 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                             )}
 
                             {selectedWriteFunction.stateMutability === "payable" && (
-                              <div style={{ marginBottom: "12px" }}>
-                                <label
+                              <label
+                                style={{
+                                  display: "block",
+                                  marginBottom: "12px",
+                                }}
+                              >
+                                <span
                                   style={{
                                     display: "block",
                                     fontSize: "0.8rem",
@@ -1258,7 +1294,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                   }}
                                 >
                                   Value (ETH)
-                                </label>
+                                </span>
                                 <input
                                   type="text"
                                   // biome-ignore lint/complexity/useLiteralKeys: _value is a special key for ETH value
@@ -1281,7 +1317,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                     fontFamily: "monospace",
                                   }}
                                 />
-                              </div>
+                              </label>
                             )}
 
                             {/* Transaction Status */}
@@ -1341,6 +1377,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
                             <div style={{ display: "flex", gap: "8px" }}>
                               <button
+                                type="button"
                                 onClick={handleWriteFunction}
                                 disabled={isPending || isConfirming}
                                 style={{
@@ -1380,6 +1417,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                     : "Write"}
                               </button>
                               <button
+                                type="button"
                                 onClick={() => setSelectedWriteFunction(null)}
                                 style={{
                                   padding: "10px 16px",
@@ -1607,7 +1645,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                         onChange={(e) => setStorageSlot(e.target.value)}
                         className="storage-input"
                       />
-                      <button onClick={handleGetStorage} className="storage-button">
+                      <button type="button" onClick={handleGetStorage} className="storage-button">
                         Get
                       </button>
                     </div>

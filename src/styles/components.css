@@ -2679,3 +2679,56 @@
 	color: #ef4444 !important;
 }
 
+/* ============================================
+   Button Reset Styles
+   ============================================ */
+
+/* Base button reset - removes default button styling */
+.btn-reset {
+	background: none;
+	border: none;
+	padding: 0;
+	font: inherit;
+	color: inherit;
+	cursor: pointer;
+}
+
+/* Button reset with full width and left alignment */
+.btn-reset-block {
+	background: none;
+	border: none;
+	width: 100%;
+	text-align: left;
+	padding: 0;
+	font: inherit;
+	color: inherit;
+	cursor: pointer;
+}
+
+/* Toggle button for collapsible sections */
+.btn-toggle-section {
+	background: none;
+	border: none;
+	width: 100%;
+	text-align: left;
+	padding: 0;
+	font: inherit;
+	color: inherit;
+	cursor: pointer;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+/* ENS Records toggle button */
+.btn-ens-toggle {
+	background: none;
+	border: none;
+	width: 100%;
+	text-align: left;
+	padding: 0;
+	font: inherit;
+	color: inherit;
+	cursor: pointer;
+}
+

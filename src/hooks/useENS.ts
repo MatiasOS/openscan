@@ -1,8 +1,8 @@
 // src/hooks/useENS.ts
-import { useState, useEffect, useContext, useCallback } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { AppContext } from "../context";
 import { ENSService } from "../services/ENS/ENSService";
-import type { ENSRecords, ENSReverseResult, DecodedContenthash } from "../types";
+import type { DecodedContenthash, ENSRecords, ENSReverseResult } from "../types";
 
 interface UseENSResult {
   ensName: string | null;

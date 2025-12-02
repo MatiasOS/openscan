@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { useDataService } from "../../hooks/useDataService";
+import { useENS } from "../../hooks/useENS";
 import { useProviderSelection } from "../../hooks/useProviderSelection";
 import { useSelectedData } from "../../hooks/useSelectedData";
 import type {
@@ -11,7 +12,6 @@ import type {
 } from "../../types";
 import AddressDisplay from "../common/AddressDisplay";
 import Loader from "../common/Loader";
-import { useENS } from "../../hooks/useENS";
 
 export default function Address() {
   const { chainId, address } = useParams<{
