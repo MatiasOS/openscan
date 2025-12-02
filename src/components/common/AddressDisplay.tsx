@@ -285,14 +285,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
       } finally {
         setIsReadingFunction(false);
       }
-    }, [
-      selectedReadFunction,
-      contractData,
-      chainId,
-      functionInputs,
-      addressHash,
-      rpcUrls,
-    ]);
+    }, [selectedReadFunction, contractData, chainId, functionInputs, addressHash, rpcUrls]);
 
     return (
       <div className="block-display-card">

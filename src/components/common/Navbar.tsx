@@ -1,75 +1,20 @@
-import { useContext, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { AppContext } from "../../context";
-import { ENSService } from "../../services/ENS/ENSService";
+import { useSearch } from "../../hooks/useSearch";
 import { NetworkBlockIndicator } from "./NetworkBlockIndicator";
 import VersionWarningIcon from "./VersionWarningIcon";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchInput, setSearchInput] = useState("");
-  const [isResolving, setIsResolving] = useState(false);
-  const { rpcUrls } = useContext(AppContext);
-
-  // Extract chainId from the pathname (e.g., /1/blocks -> 1)
-  const pathSegments = location.pathname.split("/").filter(Boolean);
-  const chainId =
-    pathSegments[0] && !Number.isNaN(Number(pathSegments[0])) ? pathSegments[0] : undefined;
+  const { searchTerm, setSearchTerm, isResolving, handleSearch, chainId } = useSearch();
 
   // Check if we should show the search box (on blocks, block, txs, tx pages)
+  const pathSegments = location.pathname.split("/").filter(Boolean);
   const shouldShowSearch =
     chainId &&
     pathSegments.length >= 2 &&
     pathSegments[1] &&
     ["blocks", "block", "txs", "tx", "address"].includes(pathSegments[1]);
-
-  console.log("Navbar chainId from URL:", chainId, "pathname:", location.pathname);
-
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchInput.trim() || !chainId) return;
-
-    const input = searchInput.trim();
-
-    // Check if it's an ENS name
-    if (ENSService.isENSName(input)) {
-      setIsResolving(true);
-      try {
-        const mainnetRpcUrls = rpcUrls[1];
-        if (!mainnetRpcUrls || mainnetRpcUrls.length === 0) {
-          setIsResolving(false);
-          return;
-        }
-        const ensService = new ENSService(mainnetRpcUrls);
-        const resolvedAddress = await ensService.resolve(input);
-        if (resolvedAddress) {
-          navigate(`/${chainId}/address/${resolvedAddress}`, {
-            state: { ensName: input },
-          });
-          setSearchInput("");
-        }
-      } finally {
-        setIsResolving(false);
-      }
-      return;
-    }
-
-    // Check if it's a transaction hash (0x followed by 64 hex chars)
-    if (/^0x[a-fA-F0-9]{64}$/.test(input)) {
-      navigate(`/${chainId}/tx/${input}`);
-    }
-    // Check if it's an address (0x followed by 40 hex chars)
-    else if (/^0x[a-fA-F0-9]{40}$/.test(input)) {
-      navigate(`/${chainId}/address/${input}`);
-    }
-    // Check if it's a block number
-    else if (/^\d+$/.test(input)) {
-      navigate(`/${chainId}/block/${input}`);
-    }
-
-    setSearchInput("");
-  };
 
   const goToSettings = () => {
     navigate("/settings");
@@ -116,8 +61,8 @@ const Navbar = () => {
             <form onSubmit={handleSearch} className="search-form">
               <input
                 type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search by Address / Tx Hash / Block / ENS"
                 className="search-input"
                 disabled={isResolving}
