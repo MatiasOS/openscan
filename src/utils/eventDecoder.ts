@@ -328,7 +328,7 @@ export function formatDecodedValue(value: string, type: string): string {
         // Show both raw and potential ETH value
         const ethValue = Number(num) / 1e18;
         if (ethValue >= 0.0001 && ethValue < 1e15) {
-          return `${num.toLocaleString()} (≈${ethValue.toFixed(6)} if 18 decimals)`;
+          return `${num.toString()} (≈${ethValue.toFixed(6)} if 18 decimals)`;
         }
       }
       return num.toLocaleString();

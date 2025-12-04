@@ -1,5 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { AppContext } from "../../context";
+import { useSourcify } from "../../hooks/useSourcify";
 import type { DataService } from "../../services/DataService";
 import type { TraceResult } from "../../services/EVM/L1/fetchers/trace";
 import type {
@@ -15,6 +17,11 @@ import {
   formatDecodedValue,
   getEventTypeColor,
 } from "../../utils/eventDecoder";
+import {
+  type DecodedInput,
+  decodeEventWithAbi,
+  decodeFunctionCall,
+} from "../../utils/inputDecoder";
 import LongString from "./LongString";
 import { RPCIndicator } from "./RPCIndicator";
 
@@ -47,6 +54,65 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
     const [loadingTrace, setLoadingTrace] = useState(false);
     const [_copiedField, _setCopiedField] = useState<string | null>(null);
     const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // Get local artifacts from context
+    const { jsonFiles } = useContext(AppContext);
+
+    // Check if we have local artifact data for the recipient address
+    const localArtifact = transaction.to ? jsonFiles[transaction.to.toLowerCase()] : null;
+
+    // Parse local artifact to sourcify format if it exists
+    const parsedLocalData = useMemo(() => {
+      if (!localArtifact) return null;
+      return {
+        name: localArtifact.contractName,
+        compilerVersion: localArtifact.buildInfo?.solcLongVersion,
+        evmVersion: localArtifact.buildInfo?.input?.settings?.evmVersion,
+        abi: localArtifact.abi,
+        files: localArtifact.sourceCode
+          ? [
+              {
+                name: localArtifact.sourceName || "Contract.sol",
+                path: localArtifact.sourceName || "Contract.sol",
+                content: localArtifact.sourceCode,
+              },
+            ]
+          : undefined,
+        metadata: {
+          language: localArtifact.buildInfo?.input?.language,
+          compiler: localArtifact.buildInfo
+            ? {
+                version: localArtifact.buildInfo.solcVersion,
+              }
+            : undefined,
+        },
+        match: "perfect" as const,
+        creation_match: null,
+        runtime_match: null,
+        chainId: chainId,
+        address: transaction.to,
+        verifiedAt: undefined,
+      };
+    }, [localArtifact, chainId, transaction.to]);
+
+    // Fetch Sourcify data for the recipient contract
+    const { data: sourcifyData, isVerified } = useSourcify(
+      Number(chainId),
+      transaction.to || undefined,
+      true,
+    );
+
+    // Use local artifact data if available and sourcify is not verified, otherwise use sourcify
+    const contractData = useMemo(
+      () => (isVerified && sourcifyData ? sourcifyData : parsedLocalData),
+      [isVerified, sourcifyData, parsedLocalData],
+    );
+
+    // Decode input data if contract data is available
+    const decodedInput: DecodedInput | null = useMemo(() => {
+      if (!contractData?.abi || !transaction.data) return null;
+      return decodeFunctionCall(transaction.data, contractData.abi);
+    }, [contractData?.abi, transaction.data]);
 
     // Check if trace is available (localhost only)
     const isTraceAvailable = dataService?.isTraceAvailable() || false;
@@ -444,6 +510,41 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
               <span className="tx-empty">0x</span>
             )}
           </div>
+
+          {/* Decoded Input Data */}
+          {decodedInput && (
+            <div className="tx-row tx-row-vertical">
+              <span className="tx-label">Decoded Input:</span>
+              <div className="tx-decoded-input">
+                <div className="tx-decoded-function">
+                  <span className="tx-function-badge">{decodedInput.functionName}</span>
+                  <span className="tx-function-signature">{decodedInput.signature}</span>
+                </div>
+                {decodedInput.params.length > 0 && (
+                  <div className="tx-decoded-params">
+                    {decodedInput.params.map((param, i) => (
+                      // biome-ignore lint/suspicious/noArrayIndexKey: params have stable order
+                      <div key={i} className="tx-decoded-param">
+                        <span className="tx-param-name">{param.name}</span>
+                        <span className="tx-param-type">({param.type})</span>
+                        <span
+                          className={`tx-param-value ${param.type === "address" ? "tx-mono" : ""}`}
+                        >
+                          {param.type === "address" && chainId ? (
+                            <Link to={`/${chainId}/address/${param.value}`} className="link-accent">
+                              {param.value}
+                            </Link>
+                          ) : (
+                            formatDecodedValue(param.value, param.type)
+                          )}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Event Logs Section - Always visible */}
@@ -457,9 +558,29 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
             <div className="tx-logs">
               {/** biome-ignore lint/suspicious/noExplicitAny: <TODO> */}
               {transaction.receipt.logs.map((log: any, index: number) => {
-                const decoded: DecodedEvent | null = log.topics
-                  ? decodeEventLog(log.topics, log.data || "0x")
-                  : null;
+                // Try ABI-based decoding first if log is from tx.to and we have contract data
+                let decoded: DecodedEvent | null = null;
+                let abiDecoded: DecodedInput | null = null;
+
+                const isFromTxRecipient =
+                  transaction.to &&
+                  log.address &&
+                  log.address.toLowerCase() === transaction.to.toLowerCase();
+
+                if (isFromTxRecipient && contractData?.abi && log.topics) {
+                  abiDecoded = decodeEventWithAbi(log.topics, log.data || "0x", contractData.abi);
+                }
+
+                // Fallback to standard event lookup
+                if (!abiDecoded && log.topics) {
+                  decoded = decodeEventLog(log.topics, log.data || "0x");
+                }
+
+                // Determine which decoded data to display
+                const hasDecoded = abiDecoded || decoded;
+                const displayName = abiDecoded?.functionName || decoded?.name;
+                const displaySignature = abiDecoded?.signature || decoded?.fullSignature;
+                const displayParams = abiDecoded?.params || decoded?.params || [];
 
                 return (
                   // biome-ignore lint/suspicious/noArrayIndexKey: <TODO>
@@ -467,19 +588,29 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                     <div className="tx-log-index">{index}</div>
                     <div className="tx-log-content">
                       {/* Decoded Event Header */}
-                      {decoded && (
+                      {hasDecoded && (
                         <div className="tx-log-decoded">
                           <span
                             className="tx-event-badge"
                             style={{
-                              backgroundColor: getEventTypeColor(decoded.type),
+                              backgroundColor: abiDecoded
+                                ? "#10b981"
+                                : getEventTypeColor(decoded?.type || ""),
                             }}
                           >
-                            {decoded.name}
+                            {displayName}
                           </span>
-                          <span className="tx-event-signature" title={decoded.description}>
-                            {decoded.fullSignature}
+                          <span
+                            className="tx-event-signature"
+                            title={decoded?.description || displaySignature}
+                          >
+                            {displaySignature}
                           </span>
+                          {abiDecoded && (
+                            <span className="tx-abi-badge" title="Decoded using contract ABI">
+                              ABI
+                            </span>
+                          )}
                         </div>
                       )}
 
@@ -498,11 +629,11 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                       </div>
 
                       {/* Decoded Parameters */}
-                      {decoded && decoded.params.length > 0 && (
+                      {displayParams.length > 0 && (
                         <div className="tx-log-row tx-log-params">
                           <span className="tx-log-label">Decoded</span>
                           <div className="tx-log-value">
-                            {decoded.params.map((param, i) => (
+                            {displayParams.map((param, i) => (
                               // biome-ignore lint/suspicious/noArrayIndexKey: <TODO>
                               <div key={i} className="tx-decoded-param">
                                 <span className="tx-param-name">{param.name}</span>
@@ -531,7 +662,9 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                       {/* Raw Topics (collapsed if decoded) */}
                       {log.topics && log.topics.length > 0 && (
                         <div className="tx-log-row tx-log-topics">
-                          <span className="tx-log-label">{decoded ? "Raw Topics" : "Topics"}</span>
+                          <span className="tx-log-label">
+                            {hasDecoded ? "Raw Topics" : "Topics"}
+                          </span>
                           <div className="tx-log-value">
                             {log.topics.map((topic: string, i: number) => (
                               <div key={topic} className="tx-topic">
@@ -546,7 +679,7 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                       {/* Raw Data */}
                       {log.data && log.data !== "0x" && (
                         <div className="tx-log-row">
-                          <span className="tx-log-label">{decoded ? "Raw Data" : "Data"}</span>
+                          <span className="tx-log-label">{hasDecoded ? "Raw Data" : "Data"}</span>
                           <div className="tx-log-value">
                             <code className="tx-log-data">{log.data}</code>
                           </div>
