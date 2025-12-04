@@ -14,13 +14,13 @@ import AddressDisplay from "../common/AddressDisplay";
 import Loader from "../common/Loader";
 
 export default function Address() {
-  const { chainId, address } = useParams<{
-    chainId?: string;
+  const { networkId, address } = useParams<{
+    networkId?: string;
     address?: string;
   }>();
   const location = useLocation();
-  const numericChainId = Number(chainId) || 1;
-  const dataService = useDataService(numericChainId);
+  const numericNetworkId = Number(networkId) || 1;
+  const dataService = useDataService(numericNetworkId);
   const [addressResult, setAddressResult] = useState<DataWithMetadata<AddressType> | null>(null);
   const [transactionsResult, setTransactionsResult] = useState<AddressTransactionsResult | null>(
     null,
@@ -32,7 +32,7 @@ export default function Address() {
 
   // Provider selection state
   const [selectedProvider, setSelectedProvider] = useProviderSelection(
-    `address_${numericChainId}_${address}`,
+    `address_${numericNetworkId}_${address}`,
   );
 
   // Extract actual address data based on selected provider
@@ -49,7 +49,7 @@ export default function Address() {
     decodedContenthash,
     loading: ensLoading,
     isMainnet,
-  } = useENS(address, numericChainId, initialEnsName);
+  } = useENS(address, numericNetworkId, initialEnsName);
 
   useEffect(() => {
     if (!dataService || !address) {
@@ -57,7 +57,7 @@ export default function Address() {
       return;
     }
 
-    console.log("Fetching address data for:", address, "on chain:", numericChainId);
+    console.log("Fetching address data for:", address, "on chain:", numericNetworkId);
     setLoading(true);
     setError(null);
 
@@ -111,7 +111,7 @@ export default function Address() {
           message: `Failed to fetch transaction history: ${err.message}`,
         });
       });
-  }, [dataService, address, numericChainId]);
+  }, [dataService, address, numericNetworkId]);
 
   if (loading) {
     return (
@@ -166,7 +166,7 @@ export default function Address() {
         <AddressDisplay
           address={addressData}
           addressHash={address}
-          chainId={chainId}
+          networkId={networkId}
           transactionsResult={transactionsResult}
           transactionDetails={transactionDetails}
           loadingTxDetails={loadingTxDetails}

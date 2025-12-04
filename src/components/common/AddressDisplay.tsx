@@ -24,7 +24,7 @@ import { RPCIndicator } from "./RPCIndicator";
 interface AddressDisplayProps {
   address: Address;
   addressHash: string;
-  chainId?: string;
+  networkId?: string;
   transactionsResult?: AddressTransactionsResult | null;
   transactionDetails?: Transaction[];
   loadingTxDetails?: boolean;
@@ -44,7 +44,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
   ({
     address,
     addressHash,
-    chainId = "1",
+    networkId = "1",
     transactionsResult,
     transactionDetails = [],
     loadingTxDetails = false,
@@ -81,7 +81,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
       data: sourcifyData,
       loading: sourcifyLoading,
       isVerified,
-    } = useSourcify(Number(chainId), isContract ? addressHash : undefined, true);
+    } = useSourcify(Number(networkId), isContract ? addressHash : undefined, true);
 
     // Memoized helper functions
     const truncate = useCallback((str: string, start = 6, end = 4) => {
@@ -154,11 +154,11 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
         match: "perfect" as const,
         creation_match: null,
         runtime_match: null,
-        chainId: chainId,
+        chainId: networkId,
         address: addressHash,
         verifiedAt: undefined,
       };
-    }, [localArtifact, chainId, addressHash]);
+    }, [localArtifact, networkId, addressHash]);
 
     // Use local artifact data if available and sourcify is not verified, otherwise use sourcify
     const contractData = useMemo(
@@ -252,11 +252,11 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
       try {
         // Get RPC URL for the current chain
-        const chainIdNum = Number(chainId);
-        const rpcUrlsForChain = rpcUrls[chainIdNum as keyof typeof rpcUrls];
+        const networkIdNum = Number(networkId);
+        const rpcUrlsForChain = rpcUrls[networkIdNum as keyof typeof rpcUrls];
 
         if (!rpcUrlsForChain) {
-          throw new Error(`No RPC URL configured for chain ${chainId}`);
+          throw new Error(`No RPC URL configured for chain ${networkId}`);
         }
 
         // Get first RPC URL (could be string or array)
@@ -264,7 +264,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
 
         if (!rpcUrl) {
           // Defensive: ensure rpcUrl is defined before calling fetch
-          throw new Error(`No RPC URL configured for chain ${chainId}`);
+          throw new Error(`No RPC URL configured for chain ${networkId}`);
         }
 
         // Prepare function arguments
@@ -321,7 +321,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
       } finally {
         setIsReadingFunction(false);
       }
-    }, [selectedReadFunction, contractData, chainId, functionInputs, addressHash, rpcUrls]);
+    }, [selectedReadFunction, contractData, networkId, functionInputs, addressHash, rpcUrls]);
 
     return (
       <div className="block-display-card">
@@ -1392,7 +1392,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                                         }}
                                       >
                                         <Link
-                                          to={`/${chainId}/tx/${hash}`}
+                                          to={`/${networkId}/tx/${hash}`}
                                           style={{
                                             color: "#10b981",
                                             textDecoration: "underline",
@@ -1485,7 +1485,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                     <div className="tx-row">
                       <span className="tx-label">Sourcify</span>
                       <a
-                        href={`https://repo.sourcify.dev/contracts/full_match/${chainId}/${addressHash}/`}
+                        href={`https://repo.sourcify.dev/contracts/full_match/${networkId}/${addressHash}/`}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
@@ -1596,7 +1596,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                     {transactionDetails.map((tx) => (
                       <tr key={tx.hash}>
                         <td>
-                          <Link to={`/${chainId}/tx/${tx.hash}`} className="address-table-link">
+                          <Link to={`/${networkId}/tx/${tx.hash}`} className="address-table-link">
                             {truncate(tx.hash, 8, 6)}
                           </Link>
                         </td>
@@ -1637,7 +1637,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                         )}
                         <td>
                           <Link
-                            to={`/${chainId}/address/${tx.from}`}
+                            to={`/${networkId}/address/${tx.from}`}
                             className="address-table-link"
                           >
                             {tx.from?.toLowerCase() === addressHash.toLowerCase()
@@ -1648,7 +1648,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                         <td>
                           {tx.to ? (
                             <Link
-                              to={`/${chainId}/address/${tx.to}`}
+                              to={`/${networkId}/address/${tx.to}`}
                               style={{
                                 color:
                                   tx.to?.toLowerCase() === addressHash.toLowerCase()

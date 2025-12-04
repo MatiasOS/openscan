@@ -10,7 +10,7 @@ interface UseSearchResult {
   error: string | null;
   clearError: () => void;
   handleSearch: (e: React.FormEvent) => Promise<void>;
-  chainId: string | undefined;
+  networkId: string | undefined;
 }
 
 export function useSearch(): UseSearchResult {
@@ -21,9 +21,9 @@ export function useSearch(): UseSearchResult {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Extract chainId from the pathname (e.g., /1/blocks -> 1)
+  // Extract networkId from the pathname (e.g., /1/blocks -> 1)
   const pathSegments = location.pathname.split("/").filter(Boolean);
-  const chainId =
+  const networkId =
     pathSegments[0] && !Number.isNaN(Number(pathSegments[0])) ? pathSegments[0] : undefined;
 
   const clearError = useCallback(() => setError(null), []);
@@ -50,7 +50,7 @@ export function useSearch(): UseSearchResult {
           const resolvedAddress = await ensService.resolve(term);
 
           if (resolvedAddress) {
-            const targetChainId = chainId || "1";
+            const targetChainId = networkId || "1";
             navigate(`/${targetChainId}/address/${resolvedAddress}`, {
               state: { ensName: term },
             });
@@ -66,26 +66,26 @@ export function useSearch(): UseSearchResult {
         return;
       }
 
-      // Need chainId for non-ENS searches
-      if (!chainId) return;
+      // Need networkId for non-ENS searches
+      if (!networkId) return;
 
       // Check if it's a transaction hash (0x followed by 64 hex chars)
       if (/^0x[a-fA-F0-9]{64}$/.test(term)) {
-        navigate(`/${chainId}/tx/${term}`);
+        navigate(`/${networkId}/tx/${term}`);
         setSearchTerm("");
       }
       // Check if it's an address (0x followed by 40 hex chars)
       else if (/^0x[a-fA-F0-9]{40}$/.test(term)) {
-        navigate(`/${chainId}/address/${term}`);
+        navigate(`/${networkId}/address/${term}`);
         setSearchTerm("");
       }
       // Check if it's a block number
       else if (/^\d+$/.test(term)) {
-        navigate(`/${chainId}/block/${term}`);
+        navigate(`/${networkId}/block/${term}`);
         setSearchTerm("");
       }
     },
-    [searchTerm, chainId, navigate, rpcUrls],
+    [searchTerm, networkId, navigate, rpcUrls],
   );
 
   return {
@@ -95,6 +95,6 @@ export function useSearch(): UseSearchResult {
     error,
     clearError,
     handleSearch,
-    chainId,
+    networkId,
   };
 }

@@ -6,12 +6,12 @@ import VersionWarningIcon from "./VersionWarningIcon";
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { searchTerm, setSearchTerm, isResolving, handleSearch, chainId } = useSearch();
+  const { searchTerm, setSearchTerm, isResolving, handleSearch, networkId } = useSearch();
 
   // Check if we should show the search box (on blocks, block, txs, tx pages)
   const pathSegments = location.pathname.split("/").filter(Boolean);
   const shouldShowSearch =
-    chainId &&
+    networkId &&
     pathSegments.length >= 2 &&
     pathSegments[1] &&
     ["blocks", "block", "txs", "tx", "address"].includes(pathSegments[1]);
@@ -43,13 +43,13 @@ const Navbar = () => {
               </svg>
             </Link>
           </li>
-          {chainId && (
+          {networkId && (
             <>
               <li>
-                <Link to={`/${chainId}/blocks`}>BLOCKS</Link>
+                <Link to={`/${networkId}/blocks`}>BLOCKS</Link>
               </li>
               <li>
-                <Link to={`/${chainId}/txs`}>TRANSACTIONS</Link>
+                <Link to={`/${networkId}/txs`}>TRANSACTIONS</Link>
               </li>
             </>
           )}

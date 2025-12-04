@@ -27,7 +27,7 @@ import { RPCIndicator } from "./RPCIndicator";
 
 interface TransactionDisplayProps {
   transaction: Transaction | TransactionArbitrum;
-  chainId?: string;
+  networkId?: string;
   currentBlockNumber?: number;
   dataService?: DataService;
   metadata?: RPCMetadata;
@@ -38,7 +38,7 @@ interface TransactionDisplayProps {
 const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
   ({
     transaction,
-    chainId,
+    networkId,
     currentBlockNumber,
     dataService,
     metadata,
@@ -89,15 +89,15 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
         match: "perfect" as const,
         creation_match: null,
         runtime_match: null,
-        chainId: chainId,
+        networkId: networkId,
         address: transaction.to,
         verifiedAt: undefined,
       };
-    }, [localArtifact, chainId, transaction.to]);
+    }, [localArtifact, networkId, transaction.to]);
 
     // Fetch Sourcify data for the recipient contract
     const { data: sourcifyData, isVerified } = useSourcify(
-      Number(chainId),
+      Number(networkId),
       transaction.to || undefined,
       true,
     );
@@ -307,8 +307,8 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
           <div className="tx-row">
             <span className="tx-label">Block:</span>
             <span className="tx-value">
-              {chainId ? (
-                <Link to={`/${chainId}/block/${transaction.blockNumber}`} className="link-accent">
+              {networkId ? (
+                <Link to={`/${networkId}/block/${transaction.blockNumber}`} className="link-accent">
                   {Number(transaction.blockNumber).toLocaleString()}
                 </Link>
               ) : (
@@ -338,8 +338,8 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
           <div className="tx-row">
             <span className="tx-label">From:</span>
             <span className="tx-value tx-mono">
-              {chainId ? (
-                <Link to={`/${chainId}/address/${transaction.from}`} className="link-accent">
+              {networkId ? (
+                <Link to={`/${networkId}/address/${transaction.from}`} className="link-accent">
                   {transaction.from}
                 </Link>
               ) : (
@@ -353,8 +353,8 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
             <span className="tx-label">{transaction.to ? "To:" : "Interacted With:"}</span>
             <span className="tx-value tx-mono">
               {transaction.to ? (
-                chainId ? (
-                  <Link to={`/${chainId}/address/${transaction.to}`} className="link-accent">
+                networkId ? (
+                  <Link to={`/${networkId}/address/${transaction.to}`} className="link-accent">
                     {transaction.to}
                   </Link>
                 ) : (
@@ -371,9 +371,9 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
             <div className="tx-row">
               <span className="tx-label">Contract Created:</span>
               <span className="tx-value tx-mono">
-                {chainId ? (
+                {networkId ? (
                   <Link
-                    to={`/${chainId}/address/${transaction.receipt.contractAddress}`}
+                    to={`/${networkId}/address/${transaction.receipt.contractAddress}`}
                     className="link-accent"
                   >
                     {transaction.receipt.contractAddress}
@@ -468,21 +468,21 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
           {/* OP Stack fields (Optimism, Base) */}
           {transaction.receipt && isOptimismReceipt(transaction.receipt) && (
             <>
-              <div className={`tx-row ${chainId === "8453" ? "tx-row-base" : "tx-row-optimism"}`}>
+              <div className={`tx-row ${networkId === "8453" ? "tx-row-base" : "tx-row-optimism"}`}>
                 <span className="tx-label">L1 Fee:</span>
                 <span className="tx-value">{formatValue(transaction.receipt.l1Fee)}</span>
               </div>
-              <div className={`tx-row ${chainId === "8453" ? "tx-row-base" : "tx-row-optimism"}`}>
+              <div className={`tx-row ${networkId === "8453" ? "tx-row-base" : "tx-row-optimism"}`}>
                 <span className="tx-label">L1 Gas Price:</span>
                 <span className="tx-value">{formatGwei(transaction.receipt.l1GasPrice)}</span>
               </div>
-              <div className={`tx-row ${chainId === "8453" ? "tx-row-base" : "tx-row-optimism"}`}>
+              <div className={`tx-row ${networkId === "8453" ? "tx-row-base" : "tx-row-optimism"}`}>
                 <span className="tx-label">L1 Gas Used:</span>
                 <span className="tx-value">
                   {Number(transaction.receipt.l1GasUsed).toLocaleString()}
                 </span>
               </div>
-              <div className={`tx-row ${chainId === "8453" ? "tx-row-base" : "tx-row-optimism"}`}>
+              <div className={`tx-row ${networkId === "8453" ? "tx-row-base" : "tx-row-optimism"}`}>
                 <span className="tx-label">L1 Fee Scalar:</span>
                 <span className="tx-value">{transaction.receipt.l1FeeScalar}</span>
               </div>
@@ -530,8 +530,11 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                         <span
                           className={`tx-param-value ${param.type === "address" ? "tx-mono" : ""}`}
                         >
-                          {param.type === "address" && chainId ? (
-                            <Link to={`/${chainId}/address/${param.value}`} className="link-accent">
+                          {param.type === "address" && networkId ? (
+                            <Link
+                              to={`/${networkId}/address/${param.value}`}
+                              className="link-accent"
+                            >
                               {param.value}
                             </Link>
                           ) : (
@@ -618,8 +621,11 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                       <div className="tx-log-row">
                         <span className="tx-log-label">Address</span>
                         <span className="tx-log-value tx-mono">
-                          {chainId ? (
-                            <Link to={`/${chainId}/address/${log.address}`} className="link-accent">
+                          {networkId ? (
+                            <Link
+                              to={`/${networkId}/address/${log.address}`}
+                              className="link-accent"
+                            >
                               {log.address}
                             </Link>
                           ) : (
@@ -641,9 +647,9 @@ const TransactionDisplay: React.FC<TransactionDisplayProps> = React.memo(
                                 <span
                                   className={`tx-param-value ${param.type === "address" ? "tx-mono" : ""}`}
                                 >
-                                  {param.type === "address" && chainId ? (
+                                  {param.type === "address" && networkId ? (
                                     <Link
-                                      to={`/${chainId}/address/${param.value}`}
+                                      to={`/${networkId}/address/${param.value}`}
                                       className="link-accent"
                                     >
                                       {param.value}
