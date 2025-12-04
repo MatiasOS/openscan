@@ -1,38 +1,7 @@
-import type React from "react";
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useSearch } from "../../hooks/useSearch";
 
 const SearchBox = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  // Extract networkId from the pathname (e.g., /1/blocks -> 1)
-  const pathSegments = location.pathname.split("/").filter(Boolean);
-  const networkId =
-    pathSegments[0] && !Number.isNaN(Number(pathSegments[0])) ? pathSegments[0] : undefined;
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchTerm.trim()) return;
-
-    // Basic routing logic placeholder
-    // In a real app, we would detect the type of input (address, tx, block)
-    // For now, we'll just log it or maybe navigate to a search result page if it existed.
-    // Since the user just asked for the UI, we'll keep the logic minimal but functional enough to show interaction.
-    console.log("Searching for:", searchTerm);
-
-    // Example logic:
-    if (searchTerm.startsWith("0x")) {
-      if (searchTerm.length === 42) {
-        navigate(`/${networkId}/address/${searchTerm}`);
-      } else if (searchTerm.length === 66) {
-        navigate(`/${networkId}/tx/${searchTerm}`);
-      }
-    } else if (!Number.isNaN(Number(searchTerm))) {
-      navigate(`/${networkId}/block/${searchTerm}`);
-    }
-  };
+  const { searchTerm, setSearchTerm, isResolving, error, clearError, handleSearch } = useSearch();
 
   return (
     <div className="search-box-container">
@@ -40,14 +9,32 @@ const SearchBox = () => {
         <input
           type="text"
           className="search-input"
-          placeholder="Search by Address / Txn Hash / Block / Token"
+          placeholder="Search by Address / Txn Hash / Block / ENS Name"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            clearError();
+          }}
+          disabled={isResolving}
         />
-        <button type="submit" className="search-button">
-          Scan
+        <button type="submit" className="search-button" disabled={isResolving}>
+          {isResolving ? "..." : "Scan"}
         </button>
       </form>
+      {error && (
+        <div
+          style={{
+            color: "#ef4444",
+            fontSize: "0.85rem",
+            marginTop: "8px",
+            padding: "8px 12px",
+            background: "rgba(239, 68, 68, 0.1)",
+            borderRadius: "6px",
+          }}
+        >
+          {error}
+        </div>
+      )}
     </div>
   );
 };

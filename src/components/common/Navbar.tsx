@@ -1,53 +1,20 @@
-import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useSearch } from "../../hooks/useSearch";
 import { NetworkBlockIndicator } from "./NetworkBlockIndicator";
 import VersionWarningIcon from "./VersionWarningIcon";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchInput, setSearchInput] = useState("");
-
-  // Extract networkId from the pathname (e.g., /1/blocks -> 1)
-  const pathSegments = location.pathname.split("/").filter(Boolean);
-  const networkId =
-    pathSegments[0] && !Number.isNaN(Number(pathSegments[0])) ? pathSegments[0] : undefined;
+  const { searchTerm, setSearchTerm, isResolving, handleSearch, networkId } = useSearch();
 
   // Check if we should show the search box (on blocks, block, txs, tx pages)
+  const pathSegments = location.pathname.split("/").filter(Boolean);
   const shouldShowSearch =
     networkId &&
     pathSegments.length >= 2 &&
     pathSegments[1] &&
     ["blocks", "block", "txs", "tx", "address"].includes(pathSegments[1]);
-
-  console.log("Navbar networkId from URL:", networkId, "pathname:", location.pathname);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchInput.trim() || !networkId) return;
-
-    const input = searchInput.trim();
-
-    // Check if it's a transaction hash (0x followed by 64 hex chars)
-    if (/^0x[a-fA-F0-9]{64}$/.test(input)) {
-      navigate(`/${networkId}/tx/${input}`);
-    }
-    // Check if it's an address (0x followed by 40 hex chars)
-    else if (/^0x[a-fA-F0-9]{40}$/.test(input)) {
-      navigate(`/${networkId}/address/${input}`);
-    }
-    // Check if it's a block number
-    else if (/^\d+$/.test(input)) {
-      navigate(`/${networkId}/block/${input}`);
-    }
-    // Check if it's a block hash (0x followed by 64 hex chars - same as tx)
-    // biome-ignore lint/suspicious/noDuplicateElseIf: <TODO>
-    else if (/^0x[a-fA-F0-9]{64}$/.test(input)) {
-      navigate(`/${networkId}/block/${input}`);
-    }
-
-    setSearchInput("");
-  };
 
   const goToSettings = () => {
     navigate("/settings");
@@ -94,12 +61,19 @@ const Navbar = () => {
             <form onSubmit={handleSearch} className="search-form">
               <input
                 type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Search by Address / Tx Hash / Block"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search by Address / Tx Hash / Block / ENS"
                 className="search-input"
+                disabled={isResolving}
               />
-              <button type="submit" className="search-button" aria-label="Search" title="Search">
+              <button
+                type="submit"
+                className="search-button"
+                aria-label="Search"
+                title="Search"
+                disabled={isResolving}
+              >
                 {/** biome-ignore lint/a11y/noSvgWithoutTitle: <TODO> */}
                 <svg
                   width="20"
@@ -167,8 +141,8 @@ const Navbar = () => {
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  <path
-                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
                     stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
