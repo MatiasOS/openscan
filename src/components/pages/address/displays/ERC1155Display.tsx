@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { AppContext } from "../../../../context";
 import { useSourcify } from "../../../../hooks/useSourcify";
 import { fetchToken, getAssetUrl, type TokenMetadata } from "../../../../services/MetadataService";
-import { decodeAbiString } from "../../../../utils/hexUtils";
 import type {
   Address,
   AddressTransactionsResult,
@@ -14,8 +13,9 @@ import type {
   RPCMetadata,
   Transaction,
 } from "../../../../types";
-import ENSRecordsDetails from "../shared/ENSRecordsDisplay";
+import { decodeAbiString } from "../../../../utils/hexUtils";
 import { AddressHeader, ContractDetails, TransactionHistory } from "../shared";
+import ENSRecordsDetails from "../shared/ENSRecordsDisplay";
 
 interface ERC1155DisplayProps {
   address: Address;

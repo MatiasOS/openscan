@@ -3,12 +3,12 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { AppContext } from "../../../context";
 import {
+  type CollectionInfo,
+  type ERC1155TokenMetadata,
   fetchCollectionInfo,
   fetchERC1155MetadataWithUri,
   fetchTokenBalance,
   getImageUrl,
-  type CollectionInfo,
-  type ERC1155TokenMetadata,
 } from "../../../utils/erc1155Metadata";
 import Loader from "../../common/Loader";
 

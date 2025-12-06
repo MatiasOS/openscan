@@ -1,8 +1,8 @@
 import type React from "react";
 import { useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
-import type { ABI, AddressTransactionsResult, FunctionABI, Transaction } from "../../../../types";
 import { toFunctionSelector } from "viem";
+import type { ABI, AddressTransactionsResult, FunctionABI, Transaction } from "../../../../types";
 
 interface TransactionHistoryProps {
   networkId: string;

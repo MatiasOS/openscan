@@ -12,8 +12,8 @@ import type {
   RPCMetadata,
   Transaction,
 } from "../../../../types";
-import ENSRecordsDetails from "../shared/ENSRecordsDisplay";
 import { AddressHeader, ContractDetails, TransactionHistory } from "../shared";
+import ENSRecordsDetails from "../shared/ENSRecordsDisplay";
 
 interface ERC20DisplayProps {
   address: Address;

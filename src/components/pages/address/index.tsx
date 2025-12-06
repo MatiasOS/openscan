@@ -4,8 +4,8 @@ import { AppContext } from "../../../context";
 import { useDataService } from "../../../hooks/useDataService";
 import { useENS } from "../../../hooks/useENS";
 import type {
-  AddressTransactionsResult,
   Address as AddressData,
+  AddressTransactionsResult,
   AddressType,
   DataWithMetadata,
   Transaction,

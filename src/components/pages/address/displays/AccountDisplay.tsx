@@ -8,8 +8,8 @@ import type {
   RPCMetadata,
   Transaction,
 } from "../../../../types";
-import ENSRecordsDetails from "../shared/ENSRecordsDisplay";
 import { AddressHeader, BalanceSection, TransactionHistory } from "../shared";
+import ENSRecordsDetails from "../shared/ENSRecordsDisplay";
 
 interface AccountDisplayProps {
   address: Address;

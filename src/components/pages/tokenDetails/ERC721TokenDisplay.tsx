@@ -3,13 +3,13 @@ import { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { AppContext } from "../../../context";
 import {
+  type CollectionInfo,
+  type ERC721TokenMetadata,
   fetchCollectionInfo,
   fetchERC721MetadataWithUri,
   fetchTokenApproval,
   fetchTokenOwner,
   getImageUrl,
-  type CollectionInfo,
-  type ERC721TokenMetadata,
 } from "../../../utils/erc721Metadata";
 import Loader from "../../common/Loader";
 

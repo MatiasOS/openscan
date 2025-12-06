@@ -43,11 +43,11 @@ import {
   LazyDevTools,
   LazyHome,
   LazyMempool,
-  LazyTokenDetails,
   LazyProfile,
   LazySettings,
   LazySubscriptions,
   LazySupporters,
+  LazyTokenDetails,
   LazyTx,
   LazyTxs,
 } from "./components/LazyComponents";

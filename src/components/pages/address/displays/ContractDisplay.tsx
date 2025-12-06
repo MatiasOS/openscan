@@ -11,8 +11,8 @@ import type {
   RPCMetadata,
   Transaction,
 } from "../../../../types";
-import ENSRecordsDetails from "../shared/ENSRecordsDisplay";
 import { AddressHeader, ContractDetails, ContractStorage, TransactionHistory } from "../shared";
+import ENSRecordsDetails from "../shared/ENSRecordsDisplay";
 
 interface ContractDisplayProps {
   address: Address;
