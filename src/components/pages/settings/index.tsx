@@ -52,6 +52,8 @@ const Settings: React.FC = () => {
 
   return (
     <div className="container-wide settings-container">
+      <h1 className="page-title-small">Settings</h1>
+
       {/* Success Message */}
       {saveSuccess && (
         <div className="settings-success-message">✓ Settings saved successfully!</div>
