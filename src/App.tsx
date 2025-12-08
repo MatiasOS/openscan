@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { HashRouter, Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { WagmiProvider } from "wagmi";
 import { networkConfig } from "./utils/networkConfig";
-import "./styles/rainbowkit.css";
+import "@rainbow-me/rainbowkit/styles.css";
 
 // Detect if we're running on GitHub Pages and get the correct basename
 function getBasename(): string {
