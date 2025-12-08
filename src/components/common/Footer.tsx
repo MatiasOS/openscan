@@ -1,6 +1,7 @@
 import type React from "react";
 import { useNavigate } from "react-router";
 import { ENVIRONMENT } from "../../utils/constants";
+import About from '../pages/about/index';
 
 interface FooterProps {
   className?: string;
@@ -40,15 +41,19 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
     <footer className={`app-footer ${className}`}>
       <div className="footer-content">
         <div className="footer-left">
+          <button type="button" onClick={() => navigate("/about")} className="footer-link btn-reset">
+            About Openscan
+          </button>
+          |
           <button type="button" onClick={goToSubscriptions} className="footer-link btn-reset">
             Subscribe
           </button>
+          |
           <button type="button" onClick={goToSupporters} className="footer-link btn-reset">
             Our Supporters ❤️
           </button>
         </div>
-        <div className={`footer-version ${getVersionClass()}`}>
-          <span className="version-label">Version:</span>
+        <div className={`footer-right ${getVersionClass()}`}>
           <a
             href={`${repoUrl}/commit/${commitHash}`}
             target="_blank"
@@ -56,7 +61,7 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
             className="commit-link"
             title={`View commit ${formattedCommitHash} on GitHub`}
           >
-            {appVersion} {formattedCommitHash}
+            v{appVersion} {formattedCommitHash}
           </a>
           {ENVIRONMENT !== "production" && (
             <span className="commit-link environment-tag">{ENVIRONMENT}</span>
