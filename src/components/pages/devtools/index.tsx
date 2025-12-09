@@ -35,8 +35,8 @@ const DevTools: React.FC = () => {
   };
 
   return (
-    <div className="page">
-      <div className="devtools-content-wrapper">
+    <div className="container-wide">
+      <div className="page-card devtools-content-wrapper">
         <h1 className="page-title-small text-center">Dev Tools</h1>
         <div className="devtools-tabs">
           {tabs.map((tab) => (
