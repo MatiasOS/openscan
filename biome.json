@@ -11,5 +11,12 @@
     "lineWidth": 100,
     "indentStyle": "space",
     "indentWidth": 2
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "off"
+      }
+    }
   }
 }
