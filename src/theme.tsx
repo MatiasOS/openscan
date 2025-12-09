@@ -34,7 +34,7 @@ export const colors = {
 
   // Light Mode
   light: {
-    bgPrimary: "#3a4a76",
+    bgPrimary: "#31457a",
     bgSecondary: "#ffffff",
     bgTertiary: "#e5e7eb",
     textPrimary: "#1a1d26",
