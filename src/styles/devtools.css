@@ -185,42 +185,6 @@
 	resize: vertical;
 }
 
-.sig-results {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-}
-
-.sig-result-row {
-	display: flex;
-	gap: 12px;
-	align-items: flex-start;
-}
-
-.sig-result-label {
-	font-weight: 600;
-	color: var(--text-secondary);
-	min-width: 140px;
-	flex-shrink: 0;
-}
-
-.sig-result-value {
-	flex: 1;
-	word-break: break-all;
-}
-
-.sig-components {
-	margin-top: 12px;
-	padding-top: 12px;
-	border-top: 1px solid var(--color-primary-alpha-15);
-}
-
-.sig-component-title {
-	font-weight: 600;
-	color: var(--color-primary);
-	margin-bottom: 8px;
-}
-
 /* ================================================
    EIP-712 Section
    ================================================ */
@@ -277,69 +241,6 @@
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
-}
-
-.keccak-input-row {
-	display: flex;
-	gap: 12px;
-	align-items: center;
-}
-
-.keccak-type-select {
-	width: auto;
-	min-width: 120px;
-	flex-shrink: 0;
-}
-
-.keccak-results {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-}
-
-.keccak-result-item {
-	padding: 12px;
-	background: var(--color-primary-alpha-4);
-	border-radius: 8px;
-	border: 1px solid var(--color-primary-alpha-15);
-}
-
-.keccak-result-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 8px;
-}
-
-.keccak-result-label {
-	font-weight: 600;
-	color: var(--text-secondary);
-	font-size: 0.85rem;
-}
-
-.keccak-result-value {
-	font-family: "JetBrains Mono", monospace;
-	font-size: 0.85rem;
-	word-break: break-all;
-	color: var(--text-primary);
-}
-
-.keccak-selector {
-	background: var(--color-primary-alpha-8);
-	border-color: var(--color-primary-alpha-30);
-}
-
-.keccak-selector-value {
-	color: var(--color-primary-muted);
-	font-weight: 600;
-}
-
-.keccak-error {
-	background: var(--color-error-alpha-10);
-	color: var(--color-error);
-	padding: 12px;
-	border-radius: 8px;
-	font-weight: 500;
 }
 
 /* ================================================
@@ -679,7 +580,7 @@
 
 .devtools-button:hover {
 	transform: translateY(-1px);
-	box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+	box-shadow: 0 6px 16px var(--color-primary-alpha-40);
 }
 
 .devtools-button:active {
@@ -1133,30 +1034,31 @@
 
 /* ================================================
    Light Mode Overrides
+   DevTools keeps a dark blue background in light mode for better contrast
    ================================================ */
 
 [data-theme="light"] .devtools-input,
 [data-theme="light"] .devtools-select,
 [data-theme="light"] .devtools-textarea {
-	border-color: rgba(255, 255, 255, 0.3);
-	background: rgb(58, 74, 118);
+	border-color: var(--overlay-light-20);
+	background: var(--bg-gradient-start);
 }
 
 [data-theme="light"] .devtools-input:focus,
 [data-theme="light"] .devtools-select:focus,
 [data-theme="light"] .devtools-textarea:focus {
-	border-color: rgba(255, 255, 255, 0.6);
+	border-color: var(--color-primary);
 }
 
 [data-theme="light"] .devtools-card,
 [data-theme="light"] .dev-section-container {
-	background: rgb(58, 74, 118);
-	border-color: rgba(255, 255, 255, 0.2);
+	background: var(--bg-gradient-start);
+	border-color: var(--overlay-light-15);
 }
 
 [data-theme="light"] .devtools-tabs {
-	background: rgb(58, 74, 118);
-	border-color: rgba(255, 255, 255, 0.2);
+	background: var(--bg-gradient-start);
+	border-color: var(--overlay-light-15);
 }
 
 [data-theme="light"] .devtools-result,
@@ -1164,14 +1066,14 @@
 [data-theme="light"] .devtools-results-pre,
 [data-theme="light"] .keccak-result-item,
 [data-theme="light"] .sig-result-row {
-	background: rgb(58, 74, 118);
-	border-color: rgba(255, 255, 255, 0.2);
+	background: var(--bg-gradient-start);
+	border-color: var(--overlay-light-15);
 }
 
 [data-theme="light"] .devtools-mode-btn,
 [data-theme="light"] .keccak-mode-btn {
-	background: rgb(58, 74, 118);
-	border-color: rgba(255, 255, 255, 0.2);
+	background: var(--bg-gradient-start);
+	border-color: var(--overlay-light-15);
 }
 
 /* ================================================

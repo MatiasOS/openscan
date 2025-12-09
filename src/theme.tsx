@@ -10,6 +10,9 @@ export const colors = {
   primaryMuted: "#059669",
   secondary: "#ff6b4a",
   secondaryHover: "#ff8a70",
+  accent: "#8b5cf6",
+  accentHover: "#a78bfa",
+  accentMuted: "#7c3aed",
 
   // Semantic
   success: "#10b981",
@@ -53,6 +56,10 @@ export const cssVariables = `
   --color-secondary: ${colors.secondary};
   --color-secondary-hover: ${colors.secondaryHover};
   --color-secondary-subtle: rgba(255, 107, 74, 0.1);
+  --color-accent: ${colors.accent};
+  --color-accent-hover: ${colors.accentHover};
+  --color-accent-muted: ${colors.accentMuted};
+  --color-accent-subtle: rgba(139, 92, 246, 0.1);
 
   /* Semantic */
   --color-success: ${colors.success};
@@ -166,6 +173,18 @@ export const cssVariables = `
   --color-info-alpha-15: rgba(59, 130, 246, 0.15);
   --color-info-alpha-20: rgba(59, 130, 246, 0.2);
   --color-info-alpha-30: rgba(59, 130, 246, 0.3);
+  --color-accent-alpha-4: rgba(139, 92, 246, 0.04);
+  --color-accent-alpha-10: rgba(139, 92, 246, 0.1);
+  --color-accent-alpha-15: rgba(139, 92, 246, 0.15);
+  --color-accent-alpha-20: rgba(139, 92, 246, 0.2);
+  --color-accent-alpha-30: rgba(139, 92, 246, 0.3);
+  --color-info-alpha-25: rgba(59, 130, 246, 0.25);
+  --color-info-alpha-40: rgba(59, 130, 246, 0.4);
+  --color-info-alpha-50: rgba(59, 130, 246, 0.5);
+  --color-warning-alpha-25: rgba(245, 158, 11, 0.25);
+  --color-warning-alpha-40: rgba(245, 158, 11, 0.4);
+  --color-error-alpha-30: rgba(239, 68, 68, 0.3);
+  --color-error-alpha-40: rgba(239, 68, 68, 0.4);
 
   /* Overlay Utilities (for dark theme - light overlays on dark bg) */
   --overlay-light-2: rgba(255, 255, 255, 0.02);
@@ -187,6 +206,8 @@ export const cssVariables = `
   --color-primary-subtle: rgba(16, 185, 129, 0.08);
   --color-secondary-hover: #e55a3a;
   --color-secondary-subtle: rgba(255, 107, 74, 0.08);
+  --color-accent-hover: ${colors.accentMuted};
+  --color-accent-subtle: rgba(139, 92, 246, 0.08);
 
   --color-success-hover: ${colors.primaryMuted};
   --color-success-subtle: rgba(16, 185, 129, 0.08);

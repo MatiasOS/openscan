@@ -1645,7 +1645,7 @@ body {
 .row-status-value-deposited {
   font-weight: 500;
   font-size: 1rem;
-  color: #3b82f6;
+  color: var(--color-info);
 }
 
 .row-status-value-gray {
@@ -1959,7 +1959,7 @@ body {
 .stat-value-purple {
   font-size: 1.2rem;
   font-weight: bold;
-  color: #8b5cf6;
+  color: var(--color-accent);
 }
 
 .stat-value-green {
@@ -3532,8 +3532,8 @@ body {
 .about-disclaimer {
   padding: 2rem;
   margin-bottom: 2rem;
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  background: var(--color-warning-alpha-10);
+  border: 1px solid var(--color-warning-alpha-30);
 }
 
 .about-disclaimer {
@@ -3553,12 +3553,12 @@ body {
 
 .help-troubleshooting-title {
   text-align: center;
-  color: #f59e0b;
+  color: var(--color-warning);
   margin-bottom: 2rem;
 }
 
 .about-disclaimer-title {
-  color: #f59e0b;
+  color: var(--color-warning);
   margin: 0.1rem 0rem;
 }
 
@@ -5205,7 +5205,7 @@ code {
 
 .profile-expand-button:hover {
   background: rgba(30, 41, 59, 0.8);
-  border-color: rgba(59, 130, 246, 0.4);
+  border-color: var(--color-info-alpha-40);
   transform: translateY(-1px);
 }
 
@@ -5231,8 +5231,8 @@ code {
   justify-content: center;
   width: 32px;
   height: 32px;
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: var(--color-info-alpha-10);
+  border: 1px solid var(--color-info-alpha-30);
   border-radius: 8px;
   color: #60a5fa;
   font-size: 0.75rem;
@@ -5241,16 +5241,16 @@ code {
 }
 
 .profile-collapse-button:hover {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.5);
+  background: var(--color-info-alpha-20);
+  border-color: var(--color-info-alpha-50);
 }
 
 /* Retry Button */
 .profile-retry-button {
   margin-left: 1rem;
   padding: 0.4rem 0.8rem;
-  background: rgba(59, 130, 246, 0.2);
-  border: 1px solid rgba(59, 130, 246, 0.4);
+  background: var(--color-info-alpha-20);
+  border: 1px solid var(--color-info-alpha-40);
   border-radius: 6px;
   color: #60a5fa;
   font-size: 0.85rem;
@@ -5259,7 +5259,7 @@ code {
 }
 
 .profile-retry-button:hover {
-  background: rgba(59, 130, 246, 0.3);
+  background: var(--color-info-alpha-30);
 }
 
 .profile-header {
@@ -5308,17 +5308,17 @@ code {
 }
 
 .tier-badge-1 {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, var(--color-info) 0%, #1d4ed8 100%);
   color: white;
 }
 
 .tier-badge-2 {
-  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, #6d28d9 100%);
   color: white;
 }
 
 .tier-badge-3 {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: linear-gradient(135deg, var(--color-warning) 0%, #d97706 100%);
   color: white;
 }
 
@@ -5329,7 +5329,7 @@ code {
 }
 
 .profile-error {
-  color: #ef4444;
+  color: var(--color-error);
 }
 
 /* Profile Content - Markdown Styles */
@@ -5399,8 +5399,8 @@ code {
 .profile-content .profile-blockquote {
   margin: 1rem 0;
   padding: 0.8rem 1.2rem;
-  border-left: 4px solid #3b82f6;
-  background: rgba(59, 130, 246, 0.1);
+  border-left: 4px solid var(--color-info);
+  background: var(--color-info-alpha-10);
   border-radius: 0 8px 8px 0;
   color: #94a3b8;
   font-style: italic;
@@ -5424,7 +5424,7 @@ code {
 
 .profile-content .profile-inline-code {
   padding: 0.2rem 0.4rem;
-  background: rgba(59, 130, 246, 0.15);
+  background: var(--color-info-alpha-15);
   border-radius: 4px;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 0.85em;
@@ -5469,8 +5469,8 @@ code {
   display: inline-flex;
   align-items: center;
   padding: 0.5rem 1rem;
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: var(--color-info-alpha-10);
+  border: 1px solid var(--color-info-alpha-30);
   border-radius: 8px;
   color: #60a5fa;
   text-decoration: none;
@@ -5480,8 +5480,8 @@ code {
 }
 
 .profile-link-item:hover {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.5);
+  background: var(--color-info-alpha-20);
+  border-color: var(--color-info-alpha-50);
   transform: translateY(-1px);
 }
 
