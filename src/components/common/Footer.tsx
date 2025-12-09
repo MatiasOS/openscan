@@ -40,7 +40,11 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
     <footer className={`app-footer ${className}`}>
       <div className="footer-content">
         <div className="footer-left">
-          <button type="button" onClick={() => navigate("/about")} className="footer-link btn-reset">
+          <button
+            type="button"
+            onClick={() => navigate("/about")}
+            className="footer-link btn-reset"
+          >
             About Openscan
           </button>
           |

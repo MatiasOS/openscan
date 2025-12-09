@@ -69,6 +69,7 @@ export const cssVariables = `
   --color-info-subtle: rgba(59, 130, 246, 0.1);
 
   /* Dark Mode (default) */
+  --bg-gradient-start: #0f172a;
   --bg-primary: ${colors.dark.bgPrimary};
   --bg-secondary: ${colors.dark.bgSecondary};
   --bg-tertiary: ${colors.dark.bgTertiary};
@@ -196,6 +197,7 @@ export const cssVariables = `
   --color-info-hover: #2563eb;
   --color-info-subtle: rgba(59, 130, 246, 0.08);
 
+  --bg-gradient-start: #1f2d52;
   --bg-primary: ${colors.light.bgPrimary};
   --bg-secondary: ${colors.light.bgSecondary};
   --bg-tertiary: ${colors.light.bgTertiary};

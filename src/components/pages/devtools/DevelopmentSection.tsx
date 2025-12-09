@@ -94,96 +94,27 @@ const DevelopmentSection: React.FC = () => {
 
   return (
     <div className="devtools-section">
-      <div
-        className="info-box"
-        style={{
-          background: "#ffffff",
-          borderRadius: "16px",
-          padding: "24px",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
-          border: "1px solid rgba(16, 185, 129, 0.1)",
-          display: "block",
-        }}
-      >
-        <h3
-          style={{
-            fontSize: "1.1rem",
-            fontWeight: "700",
-            color: "#10b981",
-            marginBottom: "8px",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            marginTop: 0,
-          }}
-        >
-          🚀 Hardhat Ignition
-        </h3>
-        <p
-          style={{
-            marginBottom: 20,
-            color: "#6b7280",
-            fontSize: "1rem",
-            marginTop: 0,
-          }}
-        >
-          Provide a .zip file with the project’s <b>contracts/</b> and <b>ignition/</b> directories
+      <div className="info-box dev-section-container">
+        <h3 className="dev-section-title">Hardhat Ignition</h3>
+        <p className="dev-section-description">
+          Provide a .zip file with the project's <b>contracts/</b> and <b>ignition/</b> directories
           inside. This will be used as local verification method
         </p>
 
-        {/** biome-ignore lint/a11y/noStaticElementInteractions: <TODO> */}
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: drag and drop zone */}
         <div
           onDragEnter={handleDragEnter}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          style={{
-            border: isDragging ? "2px dashed #10b981" : "2px dashed rgba(16, 185, 129, 0.3)",
-            borderRadius: 12,
-            padding: 40,
-            textAlign: "center",
-            backgroundColor: isDragging ? "rgba(16, 185, 129, 0.05)" : "rgba(16, 185, 129, 0.02)",
-            transition: "all 0.3s ease",
-            cursor: "pointer",
-            marginBottom: 20,
-          }}
+          className={`dev-dropzone ${isDragging ? "dragging" : ""}`}
         >
-          <div style={{ fontSize: 48, marginBottom: 12 }}>📁</div>
-          <h4
-            style={{
-              marginBottom: 8,
-              marginTop: 0,
-              fontSize: "0.95rem",
-              fontWeight: "600",
-              color: "#1f2937",
-            }}
-          >
+          <div className="dev-dropzone-icon">📁</div>
+          <h4 className="dev-dropzone-title">
             {isDragging ? "Drop files here" : "Drag and drop ZIP files here"}
           </h4>
-          <p
-            style={{
-              color: "#6b7280",
-              marginBottom: 16,
-              fontSize: "0.85rem",
-              margin: "0 0 16px 0",
-            }}
-          >
-            or
-          </p>
-          <label
-            htmlFor="file-input"
-            style={{
-              display: "inline-block",
-              padding: "10px 20px",
-              background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-              color: "white",
-              borderRadius: 8,
-              cursor: "pointer",
-              fontSize: "0.85rem",
-              fontWeight: "600",
-              border: "none",
-            }}
-          >
+          <p className="dev-dropzone-separator">or</p>
+          <label htmlFor="file-input" className="dev-browse-btn">
             Browse Files
           </label>
           <input
@@ -198,87 +129,26 @@ const DevelopmentSection: React.FC = () => {
         {files.length > 0 && (
           <div>
             <div className="flex-between mb-medium">
-              <h4
-                style={{
-                  margin: 0,
-                  fontSize: "0.95rem",
-                  fontWeight: "600",
-                  color: "#1f2937",
-                }}
-              >
-                Uploaded Files ({files.length})
-              </h4>
-              {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-              <button
-                onClick={handleClearAll}
-                style={{
-                  padding: "6px 12px",
-                  background: "#ef4444",
-                  color: "white",
-                  border: "none",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  fontSize: "0.8rem",
-                  fontWeight: "600",
-                }}
-              >
+              <h4 className="dev-section-subtitle">Uploaded Files ({files.length})</h4>
+              <button type="button" onClick={handleClearAll} className="dev-clear-btn">
                 Clear All
               </button>
             </div>
 
-            <div className="flex-column" style={{ gap: 12 }}>
+            <div className="dev-file-list">
               {files.map((file, index) => (
-                <div
-                  key={`${file.name}-${index}`}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    padding: 12,
-                    backgroundColor: "rgba(16, 185, 129, 0.02)",
-                    border: "1px solid rgba(16, 185, 129, 0.15)",
-                    borderRadius: 8,
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
-                  }}
-                >
-                  <div style={{ flex: 1 }}>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        marginBottom: 4,
-                        wordBreak: "break-all",
-                        fontSize: "0.85rem",
-                        color: "#1f2937",
-                      }}
-                    >
-                      {file.name}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6b7280",
-                        display: "flex",
-                        gap: 16,
-                      }}
-                    >
+                <div key={`${file.name}-${index}`} className="dev-file-item">
+                  <div className="dev-file-item-content">
+                    <div className="dev-file-name">{file.name}</div>
+                    <div className="dev-file-meta">
                       <span>Size: {formatFileSize(file.size)}</span>
                       <span>Type: {file.type || "Unknown"}</span>
                     </div>
                   </div>
-                  {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
                   <button
+                    type="button"
                     onClick={() => handleRemoveFile(index)}
-                    style={{
-                      padding: "6px 12px",
-                      background: "#ef4444",
-                      color: "white",
-                      border: "none",
-                      borderRadius: 6,
-                      cursor: "pointer",
-                      fontSize: "0.75rem",
-                      marginLeft: 16,
-                      fontWeight: "600",
-                    }}
+                    className="dev-remove-btn"
                   >
                     Remove
                   </button>
@@ -289,141 +159,46 @@ const DevelopmentSection: React.FC = () => {
         )}
 
         {files.length === 0 && !loading && Object.keys(jsonFiles).length === 0 && (
-          <div
-            style={{
-              textAlign: "center",
-              padding: 32,
-              color: "#6b7280",
-              backgroundColor: "rgba(16, 185, 129, 0.02)",
-              borderRadius: 8,
-              fontSize: "0.85rem",
-            }}
-          >
+          <div className="dev-empty-state">
             No files uploaded yet. Drag and drop or browse to add files.
           </div>
         )}
 
         {loading && (
-          <div
-            style={{
-              textAlign: "center",
-              padding: 32,
-              color: "#10b981",
-              backgroundColor: "rgba(16, 185, 129, 0.05)",
-              borderRadius: 8,
-              marginTop: 20,
-              border: "1px solid rgba(16, 185, 129, 0.2)",
-            }}
-          >
-            <div style={{ fontSize: 32, marginBottom: 12 }}>⏳</div>
-            <div style={{ fontSize: "0.9rem", fontWeight: "600" }}>Processing ZIP file...</div>
+          <div className="dev-loading-state">
+            <div className="dev-loading-icon">⏳</div>
+            <div className="dev-loading-text">Processing ZIP file...</div>
           </div>
         )}
 
         {error && (
-          <div
-            style={{
-              textAlign: "center",
-              padding: 20,
-              color: "#dc2626",
-              backgroundColor: "rgba(239, 68, 68, 0.05)",
-              borderRadius: 8,
-              marginTop: 20,
-              border: "1px solid rgba(239, 68, 68, 0.2)",
-            }}
-          >
-            <div style={{ fontSize: 24, marginBottom: 8 }}>⚠️</div>
-            <div style={{ fontWeight: 600, fontSize: "0.9rem" }}>{error}</div>
+          <div className="dev-error-state">
+            <div className="dev-error-icon">⚠️</div>
+            <div className="dev-error-text">{error}</div>
           </div>
         )}
 
         {Object.keys(jsonFiles).length > 0 && (
           <div className="mt-large">
             <div className="flex-between mb-medium">
-              <h4
-                style={{
-                  margin: 0,
-                  fontSize: "0.95rem",
-                  fontWeight: "600",
-                  color: "#1f2937",
-                }}
-              >
+              <h4 className="dev-section-subtitle">
                 Extracted JSON Files ({Object.keys(jsonFiles).length})
               </h4>
-              {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-              <button
-                onClick={handleClearArtifacts}
-                style={{
-                  padding: "6px 12px",
-                  background: "#ef4444",
-                  color: "white",
-                  border: "none",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  fontSize: "0.8rem",
-                  fontWeight: "600",
-                }}
-              >
+              <button type="button" onClick={handleClearArtifacts} className="dev-clear-btn">
                 Clear Artifacts
               </button>
             </div>
-            <div className="flex-column" style={{ gap: 10 }}>
+            <div className="dev-json-list">
               {Object.entries(jsonFiles).map(([path, data]) => (
-                <div
-                  key={path}
-                  style={{
-                    padding: 12,
-                    backgroundColor: "rgba(16, 185, 129, 0.02)",
-                    border: "1px solid rgba(16, 185, 129, 0.15)",
-                    borderRadius: 8,
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
-                  }}
-                >
-                  {/** biome-ignore lint/a11y/noStaticElementInteractions: <TODO> */}
-                  {/** biome-ignore lint/a11y/useKeyWithClickEvents: <TODO> */}
-                  <div
-                    onClick={() => navigate(`/31337/address/${path}`)}
-                    style={{
-                      fontWeight: 600,
-                      marginBottom: 8,
-                      color: "#10b981",
-                      wordBreak: "break-all",
-                      fontSize: "0.85rem",
-                      cursor: "pointer",
-                      textDecoration: "underline",
-                    }}
-                  >
+                <div key={path} className="dev-json-item">
+                  {/* biome-ignore lint/a11y/noStaticElementInteractions: clickable path */}
+                  {/* biome-ignore lint/a11y/useKeyWithClickEvents: clickable path */}
+                  <div onClick={() => navigate(`/31337/address/${path}`)} className="dev-json-path">
                     {path}
                   </div>
                   <details>
-                    <summary
-                      style={{
-                        cursor: "pointer",
-                        padding: "4px 0",
-                        color: "#6b7280",
-                        fontSize: "0.8rem",
-                        fontWeight: "600",
-                      }}
-                    >
-                      View JSON content
-                    </summary>
-                    <pre
-                      style={{
-                        backgroundColor: "rgba(16, 185, 129, 0.04)",
-                        padding: 12,
-                        borderRadius: 8,
-                        overflow: "auto",
-                        maxHeight: 400,
-                        fontSize: "0.75rem",
-                        marginTop: 8,
-                        border: "1px solid rgba(16, 185, 129, 0.1)",
-                        color: "#1f2937",
-                        fontFamily: "monospace",
-                        lineHeight: "1.5",
-                      }}
-                    >
-                      {JSON.stringify(data, null, 2)}
-                    </pre>
+                    <summary className="dev-json-summary">View JSON content</summary>
+                    <pre className="dev-json-content">{JSON.stringify(data, null, 2)}</pre>
                   </details>
                 </div>
               ))}

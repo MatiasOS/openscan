@@ -1130,3 +1130,298 @@
 	line-height: 1.5;
 	font-size: 0.8rem;
 }
+
+/* ================================================
+   Light Mode Overrides
+   ================================================ */
+
+[data-theme="light"] .devtools-input,
+[data-theme="light"] .devtools-select,
+[data-theme="light"] .devtools-textarea {
+	border-color: rgba(255, 255, 255, 0.3);
+	background: rgb(58, 74, 118);
+}
+
+[data-theme="light"] .devtools-input:focus,
+[data-theme="light"] .devtools-select:focus,
+[data-theme="light"] .devtools-textarea:focus {
+	border-color: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="light"] .devtools-card,
+[data-theme="light"] .dev-section-container {
+	background: rgb(58, 74, 118);
+	border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="light"] .devtools-tabs {
+	background: rgb(58, 74, 118);
+	border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="light"] .devtools-result,
+[data-theme="light"] .devtools-results,
+[data-theme="light"] .devtools-results-pre,
+[data-theme="light"] .keccak-result-item,
+[data-theme="light"] .sig-result-row {
+	background: rgb(58, 74, 118);
+	border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="light"] .devtools-mode-btn,
+[data-theme="light"] .keccak-mode-btn {
+	background: rgb(58, 74, 118);
+	border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ================================================
+   Development Section (Hardhat Ignition)
+   ================================================ */
+
+.dev-section-container {
+	background: var(--bg-card);
+	border-radius: 16px;
+	padding: 24px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	border: 1px solid var(--color-primary-alpha-10);
+	display: block;
+}
+
+.dev-section-title {
+	font-size: 1.1rem;
+	font-weight: 700;
+	color: var(--color-primary);
+	margin-bottom: 8px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-top: 0;
+}
+
+.dev-section-description {
+	margin-bottom: 20px;
+	color: var(--text-secondary);
+	font-size: 1rem;
+	margin-top: 0;
+}
+
+.dev-dropzone {
+	border: 2px dashed var(--color-primary-alpha-30);
+	border-radius: 12px;
+	padding: 40px;
+	text-align: center;
+	background-color: var(--color-primary-alpha-2);
+	transition: all 0.3s ease;
+	cursor: pointer;
+	margin-bottom: 20px;
+}
+
+.dev-dropzone.dragging {
+	border-color: var(--color-primary);
+	background-color: var(--color-primary-alpha-6);
+}
+
+.dev-dropzone-icon {
+	font-size: 48px;
+	margin-bottom: 12px;
+}
+
+.dev-dropzone-title {
+	margin-bottom: 8px;
+	margin-top: 0;
+	font-size: 0.95rem;
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.dev-dropzone-separator {
+	color: var(--text-secondary);
+	margin-bottom: 16px;
+	font-size: 0.85rem;
+	margin-top: 0;
+}
+
+.dev-browse-btn {
+	display: inline-block;
+	padding: 10px 20px;
+	background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-muted) 100%);
+	color: white;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 0.85rem;
+	font-weight: 600;
+	border: none;
+}
+
+.dev-section-subtitle {
+	margin: 0;
+	font-size: 0.95rem;
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.dev-clear-btn {
+	padding: 6px 12px;
+	background: var(--color-error);
+	color: white;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 0.8rem;
+	font-weight: 600;
+}
+
+.dev-clear-btn:hover {
+	background: var(--color-error-hover);
+}
+
+.dev-file-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.dev-file-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px;
+	background-color: var(--color-primary-alpha-2);
+	border: 1px solid var(--color-primary-alpha-15);
+	border-radius: 8px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.dev-file-item-content {
+	flex: 1;
+}
+
+.dev-file-name {
+	font-weight: 600;
+	margin-bottom: 4px;
+	word-break: break-all;
+	font-size: 0.85rem;
+	color: var(--text-primary);
+}
+
+.dev-file-meta {
+	font-size: 0.75rem;
+	color: var(--text-secondary);
+	display: flex;
+	gap: 16px;
+}
+
+.dev-remove-btn {
+	padding: 6px 12px;
+	background: var(--color-error);
+	color: white;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 0.75rem;
+	margin-left: 16px;
+	font-weight: 600;
+}
+
+.dev-remove-btn:hover {
+	background: var(--color-error-hover);
+}
+
+.dev-empty-state {
+	text-align: center;
+	padding: 32px;
+	color: var(--text-secondary);
+	background-color: var(--color-primary-alpha-2);
+	border-radius: 8px;
+	font-size: 0.85rem;
+}
+
+.dev-loading-state {
+	text-align: center;
+	padding: 32px;
+	color: var(--color-primary);
+	background-color: var(--color-primary-alpha-6);
+	border-radius: 8px;
+	margin-top: 20px;
+	border: 1px solid var(--color-primary-alpha-20);
+}
+
+.dev-loading-icon {
+	font-size: 32px;
+	margin-bottom: 12px;
+}
+
+.dev-loading-text {
+	font-size: 0.9rem;
+	font-weight: 600;
+}
+
+.dev-error-state {
+	text-align: center;
+	padding: 20px;
+	color: var(--color-error);
+	background-color: var(--color-error-alpha-4);
+	border-radius: 8px;
+	margin-top: 20px;
+	border: 1px solid var(--color-error-alpha-20);
+}
+
+.dev-error-icon {
+	font-size: 24px;
+	margin-bottom: 8px;
+}
+
+.dev-error-text {
+	font-weight: 600;
+	font-size: 0.9rem;
+}
+
+.dev-json-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.dev-json-item {
+	padding: 12px;
+	background-color: var(--color-primary-alpha-2);
+	border: 1px solid var(--color-primary-alpha-15);
+	border-radius: 8px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.dev-json-path {
+	font-weight: 600;
+	margin-bottom: 8px;
+	color: var(--color-primary);
+	word-break: break-all;
+	font-size: 0.85rem;
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.dev-json-path:hover {
+	color: var(--color-primary-hover);
+}
+
+.dev-json-summary {
+	cursor: pointer;
+	padding: 4px 0;
+	color: var(--text-secondary);
+	font-size: 0.8rem;
+	font-weight: 600;
+}
+
+.dev-json-content {
+	background-color: var(--color-primary-alpha-4);
+	padding: 12px;
+	border-radius: 8px;
+	overflow: auto;
+	max-height: 400px;
+	font-size: 0.75rem;
+	margin-top: 8px;
+	border: 1px solid var(--color-primary-alpha-10);
+	color: var(--text-primary);
+	font-family: "JetBrains Mono", monospace;
+	line-height: 1.5;
+}

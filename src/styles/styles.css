@@ -8,9 +8,9 @@
 body {
   margin: 0;
   padding: 0;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background: var(--bg-gradient-start);
   min-height: 100vh;
-  color: #f1f5f9;
+  color: var(--text-primary);
   font-family: 'Outfit', sans-serif;
 }
 
@@ -37,6 +37,10 @@ body {
   pointer-events: none;
   opacity: 0.2;
   z-index: 0;
+}
+
+[data-theme="light"] .app-background-blocks {
+  opacity: 0.6;
 }
 
 .app-content {
@@ -3963,6 +3967,12 @@ code {
   font-weight: 500;
 }
 
+[data-theme="light"] .footer-link,
+[data-theme="light"] .footer-right,
+[data-theme="light"] .version-label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .commit-link {
   color: var(--accent);
   text-decoration: none;
@@ -4134,6 +4144,9 @@ code {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   padding: 24px;
 }
+[data-theme="light"] .page-card {
+  background: rgb(58 74 118);
+}
 
 /* When page-card is used with container-wide, adjust for alignment with navbar */
 .container-wide.page-card {
@@ -4290,6 +4303,9 @@ code {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+[data-theme="light"] .block-display-card {
+  background: rgb(58, 74, 118);
+}
 
 .block-display-header {
   display: flex;
@@ -4600,7 +4616,7 @@ code {
 
 .settings-section-description {
   font-size: 0.85rem;
-  color: #374151;
+  color: var(--text-secondary);
   margin-bottom: 24px;
   text-align: center;
 }
@@ -4625,7 +4641,7 @@ code {
 
 .settings-item-description {
   font-size: 0.8rem;
-  color: #4b5563;
+  color: var(--text-secondary);
   margin-top: 2px;
 }
 
@@ -4651,13 +4667,13 @@ code {
   align-items: center;
   gap: 8px;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
   font-size: 0.95rem;
 }
 
 .settings-chain-id-badge {
   font-size: 0.8rem;
-  color: #374151;
+  color: var(--text-secondary);
   font-weight: 500;
   background: rgba(107, 114, 128, 0.1);
   padding: 2px 8px;
@@ -4671,7 +4687,7 @@ code {
   border-radius: 8px;
   font-size: 0.85rem;
   font-family: monospace;
-  color: #111827;
+  color: var(--text-primary);
   background: var(--bg-card);
   transition: all 0.2s ease;
   outline: none;
@@ -4683,7 +4699,7 @@ code {
 
 .settings-help-text {
   font-size: 0.8rem;
-  color: #4b5563;
+  color: var(--text-secondary);
   margin-top: 4px;
   text-align: left;
 }
@@ -4708,7 +4724,7 @@ code {
 .settings-rpc-list-label {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -5030,10 +5046,68 @@ code {
   box-shadow: 0 6px 16px var(--color-primary-alpha-40);
 }
 
+/* Settings Light Mode Overrides */
+[data-theme="light"] .settings-section {
+  background: rgb(58, 74, 118);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="light"] .settings-section-description {
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .settings-item,
+[data-theme="light"] .settings-chain-item,
+[data-theme="light"] .chain-config-item {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="light"] .settings-chain-name {
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .settings-chain-id-badge,
+[data-theme="light"] .chain-id-badge {
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="light"] .settings-rpc-input,
+[data-theme="light"] .settings-input {
+  background: rgb(58, 74, 118);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .settings-rpc-input:focus,
+[data-theme="light"] .settings-input:focus {
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="light"] .settings-help-text,
+[data-theme="light"] .settings-item-description,
+[data-theme="light"] .settings-rpc-list-label {
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .settings-select {
+  background: rgb(58, 74, 118);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .settings-select:focus {
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
 /* ==================== Profile Display ==================== */
 
 .profile-container {
-  margin-top: 1.5rem !important;
+  margin-top: 1.5rem !important; 
+}
+.profile-container .block-display-card {
+  background: var(--bg-card);
 }
 
 /* Expand Button */
