@@ -3,8 +3,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
 import { HashRouter, Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { WagmiProvider } from "wagmi";
-import { networkConfig } from "./utils/networkConfig";
 import { cssVariables, getRainbowKitTheme } from "./theme";
+import { networkConfig } from "./utils/networkConfig";
 import "@rainbow-me/rainbowkit/styles.css";
 
 // Detect if we're running on GitHub Pages and get the correct basename
