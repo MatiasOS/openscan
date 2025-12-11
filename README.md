@@ -60,7 +60,7 @@ A trustless, open-source, standalone web-app, multi-chain blockchain explorer fo
 
 ### Prerequisites
 
-- Node.js 16+
+- Node.js v22.21.1
 - npm or yarn
 
 ### Installation
@@ -277,15 +277,6 @@ src/
 - **Network Adapters** - Transform chain-specific data formats
 - **Type Guards** - Runtime type checking for L2-specific fields
 - **RPC Storage** - Persistent storage for custom RPC configurations
-
-### Adding a New Network
-
-1. Add chain ID to `src/types/index.ts`
-2. Add default RPC endpoints to `src/utils/rpcStorage.ts`
-3. Create adapters and fetchers in `src/services/EVM/[Network]/`
-4. Update `DataService` conditional logic
-5. Add network card to Home page
-6. Add network logo to assets folder
 
 ## Contributing
 
