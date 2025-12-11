@@ -60,7 +60,7 @@ A trustless, open-source, standalone web-app, multi-chain blockchain explorer fo
 
 ### Prerequisites
 
-- Node.js 16+
+- Node.js v22.21.1
 - npm or yarn
 
 ### Installation
@@ -129,6 +129,31 @@ npm run format:fix
 ```bash
 npm run lint:fix
 ```
+
+### End-to-End Tests
+
+The project uses Playwright for E2E testing against Ethereum mainnet data.
+
+```bash
+# Run all E2E tests
+npm run test:e2e
+
+# Run tests with UI mode (for debugging)
+npm run test:e2e:ui
+
+# Run tests in debug mode
+npm run test:e2e:debug
+```
+
+**Test Coverage:**
+
+- **Block Page** - Pre/post London blocks, hash fields, navigation
+- **Transaction Page** - Legacy and EIP-1559 transactions, from/to addresses, gas info
+- **Address Page** - EOA balances, ENS names, ERC20/ERC721/ERC1155 contracts
+- **Token Details** - NFT metadata, properties, token URI, collection info
+- **Contract Interaction** - Verified contract functions, events, verification status
+
+Tests run automatically on every PR via GitHub Actions.
 
 ## Configuration
 
@@ -252,15 +277,6 @@ src/
 - **Network Adapters** - Transform chain-specific data formats
 - **Type Guards** - Runtime type checking for L2-specific fields
 - **RPC Storage** - Persistent storage for custom RPC configurations
-
-### Adding a New Network
-
-1. Add chain ID to `src/types/index.ts`
-2. Add default RPC endpoints to `src/utils/rpcStorage.ts`
-3. Create adapters and fetchers in `src/services/EVM/[Network]/`
-4. Update `DataService` conditional logic
-5. Add network card to Home page
-6. Add network logo to assets folder
 
 ## Contributing
 
