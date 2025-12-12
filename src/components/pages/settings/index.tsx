@@ -1,5 +1,5 @@
 import type React from "react";
-import { useContext, useMemo, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { getEnabledNetworks } from "../../../config/networks";
 import { AppContext } from "../../../context/AppContext";
 import { useSettings } from "../../../context/SettingsContext";
@@ -12,10 +12,95 @@ const Settings: React.FC = () => {
     ...rpcUrls,
   });
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [draggedItem, setDraggedItem] = useState<{ chainId: number; index: number } | null>(null);
 
   const updateField = (key: keyof RpcUrlsContextType, value: string) => {
     setLocalRpc((prev) => ({ ...prev, [key]: value }));
   };
+
+  // Helper to get URLs as array from localRpc
+  const getLocalRpcArray = useCallback(
+    (chainId: number): string[] => {
+      const value = localRpc[chainId];
+      if (Array.isArray(value)) return value;
+      if (typeof value === "string") {
+        return value
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }
+      return [];
+    },
+    [localRpc],
+  );
+
+  // Helper to get URLs as string for input display
+  const getLocalRpcString = useCallback(
+    (chainId: number): string => {
+      const value = localRpc[chainId];
+      if (Array.isArray(value)) return value.join(", ");
+      if (typeof value === "string") return value;
+      return "";
+    },
+    [localRpc],
+  );
+
+  const deleteRpc = useCallback((chainId: number, index: number) => {
+    setLocalRpc((prev) => {
+      const currentValue = prev[chainId];
+      const currentUrls = Array.isArray(currentValue)
+        ? currentValue
+        : typeof currentValue === "string"
+          ? currentValue
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : [];
+      const newUrls = currentUrls.filter((_, i) => i !== index);
+      return {
+        ...prev,
+        [chainId]: newUrls,
+      };
+    });
+  }, []);
+
+  const handleDragStart = useCallback((chainId: number, index: number) => {
+    setDraggedItem({ chainId, index });
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+  }, []);
+
+  const handleDrop = useCallback(
+    (chainId: number, dropIndex: number) => {
+      if (!draggedItem || draggedItem.chainId !== chainId) {
+        setDraggedItem(null);
+        return;
+      }
+
+      setLocalRpc((prev) => {
+        const currentValue = prev[chainId];
+        const currentUrls = Array.isArray(currentValue)
+          ? [...currentValue]
+          : typeof currentValue === "string"
+            ? currentValue
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean)
+            : [];
+        const draggedUrl = currentUrls.splice(draggedItem.index, 1)[0];
+        if (!draggedUrl) return prev;
+        currentUrls.splice(dropIndex, 0, draggedUrl);
+        return {
+          ...prev,
+          [chainId]: currentUrls,
+        };
+      });
+      setDraggedItem(null);
+    },
+    [draggedItem],
+  );
 
   const save = () => {
     // Convert comma-separated strings into arrays for each chainId
@@ -143,7 +228,7 @@ const Settings: React.FC = () => {
                   </div>
                   <input
                     className="settings-rpc-input"
-                    value={localRpc[chain.id]}
+                    value={getLocalRpcString(chain.id)}
                     onChange={(e) =>
                       updateField(chain.id as keyof RpcUrlsContextType, e.target.value)
                     }
@@ -166,23 +251,35 @@ const Settings: React.FC = () => {
                   )}
 
                   {/* Display current RPC list as tags */}
-                  {rpcUrls[chain.id as keyof RpcUrlsContextType] &&
-                    Array.isArray(rpcUrls[chain.id as keyof RpcUrlsContextType]) &&
-                    (rpcUrls[chain.id as keyof RpcUrlsContextType] as string[]).length > 0 && (
-                      <div className="flex-column settings-rpc-list">
-                        <span className="settings-rpc-list-label">Current RPCs:</span>
-                        <div className="flex-start settings-rpc-tags">
-                          {(rpcUrls[chain.id as keyof RpcUrlsContextType] as string[]).map(
-                            (url, idx) => (
-                              <div key={url} className="settings-rpc-tag">
-                                <span className="settings-rpc-tag-index">{idx + 1}</span>
-                                <span className="settings-rpc-tag-url">{url}</span>
-                              </div>
-                            ),
-                          )}
-                        </div>
+                  {getLocalRpcArray(chain.id).length > 0 && (
+                    <div className="flex-column settings-rpc-list">
+                      <span className="settings-rpc-list-label">Current RPCs:</span>
+                      <div className="flex-start settings-rpc-tags">
+                        {getLocalRpcArray(chain.id).map((url, idx) => (
+                          <div
+                            key={`${chain.id}-${idx}`}
+                            className={`settings-rpc-tag ${draggedItem?.chainId === chain.id && draggedItem?.index === idx ? "dragging" : ""}`}
+                            draggable
+                            onDragStart={() => handleDragStart(chain.id, idx)}
+                            onDragOver={handleDragOver}
+                            onDrop={() => handleDrop(chain.id, idx)}
+                            onDragEnd={() => setDraggedItem(null)}
+                          >
+                            <span className="settings-rpc-tag-index">{idx + 1}</span>
+                            <span className="settings-rpc-tag-url">{url}</span>
+                            <button
+                              type="button"
+                              className="settings-rpc-tag-delete"
+                              onClick={() => deleteRpc(chain.id, idx)}
+                              title="Remove RPC"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
                       </div>
-                    )}
+                    </div>
+                  )}
                 </label>
               </div>
             ))}
