@@ -544,11 +544,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                         ▶
                       </span>
                     </button>
-                    <div
-                      id="bytecode-content"
-                      className="tx-input-data"
-                      style={{ display: "none" }}
-                    >
+                    <div id="bytecode-content" className="tx-input-data hidden">
                       <code>{address.code}</code>
                     </div>
                   </div>
@@ -590,11 +586,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                               ▶
                             </span>
                           </button>
-                          <div
-                            id="source-code-content"
-                            className="margin-top-8"
-                            style={{ display: "none" }}
-                          >
+                          <div id="source-code-content" className="margin-top-8 hidden">
                             {sourceFiles.map((file) => (
                               <div key={file.path} className="source-file-container">
                                 <div className="source-file-header">
@@ -629,11 +621,7 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
                           ▶
                         </span>
                       </button>
-                      <div
-                        id="raw-abi-content"
-                        className="tx-input-data"
-                        style={{ display: "none" }}
-                      >
+                      <div id="raw-abi-content" className="tx-input-data hidden">
                         <code>{JSON.stringify(contractData.abi, null, 2)}</code>
                       </div>
                     </div>
