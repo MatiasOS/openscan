@@ -42,6 +42,7 @@ export function useENS(
     setFetchTrigger((prev) => prev + 1);
   }, []);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: _fetchTrigger is intentionally included to enable refetch()
   useEffect(() => {
     if (!address) {
       setEnsName(null);
@@ -105,7 +106,7 @@ export function useENS(
     };
 
     fetchENSData();
-  }, [address, rpcUrls, initialEnsName]);
+  }, [address, rpcUrls, initialEnsName, _fetchTrigger]);
 
   return {
     ensName,

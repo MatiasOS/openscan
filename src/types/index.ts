@@ -115,7 +115,7 @@ export interface Address {
   balance: string;
   code: string;
   txCount: string;
-  storeageAt: StoreageAt;
+  storageAt: StorageAt;
   recentTransactions?: Transaction[];
 }
 
@@ -124,7 +124,7 @@ export interface Address {
  */
 export type AddressType = "account" | "contract" | "erc20" | "erc721" | "erc1155";
 
-export type StoreageAt = Record<string, string>;
+export type StorageAt = Record<string, string>;
 
 export interface MempoolTransaction {
   from: string;
