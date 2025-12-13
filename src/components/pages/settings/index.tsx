@@ -13,6 +13,7 @@ const Settings: React.FC = () => {
   });
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [draggedItem, setDraggedItem] = useState<{ chainId: number; index: number } | null>(null);
+  const [fetchingChainId, setFetchingChainId] = useState<number | null>(null);
 
   const updateField = (key: keyof RpcUrlsContextType, value: string) => {
     setLocalRpc((prev) => ({ ...prev, [key]: value }));
@@ -43,6 +44,48 @@ const Settings: React.FC = () => {
       return "";
     },
     [localRpc],
+  );
+
+  // Fetch RPCs from Chainlist API
+  const fetchFromChainlist = useCallback(
+    async (chainId: number) => {
+      setFetchingChainId(chainId);
+      try {
+        const response = await fetch("https://chainlist.org/rpcs.json");
+        if (!response.ok) throw new Error("Failed to fetch from Chainlist");
+
+        const chains = await response.json();
+        const chain = chains.find((c: { chainId: number }) => c.chainId === chainId);
+
+        if (!chain?.rpc) {
+          throw new Error(`No RPCs found for chain ${chainId}`);
+        }
+
+        // Filter for tracking: "none" and extract URLs
+        const newUrls = chain.rpc
+          .filter((rpc: { tracking?: string }) => rpc.tracking === "none")
+          .map((rpc: { url: string }) => rpc.url)
+          .filter((url: string) => url && !url.includes("${"));
+
+        if (newUrls.length === 0) {
+          throw new Error(`No privacy-friendly RPCs found for chain ${chainId}`);
+        }
+
+        // Merge with existing URLs, avoiding duplicates
+        const existingUrls = getLocalRpcArray(chainId);
+        const mergedUrls = Array.from(new Set([...existingUrls, ...newUrls]));
+
+        setLocalRpc((prev) => ({
+          ...prev,
+          [chainId]: mergedUrls,
+        }));
+      } catch (error) {
+        console.error("Error fetching from Chainlist:", error);
+      } finally {
+        setFetchingChainId(null);
+      }
+    },
+    [getLocalRpcArray],
   );
 
   const deleteRpc = useCallback((chainId: number, index: number) => {
@@ -225,6 +268,14 @@ const Settings: React.FC = () => {
                   <div className="settings-chain-name">
                     {chain.name}
                     <span className="settings-chain-id-badge">Chain ID: {chain.id}</span>
+                    <button
+                      type="button"
+                      className="settings-fetch-rpc-button"
+                      onClick={() => fetchFromChainlist(chain.id)}
+                      disabled={fetchingChainId === chain.id}
+                    >
+                      {fetchingChainId === chain.id ? "Fetching..." : "Fetch from Chainlist"}
+                    </button>
                   </div>
                   <input
                     className="settings-rpc-input"

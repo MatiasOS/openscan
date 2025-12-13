@@ -4813,6 +4813,29 @@ code {
   border-radius: 6px;
 }
 
+.settings-fetch-rpc-button {
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: "Outfit", sans-serif;
+  color: var(--color-primary);
+  background: var(--color-primary-alpha-10);
+  border: 1px solid var(--color-primary-alpha-20);
+  padding: 2px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.settings-fetch-rpc-button:hover:not(:disabled) {
+  background: var(--color-primary-alpha-20);
+  border-color: var(--color-primary-alpha-40);
+}
+
+.settings-fetch-rpc-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .settings-rpc-input {
   width: 100%;
   padding: 10px 12px;
