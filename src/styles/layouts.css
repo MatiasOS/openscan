@@ -22,6 +22,21 @@
 	margin-bottom: 16px;
 }
 
+/* Centered grid variants - use flexbox to center incomplete rows */
+.data-grid-3-centered {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 12px;
+	margin-bottom: 16px;
+}
+
+.data-grid-3-centered > * {
+	flex: 0 1 calc(33.333% - 8px);
+	min-width: 250px;
+	max-width: 350px;
+}
+
 .unit-converter-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -198,6 +213,11 @@
 		grid-template-columns: 1fr;
 	}
 
+	.data-grid-3-centered > * {
+		flex: 0 1 100%;
+		max-width: 100%;
+  }
+  
 	.container-wide {
 		padding: 0 16px;
 	}
