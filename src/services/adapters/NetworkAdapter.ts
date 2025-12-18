@@ -9,8 +9,7 @@ import type {
 } from "../../types";
 
 export type BlockTag = "latest" | "earliest" | "pending" | "finalized" | "safe";
-// <TODO> Remove string and 0x{string} overlap
-export type BlockNumberOrTag = string | number | `0x${string}` | BlockTag;
+export type BlockNumberOrTag = number | string | BlockTag;
 
 export interface TraceLog {
   pc: number;
@@ -52,18 +51,18 @@ export abstract class NetworkAdapter {
   }
   /**
    * Get block by number or tag
-   * @param blockNumber - Block number or "latest"
+   * @param blockNumber - Block number (as number or hex string) or block tag
    * @returns Block data with optional metadata
    */
-  abstract getBlock(blockNumber: BlockNumberOrTag): Promise<DataWithMetadata<Block>>;
+  abstract getBlock(blockNumber: number | BlockNumberOrTag): Promise<DataWithMetadata<Block>>;
 
   /**
    * Get block with full transaction details
-   * @param blockNumber - Block number or "latest"
+   * @param blockNumber - Block number (as number or hex string) or block tag
    * @returns Block with embedded transaction objects
    */
   abstract getBlockWithTransactions(
-    blockNumber: BlockNumberOrTag,
+    blockNumber: number | BlockNumberOrTag,
   ): Promise<Block & { transactionDetails: Transaction[] }>;
 
   /**

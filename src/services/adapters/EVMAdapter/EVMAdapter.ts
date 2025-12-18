@@ -15,6 +15,7 @@ import {
   hexToNumber,
 } from "./utils";
 import { extractData } from "../shared/extractData";
+import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import type { EthereumClient, SupportedChainId } from "explorer-network-connectors";
 
 /**
@@ -29,7 +30,8 @@ export class EVMAdapter extends NetworkAdapter {
     this.client = client;
   }
   async getBlock(blockNumber: BlockNumberOrTag): Promise<DataWithMetadata<Block>> {
-    const result = await this.client.getBlockByNumber(blockNumber as string);
+    const normalizedBlockNumber = normalizeBlockNumber(blockNumber);
+    const result = await this.client.getBlockByNumber(normalizedBlockNumber);
 
     const blockData = extractData<typeof result.data>(result.data);
     if (!blockData) {
@@ -47,7 +49,8 @@ export class EVMAdapter extends NetworkAdapter {
   async getBlockWithTransactions(
     blockNumber: BlockNumberOrTag,
   ): Promise<Block & { transactionDetails: Transaction[] }> {
-    const result = await this.client.getBlockByNumber(blockNumber as string, true);
+    const normalizedBlockNumber = normalizeBlockNumber(blockNumber);
+    const result = await this.client.getBlockByNumber(normalizedBlockNumber, true);
 
     const blockData = extractData<typeof result.data>(result.data);
     if (!blockData) {
@@ -186,7 +189,7 @@ export class EVMAdapter extends NetworkAdapter {
     for (let i = 0; i < count; i++) {
       const blockNum = latestBlockNumber - i;
       if (blockNum >= 0) {
-        promises.push(this.getBlock(`0x${blockNum.toString(16)}`));
+        promises.push(this.getBlock(blockNum));
       }
     }
 
@@ -216,7 +219,7 @@ export class EVMAdapter extends NetworkAdapter {
       if (blockNum < 0) break;
 
       try {
-        const blockWithTxs = await this.getBlockWithTransactions(`0x${blockNum.toString(16)}`);
+        const blockWithTxs = await this.getBlockWithTransactions(blockNum);
         for (const tx of blockWithTxs.transactionDetails) {
           transactions.push({
             ...tx,
