@@ -7,6 +7,17 @@ import { getSubdomainConfig, getSubdomainForNetwork } from "../config/subdomains
 export function getSubdomain(): string | null {
   const hostname = window.location.hostname;
 
+  // Skip subdomain processing for Netlify preview/deploy URLs
+  // These follow patterns like: pr-95--openscan.netlify.app, deploy-preview-123--site.netlify.app
+  if (hostname.endsWith(".netlify.app")) {
+    return null;
+  }
+
+  // Skip subdomain processing for GitHub Pages
+  if (hostname.endsWith(".github.io")) {
+    return null;
+  }
+
   // Handle localhost subdomains (e.g., ethereum.localhost)
   if (hostname.endsWith(".localhost")) {
     return hostname.replace(".localhost", "");
