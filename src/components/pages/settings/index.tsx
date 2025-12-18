@@ -58,7 +58,8 @@ const Settings: React.FC = () => {
       const newUrls = chain.rpc
         .filter((rpc: { tracking?: string }) => rpc.tracking === "none")
         .map((rpc: { url: string }) => rpc.url)
-        .filter((url: string) => url && !url.includes("${"));
+        .filter((url: string) => url && !url.includes("${"))
+        .filter((url: string) => !url.startsWith("wss://"));
 
       if (newUrls.length === 0) {
         throw new Error(`No privacy-friendly RPCs found for chain ${chainId}`);
