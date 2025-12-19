@@ -1,21 +1,42 @@
 /**
  * Network configuration for OpenScan
- * Networks are fetched from the explorer-metadata repository
+ * Networks are loaded from a local JSON file
  */
 
-import {
-  fetchNetworks,
-  getNetworkLogoUrl,
-  type NetworkMetadata,
-  type NetworksResponse,
-} from "../services/MetadataService";
+import { getNetworkLogoUrl } from "../services/MetadataService";
 import type { NetworkConfig } from "../types";
+import networksData from "./networks.json";
 
 export type { NetworkConfig };
 
-// Cache for loaded networks
-let loadedNetworks: NetworkConfig[] | null = null;
-let networksUpdatedAt: string | null = null;
+interface NetworkMetadata {
+  chainId: number;
+  name: string;
+  shortName: string;
+  description?: string;
+  currency: string;
+  color?: string;
+  isTestnet?: boolean;
+  subscription?: {
+    tier: 1 | 2 | 3;
+    expiresAt: string;
+  };
+  logo?: string;
+  profile?: string;
+  explorer?: {
+    subdomain?: string;
+    features?: string[];
+    priority?: number;
+  };
+  rpc?: {
+    public: string[];
+  };
+  links?: Array<{
+    name: string;
+    url: string;
+    description?: string;
+  }>;
+}
 
 /**
  * Convert metadata network to NetworkConfig
@@ -23,7 +44,7 @@ let networksUpdatedAt: string | null = null;
  */
 function metadataToNetworkConfig(network: NetworkMetadata): NetworkConfig {
   return {
-    networkId: network.chainId, // Map chainId from metadata to networkId
+    networkId: network.chainId,
     name: network.name,
     shortName: network.shortName,
     description: network.description,
@@ -39,30 +60,29 @@ function metadataToNetworkConfig(network: NetworkMetadata): NetworkConfig {
   };
 }
 
+// Load networks from local JSON file
+const loadedNetworks: NetworkConfig[] = (networksData.networks as NetworkMetadata[]).map(
+  metadataToNetworkConfig,
+);
+const networksUpdatedAt: string = networksData.updatedAt;
+
+console.log(
+  `Loaded ${loadedNetworks.length} networks from local config (updated: ${networksUpdatedAt})`,
+);
+
 /**
- * Load networks from metadata repository
- * Returns cached networks if already loaded
+ * Load networks - now synchronous since data is bundled
+ * Kept async for backwards compatibility
  */
 export async function loadNetworks(): Promise<NetworkConfig[]> {
-  if (loadedNetworks) {
-    return loadedNetworks;
-  }
-
-  const response: NetworksResponse = await fetchNetworks();
-  loadedNetworks = response.networks.map(metadataToNetworkConfig);
-  networksUpdatedAt = response.updatedAt;
-  console.log(
-    `Loaded ${loadedNetworks.length} networks from metadata (updated: ${networksUpdatedAt})`,
-  );
   return loadedNetworks;
 }
 
 /**
- * Get all networks (sync version, returns cached or empty array)
- * Use loadNetworks() for async loading with fresh data
+ * Get all networks (sync version)
  */
 export function getAllNetworks(): NetworkConfig[] {
-  return loadedNetworks ?? [];
+  return loadedNetworks;
 }
 
 /**
@@ -138,10 +158,9 @@ export function getNetworksUpdatedAt(): string | null {
 }
 
 /**
- * Force reload networks from metadata
+ * Reload networks - now a no-op since data is bundled
+ * Kept for backwards compatibility
  */
 export async function reloadNetworks(): Promise<NetworkConfig[]> {
-  loadedNetworks = null;
-  networksUpdatedAt = null;
-  return loadNetworks();
+  return loadedNetworks;
 }
