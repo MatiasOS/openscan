@@ -270,6 +270,7 @@ export interface UserSettings {
   theme?: "light" | "dark" | "auto";
   showBackgroundBlocks?: boolean;
   rpcStrategy?: "fallback" | "parallel";
+  maxParallelRequests?: number;
 }
 
 /**
@@ -279,6 +280,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   theme: "auto",
   showBackgroundBlocks: true,
   rpcStrategy: "fallback",
+  maxParallelRequests: 3,
 };
 
 /**

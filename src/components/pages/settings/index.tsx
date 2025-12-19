@@ -58,7 +58,8 @@ const Settings: React.FC = () => {
       const newUrls = chain.rpc
         .filter((rpc: { tracking?: string }) => rpc.tracking === "none")
         .map((rpc: { url: string }) => rpc.url)
-        .filter((url: string) => url && !url.includes("${"));
+        .filter((url: string) => url && !url.includes("${"))
+        .filter((url: string) => !url.startsWith("wss://"));
 
       if (newUrls.length === 0) {
         throw new Error(`No privacy-friendly RPCs found for chain ${chainId}`);
@@ -251,6 +252,36 @@ const Settings: React.FC = () => {
                 <option value="parallel">Parallel</option>
               </select>
             </div>
+
+            {/* Max Parallel Requests - Only show when parallel mode is active */}
+            {settings.rpcStrategy === "parallel" && (
+              <div className="settings-item">
+                <div>
+                  <div className="settings-item-label">Max Parallel Requests</div>
+                  <div className="settings-item-description">
+                    Limit how many RPC endpoints are queried simultaneously. Lower values reduce
+                    bandwidth usage. Uses the first N endpoints from your RPC list (reorder by
+                    dragging).
+                  </div>
+                </div>
+                <select
+                  value={settings.maxParallelRequests ?? 3}
+                  onChange={(e) =>
+                    updateSettings({
+                      maxParallelRequests: Number(e.target.value),
+                    })
+                  }
+                  className="settings-select"
+                >
+                  <option value={1}>1 endpoint</option>
+                  <option value={2}>2 endpoints</option>
+                  <option value={3}>3 endpoints (Default)</option>
+                  <option value={5}>5 endpoints</option>
+                  <option value={10}>10 endpoints</option>
+                  <option value={0}>Unlimited</option>
+                </select>
+              </div>
+            )}
           </div>
         </div>
 
