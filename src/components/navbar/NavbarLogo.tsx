@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { NetworkConfig } from "../../config/networks";
 import { getSubdomainForNetwork, subdomainConfig } from "../../config/subdomains";
 import { useNetworks } from "../../context/AppContext";
@@ -43,6 +43,7 @@ export default function NavbarLogo() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Get current subdomain info
   const subdomain = getSubdomain();
@@ -136,11 +137,11 @@ export default function NavbarLogo() {
       const targetNetworkId = networkId ?? activeNetworkId;
       if (!targetNetworkId) return;
 
-      // Navigate to network page path
-      window.location.href = `/${targetNetworkId}`;
+      // Navigate to network page path using React Router
+      navigate(`/${targetNetworkId}`);
       setIsDropdownOpen(false);
     },
-    [activeNetworkId],
+    [activeNetworkId, navigate],
   );
 
   // If not on a network subdomain, show the regular OpenScan cube
