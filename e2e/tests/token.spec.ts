@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures/test";
 import { MAINNET } from "../fixtures/mainnet";
 
 // Helper to wait for token content or error
