@@ -2,13 +2,14 @@ import { test, expect } from "../fixtures/test";
 import { BlockPage } from "../pages/block.page";
 import { AddressPage } from "../pages/address.page";
 import { TransactionPage } from "../pages/transaction.page";
-import { ARBITRUM } from "../fixtures/arbitrum";
+import { OPTIMISM } from "../fixtures/optimism";
 
-const CHAIN_ID = ARBITRUM.chainId;
+const CHAIN_ID = OPTIMISM.chainId;
 
 // Transaction hash constants for readability
-const UNISWAP_SWAP = "0x87815a816c02b5a563a026e4a37d423734204b50972e75284b62f05e4134ae44";
-const USDC_TRANSFER = "0x160687cbf03f348cf36997dbab53abbd32d91af5971bccac4cfa1577da27607e";
+const VELODROME_SWAP = "0xa8d73ea0639f39157f787a29591b36fc73c19b443bbe8416d8d6f24858063910";
+const OP_TRANSFER = "0xdcf7c4afb479cd47f7ce263cbbb298f559b81fc592cc07737935a6166fb90f0c";
+const SYSTEM_TX = "0x5d3522dad0d0745b59e9443733f8423548f99856c00768aba9779ae288dedd0a";
 
 // Helper to wait for block content or error
 async function waitForBlockContent(page: import("@playwright/test").Page) {
@@ -60,20 +61,20 @@ async function waitForTxContent(page: import("@playwright/test").Page) {
 // BLOCK TESTS
 // ============================================
 
-test.describe("Arbitrum One - Block Page", () => {
-  test("genesis block #0 - Arbitrum One launch", async ({ page }) => {
+test.describe("Optimism - Block Page", () => {
+  test("genesis block #0 - Optimism mainnet (post-regenesis)", async ({ page }) => {
     const blockPage = new BlockPage(page);
-    const block = ARBITRUM.blocks["0"];
+    const block = OPTIMISM.blocks["0"];
     await blockPage.goto(block.number, CHAIN_ID);
 
     const loaded = await waitForBlockContent(page);
     if (loaded) {
       // Header section
       await expect(blockPage.blockNumber).toBeVisible();
+      await expect(blockPage.timestampAge).toBeVisible();
 
-      // Genesis block should have 0 transactions
+      // Genesis block has 8,893 transactions from state migration
       await expect(page.locator("text=Transactions:")).toBeVisible();
-      await expect(page.locator("text=0 transactions in this block")).toBeVisible();
 
       // Gas Used should be 0
       await expect(page.locator("text=Gas Used:")).toBeVisible();
@@ -84,60 +85,34 @@ test.describe("Arbitrum One - Block Page", () => {
     }
   });
 
-  test("block #22,207,817 - Nitro upgrade block", async ({ page }) => {
+  test("block #100,000,000 - pre-Bedrock block with gas details", async ({ page }) => {
     const blockPage = new BlockPage(page);
-    const block = ARBITRUM.blocks["22207817"];
+    const block = OPTIMISM.blocks["100000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
     const loaded = await waitForBlockContent(page);
     if (loaded) {
-      await expect(blockPage.blockNumber).toBeVisible();
-
-      // Nitro upgrade block - 0 transactions
-      await expect(page.locator("text=Transactions:")).toBeVisible();
-      await expect(page.locator("text=0 transactions in this block")).toBeVisible();
-
-      // Size
-      await expect(page.locator("text=Size:")).toBeVisible();
-      await expect(page.locator(`text=${block.size}`)).toBeVisible();
-    }
-  });
-
-  test("block #100,000,000 - post-Nitro with gas details", async ({ page }) => {
-    const blockPage = new BlockPage(page);
-    const block = ARBITRUM.blocks["100000000"];
-    await blockPage.goto(block.number, CHAIN_ID);
-
-    const loaded = await waitForBlockContent(page);
-    if (loaded) {
+      // Header
       await expect(blockPage.blockNumber).toBeVisible();
       await expect(blockPage.statusBadge).toContainText("Finalized");
 
       // Transaction count
       await expect(page.locator("text=Transactions:")).toBeVisible();
-      await expect(page.locator(`text=${block.txCount} transactions in this block`)).toBeVisible();
+      await expect(page.locator(`text=${block.txCount} transaction`)).toBeVisible();
 
-      // Gas Used with value
+      // Gas Used
       await expect(page.locator("text=Gas Used:")).toBeVisible();
       await expect(page.locator(`text=${block.gasUsed}`)).toBeVisible();
 
-      // Size with value
-      await expect(page.locator("text=Size:")).toBeVisible();
-      await expect(page.locator(`text=${block.size}`)).toBeVisible();
-
-      // Base Fee Per Gas
-      await expect(page.locator("text=Base Fee Per Gas:")).toBeVisible();
-
-      // Fee Recipient (sequencer address)
-      await expect(page.locator("text=Fee Recipient:")).toBeVisible();
-      const feeRecipient = await blockPage.getFeeRecipient();
-      expect(feeRecipient.toLowerCase()).toContain(block.feeRecipientPartial.toLowerCase());
+      // Gas Limit
+      await expect(page.locator("text=Gas Limit:")).toBeVisible();
+      await expect(page.locator(`text=${block.gasLimit}`)).toBeVisible();
     }
   });
 
   test("block #100,000,000 more details section shows correct hashes", async ({ page }) => {
     const blockPage = new BlockPage(page);
-    const block = ARBITRUM.blocks["100000000"];
+    const block = OPTIMISM.blocks["100000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
     const loaded = await waitForBlockContent(page);
@@ -159,9 +134,9 @@ test.describe("Arbitrum One - Block Page", () => {
     }
   });
 
-  test("block #200,000,000 - post-ArbOS 20 Atlas (Dencun)", async ({ page }) => {
+  test("block #110,000,000 - post-Bedrock with complete gas details", async ({ page }) => {
     const blockPage = new BlockPage(page);
-    const block = ARBITRUM.blocks["200000000"];
+    const block = OPTIMISM.blocks["110000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
     const loaded = await waitForBlockContent(page);
@@ -173,24 +148,26 @@ test.describe("Arbitrum One - Block Page", () => {
       await expect(page.locator("text=Transactions:")).toBeVisible();
       await expect(page.locator(`text=${block.txCount} transactions in this block`)).toBeVisible();
 
-      // Gas Used with value
+      // Gas details
       await expect(page.locator("text=Gas Used:")).toBeVisible();
       await expect(page.locator(`text=${block.gasUsed}`)).toBeVisible();
 
-      // Size with value
-      await expect(page.locator("text=Size:")).toBeVisible();
-      await expect(page.locator(`text=${block.size}`)).toBeVisible();
+      await expect(page.locator("text=Gas Limit:")).toBeVisible();
+      await expect(page.locator(`text=${block.gasLimit}`)).toBeVisible();
 
-      // Fee Recipient
+      // Base Fee Per Gas (post-Bedrock)
+      await expect(page.locator("text=Base Fee Per Gas:")).toBeVisible();
+
+      // Fee Recipient (SequencerFeeVault)
       await expect(page.locator("text=Fee Recipient:")).toBeVisible();
       const feeRecipient = await blockPage.getFeeRecipient();
       expect(feeRecipient.toLowerCase()).toContain(block.feeRecipientPartial.toLowerCase());
     }
   });
 
-  test("block #200,000,000 more details shows hashes", async ({ page }) => {
+  test("block #110,000,000 more details shows hashes", async ({ page }) => {
     const blockPage = new BlockPage(page);
-    const block = ARBITRUM.blocks["200000000"];
+    const block = OPTIMISM.blocks["110000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
     const loaded = await waitForBlockContent(page);
@@ -200,34 +177,31 @@ test.describe("Arbitrum One - Block Page", () => {
         await showMoreBtn.click();
         await expect(page.locator("text=Hide More Details")).toBeVisible();
 
-        // Block hash
         await expect(page.locator(`text=${block.hash}`)).toBeVisible();
-        // Parent hash
         await expect(page.locator(`text=${block.parentHash}`)).toBeVisible();
       }
     }
   });
 
-  test("block #300,000,000 - post-ArbOS 32 Bianca (Stylus)", async ({ page }) => {
+  test("block #120,000,000 - post-Ecotone (EIP-4844) high utilization", async ({ page }) => {
     const blockPage = new BlockPage(page);
-    const block = ARBITRUM.blocks["300000000"];
+    const block = OPTIMISM.blocks["120000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
     const loaded = await waitForBlockContent(page);
     if (loaded) {
       await expect(blockPage.blockNumber).toBeVisible();
 
-      // Transaction count
+      // Should have many transactions (21)
       await expect(page.locator("text=Transactions:")).toBeVisible();
       await expect(page.locator(`text=${block.txCount} transactions in this block`)).toBeVisible();
 
-      // Gas Used with value
+      // Gas details - high utilization block (91.9%)
       await expect(page.locator("text=Gas Used:")).toBeVisible();
       await expect(page.locator(`text=${block.gasUsed}`)).toBeVisible();
 
-      // Size with value
-      await expect(page.locator("text=Size:")).toBeVisible();
-      await expect(page.locator(`text=${block.size}`)).toBeVisible();
+      await expect(page.locator("text=Gas Limit:")).toBeVisible();
+      await expect(page.locator(`text=${block.gasLimit}`)).toBeVisible();
 
       // Base Fee Per Gas
       await expect(page.locator("text=Base Fee Per Gas:")).toBeVisible();
@@ -239,9 +213,76 @@ test.describe("Arbitrum One - Block Page", () => {
     }
   });
 
+  test("block #120,000,000 more details shows hashes", async ({ page }) => {
+    const blockPage = new BlockPage(page);
+    const block = OPTIMISM.blocks["120000000"];
+    await blockPage.goto(block.number, CHAIN_ID);
+
+    const loaded = await waitForBlockContent(page);
+    if (loaded) {
+      const showMoreBtn = page.locator("text=Show More Details");
+      if (await showMoreBtn.isVisible()) {
+        await showMoreBtn.click();
+        await expect(page.locator("text=Hide More Details")).toBeVisible();
+
+        await expect(page.locator(`text=${block.hash}`)).toBeVisible();
+        await expect(page.locator(`text=${block.parentHash}`)).toBeVisible();
+      }
+    }
+  });
+
+  test("block #130,000,000 - post-Holocene with increased gas limit (60M)", async ({ page }) => {
+    const blockPage = new BlockPage(page);
+    const block = OPTIMISM.blocks["130000000"];
+    await blockPage.goto(block.number, CHAIN_ID);
+
+    const loaded = await waitForBlockContent(page);
+    if (loaded) {
+      await expect(blockPage.blockNumber).toBeVisible();
+
+      // Transaction count
+      await expect(page.locator("text=Transactions:")).toBeVisible();
+      await expect(page.locator(`text=${block.txCount} transactions in this block`)).toBeVisible();
+
+      // Gas Used
+      await expect(page.locator("text=Gas Used:")).toBeVisible();
+      await expect(page.locator(`text=${block.gasUsed}`)).toBeVisible();
+
+      // Gas Limit - increased post-Holocene (60M)
+      await expect(page.locator("text=Gas Limit:")).toBeVisible();
+      await expect(page.locator(`text=${block.gasLimit}`)).toBeVisible();
+
+      // Base Fee Per Gas
+      await expect(page.locator("text=Base Fee Per Gas:")).toBeVisible();
+
+      // Fee Recipient
+      await expect(page.locator("text=Fee Recipient:")).toBeVisible();
+      const feeRecipient = await blockPage.getFeeRecipient();
+      expect(feeRecipient.toLowerCase()).toContain(block.feeRecipientPartial.toLowerCase());
+    }
+  });
+
+  test("block #130,000,000 more details shows hashes", async ({ page }) => {
+    const blockPage = new BlockPage(page);
+    const block = OPTIMISM.blocks["130000000"];
+    await blockPage.goto(block.number, CHAIN_ID);
+
+    const loaded = await waitForBlockContent(page);
+    if (loaded) {
+      const showMoreBtn = page.locator("text=Show More Details");
+      if (await showMoreBtn.isVisible()) {
+        await showMoreBtn.click();
+        await expect(page.locator("text=Hide More Details")).toBeVisible();
+
+        await expect(page.locator(`text=${block.hash}`)).toBeVisible();
+        await expect(page.locator(`text=${block.parentHash}`)).toBeVisible();
+      }
+    }
+  });
+
   test("genesis block more details section shows correct hash", async ({ page }) => {
     const blockPage = new BlockPage(page);
-    const block = ARBITRUM.blocks["0"];
+    const block = OPTIMISM.blocks["0"];
     await blockPage.goto(block.number, CHAIN_ID);
 
     const loaded = await waitForBlockContent(page);
@@ -253,16 +294,19 @@ test.describe("Arbitrum One - Block Page", () => {
 
         // Verify hash field labels
         await expect(page.getByText("Hash:", { exact: true })).toBeVisible();
+        await expect(page.getByText("Parent Hash:", { exact: true })).toBeVisible();
 
         // Genesis block hash
         await expect(page.locator(`text=${block.hash}`)).toBeVisible();
+        // Genesis parent hash (all zeros) - use first() as it appears in multiple places
+        await expect(page.locator(`text=${block.parentHash}`).first()).toBeVisible();
       }
     }
   });
 
-  test("block navigation buttons work on Arbitrum", async ({ page }) => {
+  test("block navigation buttons work on Optimism", async ({ page }) => {
     const blockPage = new BlockPage(page);
-    await blockPage.goto(ARBITRUM.blocks["100000000"].number, CHAIN_ID);
+    await blockPage.goto(OPTIMISM.blocks["110000000"].number, CHAIN_ID);
 
     const loaded = await waitForBlockContent(page);
     if (loaded) {
@@ -288,10 +332,10 @@ test.describe("Arbitrum One - Block Page", () => {
 // TRANSACTION TESTS
 // ============================================
 
-test.describe("Arbitrum One - Transaction Page", () => {
-  test("displays Uniswap V3 swap with all details", async ({ page }) => {
+test.describe("Optimism - Transaction Page", () => {
+  test("displays Velodrome DEX swap (Legacy Type 0) with all details", async ({ page }) => {
     const txPage = new TransactionPage(page);
-    const tx = ARBITRUM.transactions[UNISWAP_SWAP];
+    const tx = OPTIMISM.transactions[VELODROME_SWAP];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
@@ -303,7 +347,6 @@ test.describe("Arbitrum One - Transaction Page", () => {
       await expect(page.locator("text=Block:")).toBeVisible();
       await expect(page.locator("text=From:")).toBeVisible();
       await expect(page.locator("text=To:")).toBeVisible();
-      await expect(page.locator("text=Value:")).toBeVisible();
 
       // Verify gas information
       await expect(page.locator("text=Gas Limit")).toBeVisible();
@@ -311,9 +354,9 @@ test.describe("Arbitrum One - Transaction Page", () => {
     }
   });
 
-  test("shows correct from and to addresses for swap", async ({ page }) => {
+  test("shows correct from and to addresses for Velodrome swap", async ({ page }) => {
     const txPage = new TransactionPage(page);
-    const tx = ARBITRUM.transactions[UNISWAP_SWAP];
+    const tx = OPTIMISM.transactions[VELODROME_SWAP];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
@@ -327,26 +370,39 @@ test.describe("Arbitrum One - Transaction Page", () => {
     }
   });
 
-  test("displays transaction value and fee", async ({ page }) => {
+  test("displays transaction fee for Velodrome swap", async ({ page }) => {
     const txPage = new TransactionPage(page);
-    const tx = ARBITRUM.transactions[UNISWAP_SWAP];
+    const tx = OPTIMISM.transactions[VELODROME_SWAP];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
     const loaded = await waitForTxContent(page);
     if (loaded) {
-      // Verify value contains ETH
-      const value = await txPage.getValue();
-      expect(value).toContain("ETH");
-
       // Verify transaction fee is displayed
       await expect(page.locator("text=Transaction Fee:")).toBeVisible();
     }
   });
 
-  test("displays USDC transfer transaction (EIP-1559)", async ({ page }) => {
+  test("displays Velodrome swap nonce and position", async ({ page }) => {
     const txPage = new TransactionPage(page);
-    const tx = ARBITRUM.transactions[USDC_TRANSFER];
+    const tx = OPTIMISM.transactions[VELODROME_SWAP];
+
+    await txPage.goto(tx.hash, CHAIN_ID);
+
+    const loaded = await waitForTxContent(page);
+    if (loaded) {
+      await expect(page.locator("text=Other Attributes:")).toBeVisible();
+      await expect(page.locator("text=Nonce:")).toBeVisible();
+      await expect(page.locator("text=Position:")).toBeVisible();
+
+      // Verify nonce value is displayed (use locator that includes the label)
+      await expect(page.locator(`text=Nonce: ${tx.nonce}`)).toBeVisible();
+    }
+  });
+
+  test("displays OP token transfer transaction (EIP-1559 Type 2)", async ({ page }) => {
+    const txPage = new TransactionPage(page);
+    const tx = OPTIMISM.transactions[OP_TRANSFER];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
@@ -357,56 +413,15 @@ test.describe("Arbitrum One - Transaction Page", () => {
       await expect(page.locator("text=From:")).toBeVisible();
       await expect(page.locator("text=To:")).toBeVisible();
 
-      // To address should be USDC contract
+      // To address should be OP token contract
       const to = await txPage.getToAddress();
       expect(to?.toLowerCase()).toContain(tx.to?.toLowerCase().slice(0, 10));
     }
   });
 
-  test("displays transaction with input data", async ({ page }) => {
+  test("OP transfer shows correct addresses and gas details", async ({ page }) => {
     const txPage = new TransactionPage(page);
-    const tx = ARBITRUM.transactions[UNISWAP_SWAP];
-
-    await txPage.goto(tx.hash, CHAIN_ID);
-
-    const loaded = await waitForTxContent(page);
-    if (loaded) {
-      // Contract interaction should have input data
-      await expect(page.locator("text=Input Data:")).toBeVisible();
-    }
-  });
-
-  test("displays other attributes section with nonce", async ({ page }) => {
-    const txPage = new TransactionPage(page);
-    const tx = ARBITRUM.transactions[UNISWAP_SWAP];
-
-    await txPage.goto(tx.hash, CHAIN_ID);
-
-    const loaded = await waitForTxContent(page);
-    if (loaded) {
-      await expect(page.locator("text=Other Attributes:")).toBeVisible();
-      await expect(page.locator("text=Nonce:")).toBeVisible();
-      await expect(page.locator("text=Position:")).toBeVisible();
-    }
-  });
-
-  test("displays block number link", async ({ page }) => {
-    const txPage = new TransactionPage(page);
-    const tx = ARBITRUM.transactions[UNISWAP_SWAP];
-
-    await txPage.goto(tx.hash, CHAIN_ID);
-
-    const loaded = await waitForTxContent(page);
-    if (loaded) {
-      await expect(page.locator("text=Block:")).toBeVisible();
-      const blockValue = await txPage.getBlockNumber();
-      expect(blockValue).toBeTruthy();
-    }
-  });
-
-  test("USDC transfer shows correct addresses", async ({ page }) => {
-    const txPage = new TransactionPage(page);
-    const tx = ARBITRUM.transactions[USDC_TRANSFER];
+    const tx = OPTIMISM.transactions[OP_TRANSFER];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
@@ -417,6 +432,88 @@ test.describe("Arbitrum One - Transaction Page", () => {
 
       const to = await txPage.getToAddress();
       expect(to?.toLowerCase()).toContain(tx.to?.toLowerCase().slice(0, 10));
+
+      // Verify gas limit is displayed
+      await expect(page.locator("text=Gas Limit")).toBeVisible();
+    }
+  });
+
+  test("OP transfer shows nonce and position", async ({ page }) => {
+    const txPage = new TransactionPage(page);
+    const tx = OPTIMISM.transactions[OP_TRANSFER];
+
+    await txPage.goto(tx.hash, CHAIN_ID);
+
+    const loaded = await waitForTxContent(page);
+    if (loaded) {
+      await expect(page.locator("text=Nonce:")).toBeVisible();
+      await expect(page.locator("text=Position:")).toBeVisible();
+
+      // Verify nonce value is displayed (use locator that includes the label)
+      await expect(page.locator(`text=Nonce: ${tx.nonce}`)).toBeVisible();
+    }
+  });
+
+  test("displays system transaction (Type 126) - L2CrossDomainMessenger relay", async ({
+    page,
+  }) => {
+    const txPage = new TransactionPage(page);
+    const tx = OPTIMISM.transactions[SYSTEM_TX];
+
+    await txPage.goto(tx.hash, CHAIN_ID);
+
+    const loaded = await waitForTxContent(page);
+    if (loaded) {
+      await expect(page.locator("text=Transaction Hash:")).toBeVisible();
+      await expect(page.locator("text=Status:")).toBeVisible();
+      await expect(page.locator("text=From:")).toBeVisible();
+      await expect(page.locator("text=To:")).toBeVisible();
+
+      // To address should be L2CrossDomainMessenger
+      const to = await txPage.getToAddress();
+      expect(to?.toLowerCase()).toContain(tx.to?.toLowerCase().slice(0, 10));
+    }
+  });
+
+  test("system transaction shows correct from address (Aliased L1 Messenger)", async ({
+    page,
+  }) => {
+    const txPage = new TransactionPage(page);
+    const tx = OPTIMISM.transactions[SYSTEM_TX];
+
+    await txPage.goto(tx.hash, CHAIN_ID);
+
+    const loaded = await waitForTxContent(page);
+    if (loaded) {
+      const from = await txPage.getFromAddress();
+      expect(from.toLowerCase()).toContain(tx.from.toLowerCase().slice(0, 10));
+    }
+  });
+
+  test("displays transaction with input data", async ({ page }) => {
+    const txPage = new TransactionPage(page);
+    const tx = OPTIMISM.transactions[VELODROME_SWAP];
+
+    await txPage.goto(tx.hash, CHAIN_ID);
+
+    const loaded = await waitForTxContent(page);
+    if (loaded) {
+      // Contract interaction should have input data
+      await expect(page.locator("text=Input Data:")).toBeVisible();
+    }
+  });
+
+  test("displays block number link for transaction", async ({ page }) => {
+    const txPage = new TransactionPage(page);
+    const tx = OPTIMISM.transactions[VELODROME_SWAP];
+
+    await txPage.goto(tx.hash, CHAIN_ID);
+
+    const loaded = await waitForTxContent(page);
+    if (loaded) {
+      await expect(page.locator("text=Block:")).toBeVisible();
+      const blockValue = await txPage.getBlockNumber();
+      expect(blockValue).toBeTruthy();
     }
   });
 
@@ -437,10 +534,10 @@ test.describe("Arbitrum One - Transaction Page", () => {
 // ADDRESS TESTS
 // ============================================
 
-test.describe("Arbitrum One - Address Page", () => {
+test.describe("Optimism - Address Page", () => {
   test("displays native USDC contract details", async ({ page }) => {
     const addressPage = new AddressPage(page);
-    const addr = ARBITRUM.addresses.usdc;
+    const addr = OPTIMISM.addresses.usdc;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
@@ -455,7 +552,7 @@ test.describe("Arbitrum One - Address Page", () => {
 
   test("displays bridged USDC.e contract", async ({ page }) => {
     const addressPage = new AddressPage(page);
-    const addr = ARBITRUM.addresses.usdce;
+    const addr = OPTIMISM.addresses.usdce;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
@@ -466,9 +563,9 @@ test.describe("Arbitrum One - Address Page", () => {
     }
   });
 
-  test("displays WETH contract", async ({ page }) => {
+  test("displays WETH predeploy contract", async ({ page }) => {
     const addressPage = new AddressPage(page);
-    const addr = ARBITRUM.addresses.weth;
+    const addr = OPTIMISM.addresses.weth;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
@@ -479,9 +576,9 @@ test.describe("Arbitrum One - Address Page", () => {
     }
   });
 
-  test("displays ARB governance token contract", async ({ page }) => {
+  test("displays OP governance token contract", async ({ page }) => {
     const addressPage = new AddressPage(page);
-    const addr = ARBITRUM.addresses.arb;
+    const addr = OPTIMISM.addresses.op;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
@@ -492,9 +589,9 @@ test.describe("Arbitrum One - Address Page", () => {
     }
   });
 
-  test("displays GMX token contract", async ({ page }) => {
+  test("displays USDT contract", async ({ page }) => {
     const addressPage = new AddressPage(page);
-    const addr = ARBITRUM.addresses.gmx;
+    const addr = OPTIMISM.addresses.usdt;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
@@ -505,9 +602,22 @@ test.describe("Arbitrum One - Address Page", () => {
     }
   });
 
-  test("displays Uniswap V3 Router contract with details", async ({ page }) => {
+  test("displays DAI contract", async ({ page }) => {
     const addressPage = new AddressPage(page);
-    const addr = ARBITRUM.addresses.uniswapV3Router;
+    const addr = OPTIMISM.addresses.dai;
+
+    await addressPage.goto(addr.address, CHAIN_ID);
+
+    const loaded = await waitForAddressContent(page);
+    if (loaded) {
+      const isContract = await addressPage.isContract();
+      expect(isContract).toBe(true);
+    }
+  });
+
+  test("displays Velodrome Router contract with details", async ({ page }) => {
+    const addressPage = new AddressPage(page);
+    const addr = OPTIMISM.addresses.velodromeRouter;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
@@ -517,12 +627,38 @@ test.describe("Arbitrum One - Address Page", () => {
       expect(isContract).toBe(true);
 
       await expect(page.locator("text=Contract Details")).toBeVisible();
+    }
+  });
+
+  test("displays Velodrome Universal Router contract", async ({ page }) => {
+    const addressPage = new AddressPage(page);
+    const addr = OPTIMISM.addresses.velodromeUniversalRouter;
+
+    await addressPage.goto(addr.address, CHAIN_ID);
+
+    const loaded = await waitForAddressContent(page);
+    if (loaded) {
+      const isContract = await addressPage.isContract();
+      expect(isContract).toBe(true);
+    }
+  });
+
+  test("displays Uniswap V3 Router contract", async ({ page }) => {
+    const addressPage = new AddressPage(page);
+    const addr = OPTIMISM.addresses.uniswapV3Router;
+
+    await addressPage.goto(addr.address, CHAIN_ID);
+
+    const loaded = await waitForAddressContent(page);
+    if (loaded) {
+      const isContract = await addressPage.isContract();
+      expect(isContract).toBe(true);
     }
   });
 
   test("displays Uniswap Universal Router contract", async ({ page }) => {
     const addressPage = new AddressPage(page);
-    const addr = ARBITRUM.addresses.uniswapUniversalRouter;
+    const addr = OPTIMISM.addresses.uniswapUniversalRouter;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
@@ -533,24 +669,9 @@ test.describe("Arbitrum One - Address Page", () => {
     }
   });
 
-  test("displays GMX Vault contract with details", async ({ page }) => {
+  test("displays SequencerFeeVault system contract", async ({ page }) => {
     const addressPage = new AddressPage(page);
-    const addr = ARBITRUM.addresses.gmxVault;
-
-    await addressPage.goto(addr.address, CHAIN_ID);
-
-    const loaded = await waitForAddressContent(page);
-    if (loaded) {
-      const isContract = await addressPage.isContract();
-      expect(isContract).toBe(true);
-
-      await expect(page.locator("text=Contract Details")).toBeVisible();
-    }
-  });
-
-  test("displays GMX Position Router contract", async ({ page }) => {
-    const addressPage = new AddressPage(page);
-    const addr = ARBITRUM.addresses.gmxPositionRouter;
+    const addr = OPTIMISM.addresses.sequencerFeeVault;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
@@ -561,9 +682,87 @@ test.describe("Arbitrum One - Address Page", () => {
     }
   });
 
-  test("displays ArbSys system precompile", async ({ page }) => {
+  test("displays GasPriceOracle system contract", async ({ page }) => {
     const addressPage = new AddressPage(page);
-    const addr = ARBITRUM.addresses.arbSys;
+    const addr = OPTIMISM.addresses.gasPriceOracle;
+
+    await addressPage.goto(addr.address, CHAIN_ID);
+
+    const loaded = await waitForAddressContent(page);
+    if (loaded) {
+      const isContract = await addressPage.isContract();
+      expect(isContract).toBe(true);
+    }
+  });
+
+  test("displays L1Block system contract", async ({ page }) => {
+    const addressPage = new AddressPage(page);
+    const addr = OPTIMISM.addresses.l1Block;
+
+    await addressPage.goto(addr.address, CHAIN_ID);
+
+    const loaded = await waitForAddressContent(page);
+    if (loaded) {
+      const isContract = await addressPage.isContract();
+      expect(isContract).toBe(true);
+    }
+  });
+
+  test("displays L2StandardBridge contract", async ({ page }) => {
+    const addressPage = new AddressPage(page);
+    const addr = OPTIMISM.addresses.l2StandardBridge;
+
+    await addressPage.goto(addr.address, CHAIN_ID);
+
+    const loaded = await waitForAddressContent(page);
+    if (loaded) {
+      const isContract = await addressPage.isContract();
+      expect(isContract).toBe(true);
+    }
+  });
+
+  test("displays L2CrossDomainMessenger contract", async ({ page }) => {
+    const addressPage = new AddressPage(page);
+    const addr = OPTIMISM.addresses.l2CrossDomainMessenger;
+
+    await addressPage.goto(addr.address, CHAIN_ID);
+
+    const loaded = await waitForAddressContent(page);
+    if (loaded) {
+      const isContract = await addressPage.isContract();
+      expect(isContract).toBe(true);
+    }
+  });
+
+  test("displays L2ToL1MessagePasser contract", async ({ page }) => {
+    const addressPage = new AddressPage(page);
+    const addr = OPTIMISM.addresses.l2ToL1MessagePasser;
+
+    await addressPage.goto(addr.address, CHAIN_ID);
+
+    const loaded = await waitForAddressContent(page);
+    if (loaded) {
+      const isContract = await addressPage.isContract();
+      expect(isContract).toBe(true);
+    }
+  });
+
+  test("displays BaseFeeVault system contract", async ({ page }) => {
+    const addressPage = new AddressPage(page);
+    const addr = OPTIMISM.addresses.baseFeeVault;
+
+    await addressPage.goto(addr.address, CHAIN_ID);
+
+    const loaded = await waitForAddressContent(page);
+    if (loaded) {
+      const isContract = await addressPage.isContract();
+      expect(isContract).toBe(true);
+    }
+  });
+
+  test("displays L1FeeVault system contract", async ({ page }) => {
+    const addressPage = new AddressPage(page);
+    const addr = OPTIMISM.addresses.l1FeeVault;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 

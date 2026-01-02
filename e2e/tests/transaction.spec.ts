@@ -125,7 +125,10 @@ test.describe("Transaction Page", () => {
     await txPage.goto("0xinvalid");
 
     await expect(
-      txPage.errorText.or(txPage.container).or(page.locator("text=Something went wrong"))
+      txPage.errorText
+        .or(txPage.container)
+        .or(page.locator("text=Something went wrong"))
+        .first()
     ).toBeVisible({ timeout: 30000 });
   });
 });

@@ -112,7 +112,10 @@ test.describe("Address Page", () => {
     await addressPage.goto("0xinvalid");
 
     await expect(
-      addressPage.errorText.or(addressPage.container).or(page.locator("text=Something went wrong"))
+      addressPage.errorText
+        .or(addressPage.container)
+        .or(page.locator("text=Something went wrong"))
+        .first()
     ).toBeVisible({ timeout: 30000 });
   });
 

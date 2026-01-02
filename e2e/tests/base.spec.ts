@@ -214,7 +214,10 @@ test.describe("Base Network - Block Page", () => {
     await blockPage.goto(999999999999, CHAIN_ID);
 
     await expect(
-      blockPage.errorText.or(blockPage.container).or(page.locator("text=Something went wrong"))
+      blockPage.errorText
+        .or(blockPage.container)
+        .or(page.locator("text=Something went wrong"))
+        .first()
     ).toBeVisible({ timeout: 30000 });
   });
 });
@@ -325,7 +328,10 @@ test.describe("Base Network - Transaction Page", () => {
     await txPage.goto("0xinvalid", CHAIN_ID);
 
     await expect(
-      txPage.errorText.or(txPage.container).or(page.locator("text=Something went wrong"))
+      txPage.errorText
+        .or(txPage.container)
+        .or(page.locator("text=Something went wrong"))
+        .first()
     ).toBeVisible({ timeout: 30000 });
   });
 });

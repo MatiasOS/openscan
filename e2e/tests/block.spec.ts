@@ -259,7 +259,10 @@ test.describe("Block Page", () => {
     await blockPage.goto(999999999999);
 
     await expect(
-      blockPage.errorText.or(blockPage.container).or(page.locator("text=Something went wrong"))
+      blockPage.errorText
+        .or(blockPage.container)
+        .or(page.locator("text=Something went wrong"))
+        .first()
     ).toBeVisible({ timeout: 30000 });
   });
 });
