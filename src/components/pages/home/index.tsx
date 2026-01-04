@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { NetworkConfig } from "../../../config/networks";
 import { useNetworks } from "../../../context/AppContext";
@@ -37,8 +37,9 @@ const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
 
 export default function Home() {
   const { enabledNetworks: allNetworks, isLoading } = useNetworks();
+  const [showTestnets, setShowTestnets] = useState(false);
 
-  const displayNetworks = useMemo(() => {
+  const { mainnets, testnets, displayNetworks } = useMemo(() => {
     const environment = process.env.REACT_APP_ENVIRONMENT;
     const isDevelopment = environment === "development";
     const envNetworks = process.env.REACT_APP_OPENSCAN_NETWORKS;
@@ -51,11 +52,16 @@ export default function Home() {
       .includes(hardhatNetworkId);
 
     // Filter out Hardhat from home page if not in development and not explicitly enabled
+    let networks = allNetworks;
     if (!isDevelopment && !isHardhatExplicitlyEnabled) {
-      return allNetworks.filter((n) => n.networkId !== hardhatNetworkId);
+      networks = allNetworks.filter((n) => n.networkId !== hardhatNetworkId);
     }
 
-    return allNetworks;
+    // Split into mainnets and testnets
+    const mainnets = networks.filter((n) => !n.isTestnet);
+    const testnets = networks.filter((n) => n.isTestnet);
+
+    return { mainnets, testnets, displayNetworks: networks };
   }, [allNetworks]);
 
   return (
@@ -67,14 +73,33 @@ export default function Home() {
         <HomeSearchBar networks={displayNetworks} />
 
         <div className="network-grid">
-          {isLoading && displayNetworks.length === 0 ? (
+          {isLoading && mainnets.length === 0 ? (
             <p className="loading-text">Loading networks...</p>
           ) : (
-            displayNetworks.map((network) => (
-              <NetworkCard key={network.networkId} network={network} />
-            ))
+            mainnets.map((network) => <NetworkCard key={network.networkId} network={network} />)
           )}
         </div>
+
+        {testnets.length > 0 && (
+          <>
+            {showTestnets && (
+              <div className="network-grid testnet-grid">
+                {testnets.map((network) => (
+                  <NetworkCard key={network.networkId} network={network} />
+                ))}
+              </div>
+            )}
+            <div className="testnet-toggle-container">
+              <button
+                type="button"
+                className="testnet-toggle-btn"
+                onClick={() => setShowTestnets(!showTestnets)}
+              >
+                {showTestnets ? "Hide testnets" : "Show testnets"}
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
