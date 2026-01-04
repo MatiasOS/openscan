@@ -3,7 +3,12 @@ import { BlockPage } from "../pages/block.page";
 import { AddressPage } from "../pages/address.page";
 import { TransactionPage } from "../pages/transaction.page";
 import { BASE } from "../fixtures/base";
-import { waitForBlockContent, waitForTxContent, waitForAddressContent } from "../helpers/wait";
+import {
+  waitForBlockContent,
+  waitForTxContent,
+  waitForAddressContent,
+  DEFAULT_TIMEOUT,
+} from "../helpers/wait";
 
 const CHAIN_ID = BASE.chainId;
 
@@ -173,7 +178,7 @@ test.describe("Base Network - Block Page", () => {
         .or(blockPage.container)
         .or(page.locator("text=Something went wrong"))
         .first()
-    ).toBeVisible({ timeout: 30000 });
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 });
 
@@ -287,7 +292,7 @@ test.describe("Base Network - Transaction Page", () => {
         .or(txPage.container)
         .or(page.locator("text=Something went wrong"))
         .first()
-    ).toBeVisible({ timeout: 30000 });
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 });
 

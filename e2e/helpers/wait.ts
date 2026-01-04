@@ -2,6 +2,13 @@ import type { Page, TestInfo } from "@playwright/test";
 import { expect } from "@playwright/test";
 
 /**
+ * Default timeout for assertions in e2e tests.
+ * - Local: 5000ms (5 seconds)
+ * - CI (GitHub Actions): 10000ms (10 seconds)
+ */
+export const DEFAULT_TIMEOUT = process.env.CI ? 10000 : 5000;
+
+/**
  * Shared wait helpers for e2e tests with retry-aware timeouts.
  *
  * Timeout formula: baseTimeout + (increment * retryCount)

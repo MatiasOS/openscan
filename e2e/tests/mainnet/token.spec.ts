@@ -1,6 +1,6 @@
 import { test, expect } from "../../fixtures/test";
 import { MAINNET } from "../../fixtures/mainnet";
-import { waitForTokenContent } from "../../helpers/wait";
+import { waitForTokenContent, DEFAULT_TIMEOUT } from "../../helpers/wait";
 
 test.describe("ERC721 Token Details", () => {
   test("displays BAYC #1 NFT details section", async ({ page }, testInfo) => {
@@ -138,7 +138,7 @@ test.describe("ERC721 Token Details", () => {
         .locator(".erc721-token-input")
         .or(page.locator("text=Error:"))
         .or(page.locator("text=Failed to fetch"))
-    ).toBeVisible({ timeout: 45000 });
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 5 });
 
     // Only proceed if the token input is visible (page loaded successfully)
     if (await page.locator(".erc721-token-input").isVisible()) {
@@ -220,7 +220,7 @@ test.describe("ERC1155 Token Details", () => {
         .or(page.locator("text=Error:"))
         .or(page.locator("text=Failed to fetch"))
         .first()
-    ).toBeVisible({ timeout: 45000 });
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 5 });
 
     // Only proceed if the ERC1155 token input is visible (contract detected as ERC1155)
     if (await page.locator(".erc1155-token-input").isVisible()) {
@@ -236,7 +236,7 @@ test.describe("ERC1155 Token Details", () => {
       // Verify token details page loaded (may be ERC1155 or show loading/error for invalid token)
       await expect(
         page.locator(".erc1155-header").or(page.locator("text=Error:")).or(page.locator(".erc1155-detail-content"))
-      ).toBeVisible({ timeout: 30000 });
+      ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
     }
     // If not detected as ERC1155, test passes (RPC may not support interface detection)
   });
@@ -256,7 +256,7 @@ test.describe("Token Details - Error Handling", () => {
         .or(page.locator("text=Something went wrong"))
         .or(page.locator(".erc721-header"))
         .or(page.locator(".erc721-detail-content"))
-    ).toBeVisible({ timeout: 30000 });
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 
   test("handles invalid contract for token view", async ({ page }, testInfo) => {
@@ -271,6 +271,6 @@ test.describe("Token Details - Error Handling", () => {
         .locator("text=Error:")
         .or(page.locator("text=Something went wrong"))
         .or(page.locator(".container-wide"))
-    ).toBeVisible({ timeout: 30000 });
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 });

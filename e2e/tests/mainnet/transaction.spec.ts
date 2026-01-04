@@ -1,7 +1,7 @@
 import { test, expect } from "../../fixtures/test";
 import { TransactionPage } from "../../pages/transaction.page";
 import { MAINNET } from "../../fixtures/mainnet";
-import { waitForTxContent } from "../../helpers/wait";
+import { waitForTxContent, DEFAULT_TIMEOUT } from "../../helpers/wait";
 
 // Transaction hash constants for readability
 const FIRST_ETH_TRANSFER = "0x5c504ed432cb51138bcf09aa5e8a410dd4a1e204ef84bfed1be16dfba1b22060";
@@ -115,6 +115,6 @@ test.describe("Transaction Page", () => {
         .or(txPage.container)
         .or(page.locator("text=Something went wrong"))
         .first()
-    ).toBeVisible({ timeout: 30000 });
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 });

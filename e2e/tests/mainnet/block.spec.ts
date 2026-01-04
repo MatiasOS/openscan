@@ -1,7 +1,7 @@
 import { test, expect } from "../../fixtures/test";
 import { BlockPage } from "../../pages/block.page";
 import { MAINNET } from "../../fixtures/mainnet";
-import { waitForBlockContent } from "../../helpers/wait";
+import { waitForBlockContent, DEFAULT_TIMEOUT } from "../../helpers/wait";
 
 test.describe("Block Page", () => {
   test("block #10,000 - pre-London block with no transactions", async ({ page }, testInfo) => {
@@ -249,6 +249,6 @@ test.describe("Block Page", () => {
         .or(blockPage.container)
         .or(page.locator("text=Something went wrong"))
         .first()
-    ).toBeVisible({ timeout: 30000 });
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 });

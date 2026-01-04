@@ -3,7 +3,12 @@ import { BlockPage } from "../pages/block.page";
 import { AddressPage } from "../pages/address.page";
 import { TransactionPage } from "../pages/transaction.page";
 import { ARBITRUM } from "../fixtures/arbitrum";
-import { waitForBlockContent, waitForTxContent, waitForAddressContent } from "../helpers/wait";
+import {
+  waitForBlockContent,
+  waitForTxContent,
+  waitForAddressContent,
+  DEFAULT_TIMEOUT,
+} from "../helpers/wait";
 
 const CHAIN_ID = ARBITRUM.chainId;
 
@@ -235,7 +240,7 @@ test.describe("Arbitrum One - Block Page", () => {
         .or(blockPage.container)
         .or(page.locator("text=Something went wrong"))
         .first()
-    ).toBeVisible({ timeout: 30000 });
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 });
 
@@ -384,7 +389,7 @@ test.describe("Arbitrum One - Transaction Page", () => {
         .or(txPage.container)
         .or(page.locator("text=Something went wrong"))
         .first()
-    ).toBeVisible({ timeout: 30000 });
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 });
 

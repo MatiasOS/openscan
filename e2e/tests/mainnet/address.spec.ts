@@ -1,7 +1,7 @@
 import { test, expect } from "../../fixtures/test";
 import { AddressPage } from "../../pages/address.page";
 import { MAINNET } from "../../fixtures/mainnet";
-import { waitForAddressContent } from "../../helpers/wait";
+import { waitForAddressContent, DEFAULT_TIMEOUT } from "../../helpers/wait";
 
 test.describe("Address Page", () => {
   test("displays address with balance and transaction count", async ({ page }, testInfo) => {
@@ -89,7 +89,7 @@ test.describe("Address Page", () => {
     await addressPage.goto(addr.address);
 
     // Verify address is displayed in header (at least partial)
-    await expect(page.locator(`text=${addr.address.slice(0, 10)}`)).toBeVisible({ timeout: 30000 });
+    await expect(page.locator(`text=${addr.address.slice(0, 10)}`)).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 
   test("handles invalid address gracefully", async ({ page }) => {
@@ -101,7 +101,7 @@ test.describe("Address Page", () => {
         .or(addressPage.container)
         .or(page.locator("text=Something went wrong"))
         .first()
-    ).toBeVisible({ timeout: 30000 });
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 
   test("displays ERC721 NFT collection (BAYC) with collection details", async ({ page }, testInfo) => {
@@ -153,7 +153,7 @@ test.describe("Address Page", () => {
       await contractDetailsHeader.click();
 
       // Wait for expansion and verify details
-      await expect(page.locator("text=Verified At")).toBeVisible({ timeout: 5000 });
+      await expect(page.locator("text=Verified At")).toBeVisible({ timeout: DEFAULT_TIMEOUT });
 
       // Verify match type badge
       await expect(page.locator(`text=${addr.matchType}`)).toBeVisible();
@@ -181,7 +181,7 @@ test.describe("Address Page", () => {
       await contractDetailsHeader.click();
 
       // Wait for Read Functions section to be visible
-      await expect(page.locator("text=/Read Functions \\(\\d+\\)/")).toBeVisible({ timeout: 5000 });
+      await expect(page.locator("text=/Read Functions \\(\\d+\\)/")).toBeVisible({ timeout: DEFAULT_TIMEOUT });
 
       // Verify some key read functions are displayed
       const keyReadFunctions = ["name", "symbol", "totalSupply", "balanceOf", "ownerOf", "tokenURI"];
@@ -204,7 +204,7 @@ test.describe("Address Page", () => {
       await contractDetailsHeader.click();
 
       // Wait for Write Functions section to be visible
-      await expect(page.locator("text=/Write Functions \\(\\d+\\)/")).toBeVisible({ timeout: 5000 });
+      await expect(page.locator("text=/Write Functions \\(\\d+\\)/")).toBeVisible({ timeout: DEFAULT_TIMEOUT });
 
       // Verify some key write functions are displayed
       const keyWriteFunctions = ["approve", "transferFrom", "safeTransferFrom"];
@@ -227,7 +227,7 @@ test.describe("Address Page", () => {
       await contractDetailsHeader.click();
 
       // Wait for Events section to be visible
-      await expect(page.locator("text=/Events \\(\\d+\\)/")).toBeVisible({ timeout: 5000 });
+      await expect(page.locator("text=/Events \\(\\d+\\)/")).toBeVisible({ timeout: DEFAULT_TIMEOUT });
 
       // Verify the events are displayed
       for (const event of addr.events) {
@@ -284,7 +284,7 @@ test.describe("Address Page", () => {
       await contractDetailsHeader.click();
 
       // Wait for expansion and verify details
-      await expect(page.locator("text=Verified At")).toBeVisible({ timeout: 5000 });
+      await expect(page.locator("text=Verified At")).toBeVisible({ timeout: DEFAULT_TIMEOUT });
 
       // Verify match type badge (MATCH for Rarible)
       await expect(page.locator(`text=${addr.matchType}`)).toBeVisible();
@@ -312,7 +312,7 @@ test.describe("Address Page", () => {
       await contractDetailsHeader.click();
 
       // Wait for Read Functions section to be visible
-      await expect(page.locator("text=/Read Functions \\(\\d+\\)/")).toBeVisible({ timeout: 5000 });
+      await expect(page.locator("text=/Read Functions \\(\\d+\\)/")).toBeVisible({ timeout: DEFAULT_TIMEOUT });
 
       // Verify some key read functions are displayed
       const keyReadFunctions = ["balanceOf", "name", "symbol", "uri", "supportsInterface"];
@@ -335,7 +335,7 @@ test.describe("Address Page", () => {
       await contractDetailsHeader.click();
 
       // Wait for Write Functions section to be visible
-      await expect(page.locator("text=/Write Functions \\(\\d+\\)/")).toBeVisible({ timeout: 5000 });
+      await expect(page.locator("text=/Write Functions \\(\\d+\\)/")).toBeVisible({ timeout: DEFAULT_TIMEOUT });
 
       // Verify some key write functions are displayed
       const keyWriteFunctions = ["mint", "burn", "safeTransferFrom", "setApprovalForAll"];
@@ -358,7 +358,7 @@ test.describe("Address Page", () => {
       await contractDetailsHeader.click();
 
       // Wait for Events section to be visible
-      await expect(page.locator("text=/Events \\(\\d+\\)/")).toBeVisible({ timeout: 5000 });
+      await expect(page.locator("text=/Events \\(\\d+\\)/")).toBeVisible({ timeout: DEFAULT_TIMEOUT });
 
       // Verify some key events are displayed
       const keyEvents = ["TransferSingle", "TransferBatch", "ApprovalForAll", "URI"];

@@ -3,7 +3,12 @@ import { BlockPage } from "../pages/block.page";
 import { TransactionPage } from "../pages/transaction.page";
 import { AddressPage } from "../pages/address.page";
 import { POLYGON } from "../fixtures/polygon";
-import { waitForBlockContent, waitForTxContent, waitForAddressContent } from "../helpers/wait";
+import {
+  waitForBlockContent,
+  waitForTxContent,
+  waitForAddressContent,
+  DEFAULT_TIMEOUT,
+} from "../helpers/wait";
 
 const CHAIN_ID = POLYGON.chainId;
 
@@ -332,7 +337,7 @@ test.describe("Polygon Block Page", () => {
         .or(blockPage.container)
         .or(page.locator("text=Something went wrong"))
         .first()
-    ).toBeVisible({ timeout: 30000 });
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 });
 
@@ -525,7 +530,7 @@ test.describe("Polygon Transaction Page", () => {
         .or(txPage.container)
         .or(page.locator("text=Something went wrong"))
         .first()
-    ).toBeVisible({ timeout: 30000 });
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 });
 
@@ -734,6 +739,6 @@ test.describe("Polygon Address Page - System Contracts", () => {
         .or(page.locator("text=Something went wrong"))
         .or(page.locator("text=Invalid"))
         .first()
-    ).toBeVisible({ timeout: 30000 });
+    ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });
 });
