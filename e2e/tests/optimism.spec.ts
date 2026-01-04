@@ -3,6 +3,7 @@ import { BlockPage } from "../pages/block.page";
 import { AddressPage } from "../pages/address.page";
 import { TransactionPage } from "../pages/transaction.page";
 import { OPTIMISM } from "../fixtures/optimism";
+import { waitForBlockContent, waitForTxContent, waitForAddressContent } from "../helpers/wait";
 
 const CHAIN_ID = OPTIMISM.chainId;
 
@@ -11,63 +12,17 @@ const VELODROME_SWAP = "0xa8d73ea0639f39157f787a29591b36fc73c19b443bbe8416d8d6f2
 const OP_TRANSFER = "0xdcf7c4afb479cd47f7ce263cbbb298f559b81fc592cc07737935a6166fb90f0c";
 const SYSTEM_TX = "0x5d3522dad0d0745b59e9443733f8423548f99856c00768aba9779ae288dedd0a";
 
-// Helper to wait for block content or error
-async function waitForBlockContent(page: import("@playwright/test").Page) {
-  await expect(
-    page
-      .locator("text=Transactions:")
-      .or(page.locator("text=Error:"))
-      .or(page.locator("text=Something went wrong"))
-  ).toBeVisible({ timeout: 45000 });
-
-  return (
-    !(await page.locator("text=Error:").isVisible()) &&
-    !(await page.locator("text=Something went wrong").isVisible())
-  );
-}
-
-// Helper to wait for address content or error
-async function waitForAddressContent(page: import("@playwright/test").Page) {
-  await expect(
-    page
-      .locator("text=Balance:")
-      .or(page.locator("text=Error:"))
-      .or(page.locator("text=Something went wrong"))
-      .first()
-  ).toBeVisible({ timeout: 45000 });
-
-  return (
-    !(await page.locator("text=Error:").isVisible()) &&
-    !(await page.locator("text=Something went wrong").isVisible())
-  );
-}
-
-// Helper to wait for transaction content or error
-async function waitForTxContent(page: import("@playwright/test").Page) {
-  await expect(
-    page
-      .locator("text=Transaction Hash:")
-      .or(page.locator("text=Error:"))
-      .or(page.locator("text=Something went wrong"))
-  ).toBeVisible({ timeout: 45000 });
-
-  return (
-    !(await page.locator("text=Error:").isVisible()) &&
-    !(await page.locator("text=Something went wrong").isVisible())
-  );
-}
-
 // ============================================
 // BLOCK TESTS
 // ============================================
 
 test.describe("Optimism - Block Page", () => {
-  test("genesis block #0 - Optimism mainnet (post-regenesis)", async ({ page }) => {
+  test("genesis block #0 - Optimism mainnet (post-regenesis)", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = OPTIMISM.blocks["0"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Header section
       await expect(blockPage.blockNumber).toBeVisible();
@@ -85,12 +40,12 @@ test.describe("Optimism - Block Page", () => {
     }
   });
 
-  test("block #100,000,000 - pre-Bedrock block with gas details", async ({ page }) => {
+  test("block #100,000,000 - pre-Bedrock block with gas details", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = OPTIMISM.blocks["100000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Header
       await expect(blockPage.blockNumber).toBeVisible();
@@ -110,12 +65,12 @@ test.describe("Optimism - Block Page", () => {
     }
   });
 
-  test("block #100,000,000 more details section shows correct hashes", async ({ page }) => {
+  test("block #100,000,000 more details section shows correct hashes", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = OPTIMISM.blocks["100000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -134,12 +89,12 @@ test.describe("Optimism - Block Page", () => {
     }
   });
 
-  test("block #110,000,000 - post-Bedrock with complete gas details", async ({ page }) => {
+  test("block #110,000,000 - post-Bedrock with complete gas details", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = OPTIMISM.blocks["110000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       await expect(blockPage.blockNumber).toBeVisible();
       await expect(blockPage.statusBadge).toContainText("Finalized");
@@ -165,12 +120,12 @@ test.describe("Optimism - Block Page", () => {
     }
   });
 
-  test("block #110,000,000 more details shows hashes", async ({ page }) => {
+  test("block #110,000,000 more details shows hashes", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = OPTIMISM.blocks["110000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -183,12 +138,12 @@ test.describe("Optimism - Block Page", () => {
     }
   });
 
-  test("block #120,000,000 - post-Ecotone (EIP-4844) high utilization", async ({ page }) => {
+  test("block #120,000,000 - post-Ecotone (EIP-4844) high utilization", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = OPTIMISM.blocks["120000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       await expect(blockPage.blockNumber).toBeVisible();
 
@@ -213,12 +168,12 @@ test.describe("Optimism - Block Page", () => {
     }
   });
 
-  test("block #120,000,000 more details shows hashes", async ({ page }) => {
+  test("block #120,000,000 more details shows hashes", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = OPTIMISM.blocks["120000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -231,12 +186,12 @@ test.describe("Optimism - Block Page", () => {
     }
   });
 
-  test("block #130,000,000 - post-Holocene with increased gas limit (60M)", async ({ page }) => {
+  test("block #130,000,000 - post-Holocene with increased gas limit (60M)", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = OPTIMISM.blocks["130000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       await expect(blockPage.blockNumber).toBeVisible();
 
@@ -262,12 +217,12 @@ test.describe("Optimism - Block Page", () => {
     }
   });
 
-  test("block #130,000,000 more details shows hashes", async ({ page }) => {
+  test("block #130,000,000 more details shows hashes", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = OPTIMISM.blocks["130000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -280,12 +235,12 @@ test.describe("Optimism - Block Page", () => {
     }
   });
 
-  test("genesis block more details section shows correct hash", async ({ page }) => {
+  test("genesis block more details section shows correct hash", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = OPTIMISM.blocks["0"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -304,18 +259,18 @@ test.describe("Optimism - Block Page", () => {
     }
   });
 
-  test("block navigation buttons work on Optimism", async ({ page }) => {
+  test("block navigation buttons work on Optimism", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     await blockPage.goto(OPTIMISM.blocks["110000000"].number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       await expect(blockPage.navPrevBtn).toBeVisible();
       await expect(blockPage.navNextBtn).toBeVisible();
     }
   });
 
-  test("handles invalid block number gracefully", async ({ page }) => {
+  test("handles invalid block number gracefully", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     await blockPage.goto(999999999999, CHAIN_ID);
 
@@ -333,13 +288,13 @@ test.describe("Optimism - Block Page", () => {
 // ============================================
 
 test.describe("Optimism - Transaction Page", () => {
-  test("displays Velodrome DEX swap (Legacy Type 0) with all details", async ({ page }) => {
+  test("displays Velodrome DEX swap (Legacy Type 0) with all details", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = OPTIMISM.transactions[VELODROME_SWAP];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Verify core transaction details
       await expect(page.locator("text=Transaction Hash:")).toBeVisible();
@@ -354,13 +309,13 @@ test.describe("Optimism - Transaction Page", () => {
     }
   });
 
-  test("shows correct from and to addresses for Velodrome swap", async ({ page }) => {
+  test("shows correct from and to addresses for Velodrome swap", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = OPTIMISM.transactions[VELODROME_SWAP];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       const from = await txPage.getFromAddress();
       expect(from.toLowerCase()).toContain(tx.from.toLowerCase().slice(0, 10));
@@ -370,26 +325,26 @@ test.describe("Optimism - Transaction Page", () => {
     }
   });
 
-  test("displays transaction fee for Velodrome swap", async ({ page }) => {
+  test("displays transaction fee for Velodrome swap", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = OPTIMISM.transactions[VELODROME_SWAP];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Verify transaction fee is displayed
       await expect(page.locator("text=Transaction Fee:")).toBeVisible();
     }
   });
 
-  test("displays Velodrome swap nonce and position", async ({ page }) => {
+  test("displays Velodrome swap nonce and position", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = OPTIMISM.transactions[VELODROME_SWAP];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Other Attributes:")).toBeVisible();
       await expect(page.locator("text=Nonce:")).toBeVisible();
@@ -400,13 +355,13 @@ test.describe("Optimism - Transaction Page", () => {
     }
   });
 
-  test("displays OP token transfer transaction (EIP-1559 Type 2)", async ({ page }) => {
+  test("displays OP token transfer transaction (EIP-1559 Type 2)", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = OPTIMISM.transactions[OP_TRANSFER];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Transaction Hash:")).toBeVisible();
       await expect(page.locator("text=Status:")).toBeVisible();
@@ -419,13 +374,13 @@ test.describe("Optimism - Transaction Page", () => {
     }
   });
 
-  test("OP transfer shows correct addresses and gas details", async ({ page }) => {
+  test("OP transfer shows correct addresses and gas details", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = OPTIMISM.transactions[OP_TRANSFER];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       const from = await txPage.getFromAddress();
       expect(from.toLowerCase()).toContain(tx.from.toLowerCase().slice(0, 10));
@@ -438,13 +393,13 @@ test.describe("Optimism - Transaction Page", () => {
     }
   });
 
-  test("OP transfer shows nonce and position", async ({ page }) => {
+  test("OP transfer shows nonce and position", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = OPTIMISM.transactions[OP_TRANSFER];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Nonce:")).toBeVisible();
       await expect(page.locator("text=Position:")).toBeVisible();
@@ -456,13 +411,13 @@ test.describe("Optimism - Transaction Page", () => {
 
   test("displays system transaction (Type 126) - L2CrossDomainMessenger relay", async ({
     page,
-  }) => {
+  }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = OPTIMISM.transactions[SYSTEM_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Transaction Hash:")).toBeVisible();
       await expect(page.locator("text=Status:")).toBeVisible();
@@ -477,39 +432,39 @@ test.describe("Optimism - Transaction Page", () => {
 
   test("system transaction shows correct from address (Aliased L1 Messenger)", async ({
     page,
-  }) => {
+  }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = OPTIMISM.transactions[SYSTEM_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       const from = await txPage.getFromAddress();
       expect(from.toLowerCase()).toContain(tx.from.toLowerCase().slice(0, 10));
     }
   });
 
-  test("displays transaction with input data", async ({ page }) => {
+  test("displays transaction with input data", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = OPTIMISM.transactions[VELODROME_SWAP];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Contract interaction should have input data
       await expect(page.locator("text=Input Data:")).toBeVisible();
     }
   });
 
-  test("displays block number link for transaction", async ({ page }) => {
+  test("displays block number link for transaction", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = OPTIMISM.transactions[VELODROME_SWAP];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Block:")).toBeVisible();
       const blockValue = await txPage.getBlockNumber();
@@ -517,7 +472,7 @@ test.describe("Optimism - Transaction Page", () => {
     }
   });
 
-  test("handles invalid tx hash gracefully", async ({ page }) => {
+  test("handles invalid tx hash gracefully", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     await txPage.goto("0xinvalid", CHAIN_ID);
 
@@ -535,13 +490,13 @@ test.describe("Optimism - Transaction Page", () => {
 // ============================================
 
 test.describe("Optimism - Address Page", () => {
-  test("displays native USDC contract details", async ({ page }) => {
+  test("displays native USDC contract details", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.usdc;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
@@ -550,78 +505,78 @@ test.describe("Optimism - Address Page", () => {
     }
   });
 
-  test("displays bridged USDC.e contract", async ({ page }) => {
+  test("displays bridged USDC.e contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.usdce;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays WETH predeploy contract", async ({ page }) => {
+  test("displays WETH predeploy contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.weth;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays OP governance token contract", async ({ page }) => {
+  test("displays OP governance token contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.op;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays USDT contract", async ({ page }) => {
+  test("displays USDT contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.usdt;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays DAI contract", async ({ page }) => {
+  test("displays DAI contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.dai;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays Velodrome Router contract with details", async ({ page }) => {
+  test("displays Velodrome Router contract with details", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.velodromeRouter;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
@@ -630,143 +585,143 @@ test.describe("Optimism - Address Page", () => {
     }
   });
 
-  test("displays Velodrome Universal Router contract", async ({ page }) => {
+  test("displays Velodrome Universal Router contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.velodromeUniversalRouter;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays Uniswap V3 Router contract", async ({ page }) => {
+  test("displays Uniswap V3 Router contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.uniswapV3Router;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays Uniswap Universal Router contract", async ({ page }) => {
+  test("displays Uniswap Universal Router contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.uniswapUniversalRouter;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays SequencerFeeVault system contract", async ({ page }) => {
+  test("displays SequencerFeeVault system contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.sequencerFeeVault;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays GasPriceOracle system contract", async ({ page }) => {
+  test("displays GasPriceOracle system contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.gasPriceOracle;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays L1Block system contract", async ({ page }) => {
+  test("displays L1Block system contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.l1Block;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays L2StandardBridge contract", async ({ page }) => {
+  test("displays L2StandardBridge contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.l2StandardBridge;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays L2CrossDomainMessenger contract", async ({ page }) => {
+  test("displays L2CrossDomainMessenger contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.l2CrossDomainMessenger;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays L2ToL1MessagePasser contract", async ({ page }) => {
+  test("displays L2ToL1MessagePasser contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.l2ToL1MessagePasser;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays BaseFeeVault system contract", async ({ page }) => {
+  test("displays BaseFeeVault system contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.baseFeeVault;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays L1FeeVault system contract", async ({ page }) => {
+  test("displays L1FeeVault system contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = OPTIMISM.addresses.l1FeeVault;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);

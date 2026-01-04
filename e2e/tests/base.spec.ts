@@ -3,6 +3,7 @@ import { BlockPage } from "../pages/block.page";
 import { AddressPage } from "../pages/address.page";
 import { TransactionPage } from "../pages/transaction.page";
 import { BASE } from "../fixtures/base";
+import { waitForBlockContent, waitForTxContent, waitForAddressContent } from "../helpers/wait";
 
 const CHAIN_ID = BASE.chainId;
 
@@ -10,63 +11,17 @@ const CHAIN_ID = BASE.chainId;
 const AERODROME_SWAP = "0x961cf2c57f006d8c6fdbe266b2ef201159dd135dc560155e8c16d307ee321681";
 const USDC_TRANSFER = "0x6b212a5069286d710f388b948364452d28b8c33e0f39b8f50b394ff4deff1f03";
 
-// Helper to wait for block content or error
-async function waitForBlockContent(page: import("@playwright/test").Page) {
-  await expect(
-    page
-      .locator("text=Transactions:")
-      .or(page.locator("text=Error:"))
-      .or(page.locator("text=Something went wrong"))
-  ).toBeVisible({ timeout: 45000 });
-
-  return (
-    !(await page.locator("text=Error:").isVisible()) &&
-    !(await page.locator("text=Something went wrong").isVisible())
-  );
-}
-
-// Helper to wait for address content or error
-async function waitForAddressContent(page: import("@playwright/test").Page) {
-  await expect(
-    page
-      .locator("text=Balance:")
-      .or(page.locator("text=Error:"))
-      .or(page.locator("text=Something went wrong"))
-      .first()
-  ).toBeVisible({ timeout: 45000 });
-
-  return (
-    !(await page.locator("text=Error:").isVisible()) &&
-    !(await page.locator("text=Something went wrong").isVisible())
-  );
-}
-
-// Helper to wait for transaction content or error
-async function waitForTxContent(page: import("@playwright/test").Page) {
-  await expect(
-    page
-      .locator("text=Transaction Hash:")
-      .or(page.locator("text=Error:"))
-      .or(page.locator("text=Something went wrong"))
-  ).toBeVisible({ timeout: 45000 });
-
-  return (
-    !(await page.locator("text=Error:").isVisible()) &&
-    !(await page.locator("text=Something went wrong").isVisible())
-  );
-}
-
 // ============================================
 // BLOCK TESTS
 // ============================================
 
 test.describe("Base Network - Block Page", () => {
-  test("genesis block #0 - Base mainnet launch", async ({ page }) => {
+  test("genesis block #0 - Base mainnet launch", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = BASE.blocks["0"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Header section
       await expect(blockPage.blockNumber).toBeVisible();
@@ -84,12 +39,12 @@ test.describe("Base Network - Block Page", () => {
     }
   });
 
-  test("block #1,000,000 - early Base block with gas details", async ({ page }) => {
+  test("block #1,000,000 - early Base block with gas details", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = BASE.blocks["1000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Header
       await expect(blockPage.blockNumber).toBeVisible();
@@ -121,12 +76,12 @@ test.describe("Base Network - Block Page", () => {
     }
   });
 
-  test("block #10,000,000 - pre-Ecotone block", async ({ page }) => {
+  test("block #10,000,000 - pre-Ecotone block", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = BASE.blocks["10000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       await expect(blockPage.blockNumber).toBeVisible();
       await expect(blockPage.statusBadge).toContainText("Finalized");
@@ -148,12 +103,12 @@ test.describe("Base Network - Block Page", () => {
     }
   });
 
-  test("block #25,000,000 - post-Holocene with increased gas limit", async ({ page }) => {
+  test("block #25,000,000 - post-Holocene with increased gas limit", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = BASE.blocks["25000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       await expect(blockPage.blockNumber).toBeVisible();
 
@@ -174,12 +129,12 @@ test.describe("Base Network - Block Page", () => {
     }
   });
 
-  test("genesis block more details section shows correct hashes", async ({ page }) => {
+  test("genesis block more details section shows correct hashes", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = BASE.blocks["0"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -198,11 +153,11 @@ test.describe("Base Network - Block Page", () => {
     }
   });
 
-  test("block navigation buttons work on Base", async ({ page }) => {
+  test("block navigation buttons work on Base", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     await blockPage.goto(BASE.blocks["1000000"].number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       await expect(blockPage.navPrevBtn).toBeVisible();
       await expect(blockPage.navNextBtn).toBeVisible();
@@ -227,13 +182,13 @@ test.describe("Base Network - Block Page", () => {
 // ============================================
 
 test.describe("Base Network - Transaction Page", () => {
-  test("displays Aerodrome DEX swap with all details", async ({ page }) => {
+  test("displays Aerodrome DEX swap with all details", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = BASE.transactions[AERODROME_SWAP];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Verify core transaction details
       await expect(page.locator("text=Transaction Hash:")).toBeVisible();
@@ -247,13 +202,13 @@ test.describe("Base Network - Transaction Page", () => {
     }
   });
 
-  test("shows correct from and to addresses for swap", async ({ page }) => {
+  test("shows correct from and to addresses for swap", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = BASE.transactions[AERODROME_SWAP];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       const from = await txPage.getFromAddress();
       expect(from.toLowerCase()).toContain(tx.from.toLowerCase().slice(0, 10));
@@ -263,13 +218,13 @@ test.describe("Base Network - Transaction Page", () => {
     }
   });
 
-  test("displays USDC transfer transaction", async ({ page }) => {
+  test("displays USDC transfer transaction", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = BASE.transactions[USDC_TRANSFER];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Transaction Hash:")).toBeVisible();
       await expect(page.locator("text=Status:")).toBeVisible();
@@ -282,26 +237,26 @@ test.describe("Base Network - Transaction Page", () => {
     }
   });
 
-  test("displays transaction with input data", async ({ page }) => {
+  test("displays transaction with input data", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = BASE.transactions[AERODROME_SWAP];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Contract interaction should have input data
       await expect(page.locator("text=Input Data:")).toBeVisible();
     }
   });
 
-  test("displays other attributes section", async ({ page }) => {
+  test("displays other attributes section", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = BASE.transactions[AERODROME_SWAP];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Other Attributes:")).toBeVisible();
       await expect(page.locator("text=Nonce:")).toBeVisible();
@@ -309,13 +264,13 @@ test.describe("Base Network - Transaction Page", () => {
     }
   });
 
-  test("displays block number link", async ({ page }) => {
+  test("displays block number link", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = BASE.transactions[AERODROME_SWAP];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Block:")).toBeVisible();
       const blockValue = await txPage.getBlockNumber();
@@ -341,13 +296,13 @@ test.describe("Base Network - Transaction Page", () => {
 // ============================================
 
 test.describe("Base Network - Address Page", () => {
-  test("displays USDC contract details", async ({ page }) => {
+  test("displays USDC contract details", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BASE.addresses.usdc;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
@@ -356,52 +311,52 @@ test.describe("Base Network - Address Page", () => {
     }
   });
 
-  test("displays USDbC (bridged USDC) contract", async ({ page }) => {
+  test("displays USDbC (bridged USDC) contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BASE.addresses.usdbc;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays WETH predeploy contract", async ({ page }) => {
+  test("displays WETH predeploy contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BASE.addresses.weth;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays AERO token contract", async ({ page }) => {
+  test("displays AERO token contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BASE.addresses.aero;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays Aerodrome Router contract with details", async ({ page }) => {
+  test("displays Aerodrome Router contract with details", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BASE.addresses.aerodromeRouter;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
@@ -410,65 +365,65 @@ test.describe("Base Network - Address Page", () => {
     }
   });
 
-  test("displays SequencerFeeVault system contract", async ({ page }) => {
+  test("displays SequencerFeeVault system contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BASE.addresses.sequencerFeeVault;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays GasPriceOracle system contract", async ({ page }) => {
+  test("displays GasPriceOracle system contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BASE.addresses.gasPriceOracle;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays L1Block system contract", async ({ page }) => {
+  test("displays L1Block system contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BASE.addresses.l1Block;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays L2StandardBridge contract", async ({ page }) => {
+  test("displays L2StandardBridge contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BASE.addresses.l2StandardBridge;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);
     }
   });
 
-  test("displays L2CrossDomainMessenger contract", async ({ page }) => {
+  test("displays L2CrossDomainMessenger contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BASE.addresses.l2CrossDomainMessenger;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       const isContract = await addressPage.isContract();
       expect(isContract).toBe(true);

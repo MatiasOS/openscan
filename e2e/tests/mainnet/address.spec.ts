@@ -1,31 +1,16 @@
-import { test, expect } from "../fixtures/test";
-import { AddressPage } from "../pages/address.page";
-import { MAINNET } from "../fixtures/mainnet";
-
-// Helper to wait for content or error
-async function waitForAddressContent(page: import("@playwright/test").Page) {
-  await expect(
-    page
-      .locator("text=Balance:")
-      .or(page.locator("text=Error:"))
-      .or(page.locator("text=Something went wrong"))
-      .first()
-  ).toBeVisible({ timeout: 45000 });
-
-  return (
-    !(await page.locator("text=Error:").isVisible()) &&
-    !(await page.locator("text=Something went wrong").isVisible())
-  );
-}
+import { test, expect } from "../../fixtures/test";
+import { AddressPage } from "../../pages/address.page";
+import { MAINNET } from "../../fixtures/mainnet";
+import { waitForAddressContent } from "../../helpers/wait";
 
 test.describe("Address Page", () => {
-  test("displays address with balance and transaction count", async ({ page }) => {
+  test("displays address with balance and transaction count", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = MAINNET.addresses.vitalik;
 
     await addressPage.goto(addr.address);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify balance section shows ETH
       await expect(page.locator("text=Balance:")).toBeVisible();
@@ -39,13 +24,13 @@ test.describe("Address Page", () => {
     }
   });
 
-  test("shows ENS name for known address", async ({ page }) => {
+  test("shows ENS name for known address", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = MAINNET.addresses.vitalik;
 
     await addressPage.goto(addr.address);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded && addr.hasENS) {
       // Verify ENS name is displayed
       await expect(page.locator(`text=${addr.ensName}`)).toBeVisible();
@@ -56,13 +41,13 @@ test.describe("Address Page", () => {
     }
   });
 
-  test("identifies contract type for USDC", async ({ page }) => {
+  test("identifies contract type for USDC", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = MAINNET.addresses.usdc;
 
     await addressPage.goto(addr.address);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as a contract
       const isContract = await addressPage.isContract();
@@ -78,13 +63,13 @@ test.describe("Address Page", () => {
     }
   });
 
-  test("displays contract details for Uniswap Router", async ({ page }) => {
+  test("displays contract details for Uniswap Router", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = MAINNET.addresses.uniswapRouter;
 
     await addressPage.goto(addr.address);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify contract type is displayed
       const type = await addressPage.getAddressType();
@@ -119,13 +104,13 @@ test.describe("Address Page", () => {
     ).toBeVisible({ timeout: 30000 });
   });
 
-  test("displays ERC721 NFT collection (BAYC) with collection details", async ({ page }) => {
+  test("displays ERC721 NFT collection (BAYC) with collection details", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = MAINNET.addresses.bayc;
 
     await addressPage.goto(addr.address);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as ERC721 (type displays as "ERC-721 NFT")
       const type = await addressPage.getAddressType();
@@ -152,13 +137,13 @@ test.describe("Address Page", () => {
     }
   });
 
-  test("displays BAYC contract verification details", async ({ page }) => {
+  test("displays BAYC contract verification details", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = MAINNET.addresses.bayc;
 
     await addressPage.goto(addr.address);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Contract Details section exists (may be collapsed)
       await expect(page.locator("text=Contract Details")).toBeVisible();
@@ -183,13 +168,13 @@ test.describe("Address Page", () => {
     }
   });
 
-  test("displays BAYC contract read functions", async ({ page }) => {
+  test("displays BAYC contract read functions", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = MAINNET.addresses.bayc;
 
     await addressPage.goto(addr.address);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Click to expand Contract Details to show functions
       const contractDetailsHeader = page.locator("text=Contract Details").first();
@@ -206,13 +191,13 @@ test.describe("Address Page", () => {
     }
   });
 
-  test("displays BAYC contract write functions", async ({ page }) => {
+  test("displays BAYC contract write functions", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = MAINNET.addresses.bayc;
 
     await addressPage.goto(addr.address);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Click to expand Contract Details to show functions
       const contractDetailsHeader = page.locator("text=Contract Details").first();
@@ -229,13 +214,13 @@ test.describe("Address Page", () => {
     }
   });
 
-  test("displays BAYC contract events", async ({ page }) => {
+  test("displays BAYC contract events", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = MAINNET.addresses.bayc;
 
     await addressPage.goto(addr.address);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Click to expand Contract Details to show events
       const contractDetailsHeader = page.locator("text=Contract Details").first();
@@ -251,13 +236,13 @@ test.describe("Address Page", () => {
     }
   });
 
-  test("displays ERC1155 multi-token contract (Rarible) with collection details", async ({ page }) => {
+  test("displays ERC1155 multi-token contract (Rarible) with collection details", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = MAINNET.addresses.rarible;
 
     await addressPage.goto(addr.address);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as ERC1155 (type displays as "ERC-1155 MULTI-TOKEN")
       const type = await addressPage.getAddressType();
@@ -283,13 +268,13 @@ test.describe("Address Page", () => {
     }
   });
 
-  test("displays Rarible contract verification details", async ({ page }) => {
+  test("displays Rarible contract verification details", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = MAINNET.addresses.rarible;
 
     await addressPage.goto(addr.address);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Contract Details section exists (may be collapsed)
       await expect(page.locator("text=Contract Details")).toBeVisible();
@@ -314,13 +299,13 @@ test.describe("Address Page", () => {
     }
   });
 
-  test("displays Rarible contract read functions", async ({ page }) => {
+  test("displays Rarible contract read functions", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = MAINNET.addresses.rarible;
 
     await addressPage.goto(addr.address);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Click to expand Contract Details to show functions
       const contractDetailsHeader = page.locator("text=Contract Details").first();
@@ -337,13 +322,13 @@ test.describe("Address Page", () => {
     }
   });
 
-  test("displays Rarible contract write functions", async ({ page }) => {
+  test("displays Rarible contract write functions", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = MAINNET.addresses.rarible;
 
     await addressPage.goto(addr.address);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Click to expand Contract Details to show functions
       const contractDetailsHeader = page.locator("text=Contract Details").first();
@@ -360,13 +345,13 @@ test.describe("Address Page", () => {
     }
   });
 
-  test("displays Rarible contract events", async ({ page }) => {
+  test("displays Rarible contract events", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = MAINNET.addresses.rarible;
 
     await addressPage.goto(addr.address);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Click to expand Contract Details to show events
       const contractDetailsHeader = page.locator("text=Contract Details").first();

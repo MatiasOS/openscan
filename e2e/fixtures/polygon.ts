@@ -18,22 +18,22 @@ export const POLYGON = {
       hash: "0xa9c28ce2141b56c474f1dc504bee9b01eb1bd7d1a507580d5519d4437a97de1b",
       parentHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
     },
-    // Block 10,000,000 (December 2020)
+    // Block 10,000,000 (January 2021)
     // Early Polygon activity
     "10000000": {
       number: 10000000,
-      txCount: 6,
+      txCount: 5,
       gasUsed: "4,278,607",
       gasUsedPercent: "21.4%",
       gasLimit: "20,000,000",
       hash: "0x57d179b4ed2379580c46d9809c8918e28c4f1debea8e15013749694f37c14105",
       parentHash: "0xee82cb38f164bfdb75092bcc5c1cb302385a48b2d9abd647af934ecb89db61f4",
     },
-    // Block 20,000,000 (May 2021)
+    // Block 20,000,000 (October 2021)
     // Growing DeFi activity
     "20000000": {
       number: 20000000,
-      txCount: 111,
+      txCount: 110,
       gasUsed: "19,998,514",
       gasUsedPercent: "100.0%",
       gasLimit: "20,000,000",
@@ -55,11 +55,12 @@ export const POLYGON = {
     // Delhi Hard Fork - reduced sprint length, smoothed baseFee
     "38189056": {
       number: 38189056,
-      txCount: 63,
-      gasUsed: "8,896,235",
-      gasLimit: "31,898,693",
-      hash: "0xf034b3df03fe4c2aedec6590754b6ebc25289369c6df64aee1613fe458b5abc6",
-      parentHash: "0x94cb3ecc028d21aa11031ff21d645ac2d91a14a55f24303e65b39910547060bd",
+      txCount: 121,
+      gasUsed: "19,246,742",
+      gasUsedPercent: "68.2%",
+      gasLimit: "28,207,416",
+      hash: "0x19bcd5f19d3f928aae2b582b0e005c963a8ef0bfd005d1b639a5b0b5dbd632d6",
+      parentHash: "0x9c0a52241e01b66eb8987f894dea8b22d4ba1e2261217ddbaf4638c8699df79e",
     },
     // Block 50,000,000 (November 2023)
     // Post-Delhi, high activity
@@ -76,11 +77,12 @@ export const POLYGON = {
     // Ahmedabad Hard Fork - MATIC to POL migration
     "62278656": {
       number: 62278656,
-      txCount: 46,
-      gasUsed: "5,457,470",
-      gasLimit: "30,000,000",
-      hash: "0xd0a3278e1c13d54e222d53b76bec3669871c82b7a69f7840d43fc1fb4d9c735d",
-      parentHash: "0x394674d611451512b96c1f4c2b741403387235b61104d1a38ba09ffa6d891f43",
+      txCount: 65,
+      gasUsed: "7,292,621",
+      gasUsedPercent: "24.0%",
+      gasLimit: "30,442,418",
+      hash: "0xc207d13429c37fded959648b9f6d5d51d4cb65371c9b2f3a40f93f750cf000c4",
+      parentHash: "0xbfe87634499bbba796ad1b7d064c97354a12ea43c3f2f8f0a91a3d9987ef883e",
     },
     // Block 65,000,000 (December 2024)
     // Post-Ahmedabad, POL era
@@ -111,7 +113,7 @@ export const POLYGON = {
       gas: "189,792",
       gasUsed: "89,556",
       gasPrice: "125 Gwei",
-      nonce: 30637600,
+      nonce: 30554656,
       position: 0,
       status: "success" as const,
       hasInputData: true,
@@ -121,7 +123,7 @@ export const POLYGON = {
     // EIP-1559 TRANSACTIONS (Type 2)
     // ============================================
 
-    // DeFi swap from block 50,000,000 - EIP-1559 transaction
+    // Failed DeFi swap from block 50,000,000 - EIP-1559 transaction
     "0x1ed0c46bafb76d5a3d8201cdf8fc732efa97b000d88bd48dc203ac45d6340af0": {
       hash: "0x1ed0c46bafb76d5a3d8201cdf8fc732efa97b000d88bd48dc203ac45d6340af0",
       type: 2, // EIP-1559
@@ -129,11 +131,11 @@ export const POLYGON = {
       to: "0x826a4f4da02588737d3c27325b14f39b5151ca3c",
       value: "0x0",
       blockNumber: 50000000,
-      gas: "999,502",
+      gas: "1,000,014",
       gasUsed: "66,787",
       nonce: 2151,
       position: 0,
-      status: "success" as const,
+      status: "failed" as const, // Failed: ERC20 transfer amount exceeds balance
       hasInputData: true,
     },
 
@@ -145,7 +147,7 @@ export const POLYGON = {
       to: "0xe957a692c97566efc85f995162fa404091232b2e",
       value: "0x0",
       blockNumber: 65000000,
-      gas: "235,648",
+      gas: "234,624",
       gasUsed: "225,106",
       nonce: 34547,
       position: 0,

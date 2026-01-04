@@ -3,6 +3,7 @@ import { BlockPage } from "../pages/block.page";
 import { TransactionPage } from "../pages/transaction.page";
 import { AddressPage } from "../pages/address.page";
 import { POLYGON } from "../fixtures/polygon";
+import { waitForBlockContent, waitForTxContent, waitForAddressContent } from "../helpers/wait";
 
 const CHAIN_ID = POLYGON.chainId;
 
@@ -11,66 +12,17 @@ const LEGACY_NFT_TX = "0xb14598e46791c2f0ab366ba2fd4a533e21a0c9894f902773e02e386
 const DEFI_SWAP_TX = "0x1ed0c46bafb76d5a3d8201cdf8fc732efa97b000d88bd48dc203ac45d6340af0";
 const CONTRACT_TX = "0x65edbf03a20a0317295efaeb9c20836b20b16740c8311ce51ceee91d7674b20d";
 
-// Helper to wait for block content or error
-async function waitForBlockContent(page: import("@playwright/test").Page) {
-  try {
-    await expect(
-      page
-        .locator("text=Block")
-        .or(page.locator("text=Error"))
-        .or(page.locator("text=Something went wrong"))
-        .first()
-    ).toBeVisible({ timeout: 30000 });
-    return !(await page.locator("text=Error").isVisible());
-  } catch {
-    return false;
-  }
-}
-
-// Helper to wait for transaction content or error
-async function waitForTxContent(page: import("@playwright/test").Page) {
-  try {
-    await expect(
-      page
-        .locator("text=Transaction Hash")
-        .or(page.locator("text=Error"))
-        .or(page.locator("text=Something went wrong"))
-        .first()
-    ).toBeVisible({ timeout: 30000 });
-    return !(await page.locator("text=Error").isVisible());
-  } catch {
-    return false;
-  }
-}
-
-// Helper to wait for address content or error
-async function waitForAddressContent(page: import("@playwright/test").Page) {
-  try {
-    await expect(
-      page
-        .locator("text=Address")
-        .or(page.locator("text=Contract"))
-        .or(page.locator("text=Error"))
-        .or(page.locator("text=Something went wrong"))
-        .first()
-    ).toBeVisible({ timeout: 30000 });
-    return !(await page.locator("text=Error").isVisible());
-  } catch {
-    return false;
-  }
-}
-
 // ============================================
 // BLOCK TESTS
 // ============================================
 
 test.describe("Polygon Block Page", () => {
-  test("genesis block #0 - Polygon PoS mainnet launch", async ({ page }) => {
+  test("genesis block #0 - Polygon PoS mainnet launch", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = POLYGON.blocks["0"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Header
       await expect(blockPage.blockNumber).toBeVisible();
@@ -88,12 +40,12 @@ test.describe("Polygon Block Page", () => {
     }
   });
 
-  test("genesis block #0 more details shows hash and parent hash", async ({ page }) => {
+  test("genesis block #0 more details shows hash and parent hash", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = POLYGON.blocks["0"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -106,18 +58,18 @@ test.describe("Polygon Block Page", () => {
 
         // Genesis block hash
         await expect(page.locator(`text=${block.hash}`)).toBeVisible();
-        // Genesis parent hash (all zeros)
-        await expect(page.locator(`text=${block.parentHash}`)).toBeVisible();
+        // Genesis parent hash (all zeros) - use .first() to avoid matching logs bloom
+        await expect(page.locator(`text=${block.parentHash}`).first()).toBeVisible();
       }
     }
   });
 
-  test("block #10,000,000 - Early Polygon activity", async ({ page }) => {
+  test("block #10,000,000 - Early Polygon activity", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = POLYGON.blocks["10000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Header
       await expect(blockPage.blockNumber).toBeVisible();
@@ -137,12 +89,12 @@ test.describe("Polygon Block Page", () => {
     }
   });
 
-  test("block #10,000,000 more details shows hashes", async ({ page }) => {
+  test("block #10,000,000 more details shows hashes", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = POLYGON.blocks["10000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -155,12 +107,12 @@ test.describe("Polygon Block Page", () => {
     }
   });
 
-  test("block #20,000,000 - Growing DeFi activity", async ({ page }) => {
+  test("block #20,000,000 - Growing DeFi activity", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = POLYGON.blocks["20000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       await expect(blockPage.blockNumber).toBeVisible();
       await expect(blockPage.statusBadge).toContainText("Finalized");
@@ -171,12 +123,12 @@ test.describe("Polygon Block Page", () => {
     }
   });
 
-  test("block #20,000,000 more details shows hashes", async ({ page }) => {
+  test("block #20,000,000 more details shows hashes", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = POLYGON.blocks["20000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -189,12 +141,12 @@ test.describe("Polygon Block Page", () => {
     }
   });
 
-  test("block #30,000,000 - Mature network", async ({ page }) => {
+  test("block #30,000,000 - Mature network", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = POLYGON.blocks["30000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       await expect(blockPage.blockNumber).toBeVisible();
       await expect(blockPage.statusBadge).toContainText("Finalized");
@@ -205,12 +157,12 @@ test.describe("Polygon Block Page", () => {
     }
   });
 
-  test("block #30,000,000 more details shows hashes", async ({ page }) => {
+  test("block #30,000,000 more details shows hashes", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = POLYGON.blocks["30000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -223,12 +175,12 @@ test.describe("Polygon Block Page", () => {
     }
   });
 
-  test("block #38,189,056 - Delhi Hard Fork", async ({ page }) => {
+  test("block #38,189,056 - Delhi Hard Fork", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = POLYGON.blocks["38189056"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       await expect(blockPage.blockNumber).toBeVisible();
       await expect(blockPage.statusBadge).toContainText("Finalized");
@@ -239,12 +191,12 @@ test.describe("Polygon Block Page", () => {
     }
   });
 
-  test("block #38,189,056 more details shows hashes", async ({ page }) => {
+  test("block #38,189,056 more details shows hashes", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = POLYGON.blocks["38189056"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -257,12 +209,12 @@ test.describe("Polygon Block Page", () => {
     }
   });
 
-  test("block #50,000,000 - High activity block", async ({ page }) => {
+  test("block #50,000,000 - High activity block", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = POLYGON.blocks["50000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       await expect(blockPage.blockNumber).toBeVisible();
       await expect(blockPage.statusBadge).toContainText("Finalized");
@@ -273,12 +225,12 @@ test.describe("Polygon Block Page", () => {
     }
   });
 
-  test("block #50,000,000 more details shows hashes", async ({ page }) => {
+  test("block #50,000,000 more details shows hashes", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = POLYGON.blocks["50000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -291,12 +243,12 @@ test.describe("Polygon Block Page", () => {
     }
   });
 
-  test("block #62,278,656 - Ahmedabad Hard Fork (MATIC to POL)", async ({ page }) => {
+  test("block #62,278,656 - Ahmedabad Hard Fork (MATIC to POL)", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = POLYGON.blocks["62278656"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       await expect(blockPage.blockNumber).toBeVisible();
       await expect(blockPage.statusBadge).toContainText("Finalized");
@@ -307,12 +259,12 @@ test.describe("Polygon Block Page", () => {
     }
   });
 
-  test("block #62,278,656 more details shows hashes", async ({ page }) => {
+  test("block #62,278,656 more details shows hashes", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = POLYGON.blocks["62278656"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -325,12 +277,12 @@ test.describe("Polygon Block Page", () => {
     }
   });
 
-  test("block #65,000,000 - Post-Ahmedabad POL era", async ({ page }) => {
+  test("block #65,000,000 - Post-Ahmedabad POL era", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = POLYGON.blocks["65000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       await expect(blockPage.blockNumber).toBeVisible();
       await expect(blockPage.statusBadge).toContainText("Finalized");
@@ -341,12 +293,12 @@ test.describe("Polygon Block Page", () => {
     }
   });
 
-  test("block #65,000,000 more details shows hashes", async ({ page }) => {
+  test("block #65,000,000 more details shows hashes", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = POLYGON.blocks["65000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -359,11 +311,11 @@ test.describe("Polygon Block Page", () => {
     }
   });
 
-  test("block page loads successfully", async ({ page }) => {
+  test("block page loads successfully", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     await blockPage.goto(POLYGON.blocks["20000000"].number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Verify block page loaded with expected content
       await expect(blockPage.blockNumber).toBeVisible();
@@ -371,7 +323,7 @@ test.describe("Polygon Block Page", () => {
     }
   });
 
-  test("handles invalid block number gracefully", async ({ page }) => {
+  test("handles invalid block number gracefully", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     await blockPage.goto(999999999999, CHAIN_ID);
 
@@ -389,13 +341,13 @@ test.describe("Polygon Block Page", () => {
 // ============================================
 
 test.describe("Polygon Transaction Page", () => {
-  test("displays legacy NFT transaction from block 30M", async ({ page }) => {
+  test("displays legacy NFT transaction from block 30M", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = POLYGON.transactions[LEGACY_NFT_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Verify core transaction details
       await expect(page.locator("text=Transaction Hash:")).toBeVisible();
@@ -413,13 +365,13 @@ test.describe("Polygon Transaction Page", () => {
     }
   });
 
-  test("shows correct from and to addresses for legacy NFT tx", async ({ page }) => {
+  test("shows correct from and to addresses for legacy NFT tx", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = POLYGON.transactions[LEGACY_NFT_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       const from = await txPage.getFromAddress();
       expect(from.toLowerCase()).toContain(tx.from.toLowerCase().slice(0, 10));
@@ -429,13 +381,13 @@ test.describe("Polygon Transaction Page", () => {
     }
   });
 
-  test("displays legacy transaction type correctly (Type 0)", async ({ page }) => {
+  test("displays legacy transaction type correctly (Type 0)", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = POLYGON.transactions[LEGACY_NFT_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(
         page.locator("text=Type:").or(page.locator("text=Transaction Type:")).first()
@@ -443,13 +395,13 @@ test.describe("Polygon Transaction Page", () => {
     }
   });
 
-  test("displays DeFi swap transaction from block 50M", async ({ page }) => {
+  test("displays DeFi swap transaction from block 50M", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = POLYGON.transactions[DEFI_SWAP_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Transaction Hash:")).toBeVisible();
       await expect(page.locator("text=Status:")).toBeVisible();
@@ -459,13 +411,13 @@ test.describe("Polygon Transaction Page", () => {
     }
   });
 
-  test("DeFi swap shows correct addresses", async ({ page }) => {
+  test("DeFi swap shows correct addresses", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = POLYGON.transactions[DEFI_SWAP_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       const from = await txPage.getFromAddress();
       expect(from.toLowerCase()).toContain(tx.from.toLowerCase().slice(0, 10));
@@ -475,13 +427,13 @@ test.describe("Polygon Transaction Page", () => {
     }
   });
 
-  test("displays contract interaction from block 65M", async ({ page }) => {
+  test("displays contract interaction from block 65M", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = POLYGON.transactions[CONTRACT_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Transaction Hash:")).toBeVisible();
       await expect(page.locator("text=Status:")).toBeVisible();
@@ -490,13 +442,13 @@ test.describe("Polygon Transaction Page", () => {
     }
   });
 
-  test("displays transaction nonce and position for legacy NFT tx", async ({ page }) => {
+  test("displays transaction nonce and position for legacy NFT tx", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = POLYGON.transactions[LEGACY_NFT_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Other Attributes:")).toBeVisible();
       await expect(page.locator("text=Nonce:")).toBeVisible();
@@ -507,13 +459,13 @@ test.describe("Polygon Transaction Page", () => {
     }
   });
 
-  test("displays DeFi swap nonce and position", async ({ page }) => {
+  test("displays DeFi swap nonce and position", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = POLYGON.transactions[DEFI_SWAP_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Nonce:")).toBeVisible();
       await expect(page.locator("text=Position:")).toBeVisible();
@@ -522,13 +474,13 @@ test.describe("Polygon Transaction Page", () => {
     }
   });
 
-  test("displays contract tx nonce and position", async ({ page }) => {
+  test("displays contract tx nonce and position", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = POLYGON.transactions[CONTRACT_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Nonce:")).toBeVisible();
       await expect(page.locator("text=Position:")).toBeVisible();
@@ -538,25 +490,25 @@ test.describe("Polygon Transaction Page", () => {
     }
   });
 
-  test("displays transaction fee", async ({ page }) => {
+  test("displays transaction fee", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = POLYGON.transactions[LEGACY_NFT_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Transaction Fee:")).toBeVisible();
     }
   });
 
-  test("displays block number link for transaction", async ({ page }) => {
+  test("displays block number link for transaction", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = POLYGON.transactions[DEFI_SWAP_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Block:")).toBeVisible();
       const blockValue = await txPage.getBlockNumber();
@@ -564,7 +516,7 @@ test.describe("Polygon Transaction Page", () => {
     }
   });
 
-  test("handles invalid tx hash gracefully", async ({ page }) => {
+  test("handles invalid tx hash gracefully", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     await txPage.goto("0xinvalid", CHAIN_ID);
 
@@ -582,12 +534,12 @@ test.describe("Polygon Transaction Page", () => {
 // ============================================
 
 test.describe("Polygon Address Page - Tokens", () => {
-  test("displays WPOL (Wrapped POL) token contract", async ({ page }) => {
+  test("displays WPOL (Wrapped POL) token contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const token = POLYGON.addresses.wpol;
     await addressPage.goto(token.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Balance")).toBeVisible();
       // Contract should show code or token info
@@ -597,78 +549,78 @@ test.describe("Polygon Address Page - Tokens", () => {
     }
   });
 
-  test("displays USDC.e (Bridged USDC) token contract", async ({ page }) => {
+  test("displays USDC.e (Bridged USDC) token contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const token = POLYGON.addresses.usdc;
     await addressPage.goto(token.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Balance")).toBeVisible();
     }
   });
 
-  test("displays Native USDC token contract", async ({ page }) => {
+  test("displays Native USDC token contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const token = POLYGON.addresses.usdcNative;
     await addressPage.goto(token.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Balance")).toBeVisible();
     }
   });
 
-  test("displays USDT token contract", async ({ page }) => {
+  test("displays USDT token contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const token = POLYGON.addresses.usdt;
     await addressPage.goto(token.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Balance")).toBeVisible();
     }
   });
 
-  test("displays WETH token contract", async ({ page }) => {
+  test("displays WETH token contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const token = POLYGON.addresses.weth;
     await addressPage.goto(token.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Balance")).toBeVisible();
     }
   });
 
-  test("displays DAI token contract", async ({ page }) => {
+  test("displays DAI token contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const token = POLYGON.addresses.dai;
     await addressPage.goto(token.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Balance")).toBeVisible();
     }
   });
 
-  test("displays AAVE token contract", async ({ page }) => {
+  test("displays AAVE token contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const token = POLYGON.addresses.aave;
     await addressPage.goto(token.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Balance")).toBeVisible();
     }
   });
 
-  test("displays LINK token contract", async ({ page }) => {
+  test("displays LINK token contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const token = POLYGON.addresses.link;
     await addressPage.goto(token.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Balance")).toBeVisible();
     }
@@ -680,12 +632,12 @@ test.describe("Polygon Address Page - Tokens", () => {
 // ============================================
 
 test.describe("Polygon Address Page - DEX Contracts", () => {
-  test("displays QuickSwap Router contract", async ({ page }) => {
+  test("displays QuickSwap Router contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const contract = POLYGON.addresses.quickswapRouter;
     await addressPage.goto(contract.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Balance")).toBeVisible();
       await expect(
@@ -694,23 +646,23 @@ test.describe("Polygon Address Page - DEX Contracts", () => {
     }
   });
 
-  test("displays Uniswap V3 Router contract", async ({ page }) => {
+  test("displays Uniswap V3 Router contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const contract = POLYGON.addresses.uniswapV3Router;
     await addressPage.goto(contract.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Balance")).toBeVisible();
     }
   });
 
-  test("displays SushiSwap Router contract", async ({ page }) => {
+  test("displays SushiSwap Router contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const contract = POLYGON.addresses.sushiswapRouter;
     await addressPage.goto(contract.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Balance")).toBeVisible();
     }
@@ -722,23 +674,23 @@ test.describe("Polygon Address Page - DEX Contracts", () => {
 // ============================================
 
 test.describe("Polygon Address Page - NFT & Lending", () => {
-  test("displays OpenSea Storefront contract", async ({ page }) => {
+  test("displays OpenSea Storefront contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const contract = POLYGON.addresses.openseaStorefront;
     await addressPage.goto(contract.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Balance")).toBeVisible();
     }
   });
 
-  test("displays Aave V3 Pool contract", async ({ page }) => {
+  test("displays Aave V3 Pool contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const contract = POLYGON.addresses.aaveV3Pool;
     await addressPage.goto(contract.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Balance")).toBeVisible();
     }
@@ -750,29 +702,29 @@ test.describe("Polygon Address Page - NFT & Lending", () => {
 // ============================================
 
 test.describe("Polygon Address Page - System Contracts", () => {
-  test("displays POL Token system contract", async ({ page }) => {
+  test("displays POL Token system contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const contract = POLYGON.addresses.maticToken;
     await addressPage.goto(contract.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Balance")).toBeVisible();
     }
   });
 
-  test("displays StateReceiver system contract", async ({ page }) => {
+  test("displays StateReceiver system contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const contract = POLYGON.addresses.stateReceiver;
     await addressPage.goto(contract.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Balance")).toBeVisible();
     }
   });
 
-  test("handles invalid address gracefully", async ({ page }) => {
+  test("handles invalid address gracefully", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     await addressPage.goto("0xinvalid", CHAIN_ID);
 

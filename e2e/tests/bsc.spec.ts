@@ -3,6 +3,7 @@ import { BlockPage } from "../pages/block.page";
 import { TransactionPage } from "../pages/transaction.page";
 import { AddressPage } from "../pages/address.page";
 import { BSC } from "../fixtures/bsc";
+import { waitForBlockContent, waitForTxContent, waitForAddressContent } from "../helpers/wait";
 
 const CHAIN_ID = BSC.chainId;
 
@@ -11,63 +12,17 @@ const BLOCK_20M_TX = "0xad5c9b13688627d670985d68a5be0fadd5f0e34d3ff20e35c655ef4b
 const DEX_SWAP_TX = "0x0e3384ad2350d20921190b15e29305ed08eecfe97de975b6e015a6c6d476a90a";
 const DEX_AGGREGATOR_TX = "0x874a90a47bc3140adbffff0f4b89da4bea48f9420f97bc5a50e2e478d9a06176";
 
-// Helper to wait for block content or error
-async function waitForBlockContent(page: import("@playwright/test").Page) {
-  await expect(
-    page
-      .locator("text=Transactions:")
-      .or(page.locator("text=Error:"))
-      .or(page.locator("text=Something went wrong"))
-  ).toBeVisible({ timeout: 45000 });
-
-  return (
-    !(await page.locator("text=Error:").isVisible()) &&
-    !(await page.locator("text=Something went wrong").isVisible())
-  );
-}
-
-// Helper to wait for transaction content or error
-async function waitForTxContent(page: import("@playwright/test").Page) {
-  await expect(
-    page
-      .locator("text=Transaction Hash:")
-      .or(page.locator("text=Error:"))
-      .or(page.locator("text=Something went wrong"))
-  ).toBeVisible({ timeout: 45000 });
-
-  return (
-    !(await page.locator("text=Error:").isVisible()) &&
-    !(await page.locator("text=Something went wrong").isVisible())
-  );
-}
-
-// Helper to wait for address content or error
-async function waitForAddressContent(page: import("@playwright/test").Page) {
-  await expect(
-    page
-      .locator("text=Balance:")
-      .or(page.locator("text=Error:"))
-      .or(page.locator("text=Something went wrong"))
-      .first()
-  ).toBeVisible({ timeout: 45000 });
-
-  return (
-    !(await page.locator("text=Error:").isVisible()) &&
-    !(await page.locator("text=Something went wrong").isVisible())
-  );
-}
-
 // ============================================
 // BLOCK TESTS
 // ============================================
 
 test.describe("BSC Block Page", () => {
-  test("genesis block #0 - BSC mainnet launch", async ({ page }) => {
+  test("genesis block #0 - BSC mainnet launch", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = BSC.blocks["0"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Header section
       await expect(blockPage.blockNumber).toBeVisible();
@@ -87,12 +42,12 @@ test.describe("BSC Block Page", () => {
     }
   });
 
-  test("genesis block #0 more details shows hash and parent hash", async ({ page }) => {
+  test("genesis block #0 more details shows hash and parent hash", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = BSC.blocks["0"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Click "Show More Details" to expand
       const showMoreBtn = page.locator("text=Show More Details");
@@ -114,12 +69,12 @@ test.describe("BSC Block Page", () => {
     }
   });
 
-  test("block #10,000,000 - Pre-Euler block with transactions", async ({ page }) => {
+  test("block #10,000,000 - Pre-Euler block with transactions", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = BSC.blocks["10000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Header
       await expect(blockPage.blockNumber).toBeVisible();
@@ -139,12 +94,12 @@ test.describe("BSC Block Page", () => {
     }
   });
 
-  test("block #10,000,000 more details shows hashes", async ({ page }) => {
+  test("block #10,000,000 more details shows hashes", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = BSC.blocks["10000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -163,12 +118,12 @@ test.describe("BSC Block Page", () => {
     }
   });
 
-  test("block #20,000,000 - Post-Euler block with gas details", async ({ page }) => {
+  test("block #20,000,000 - Post-Euler block with gas details", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = BSC.blocks["20000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Header
       await expect(blockPage.blockNumber).toBeVisible();
@@ -188,12 +143,12 @@ test.describe("BSC Block Page", () => {
     }
   });
 
-  test("block #20,000,000 more details shows hashes", async ({ page }) => {
+  test("block #20,000,000 more details shows hashes", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = BSC.blocks["20000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -206,12 +161,12 @@ test.describe("BSC Block Page", () => {
     }
   });
 
-  test("block #30,000,000 - Post-Luban with fast finality", async ({ page }) => {
+  test("block #30,000,000 - Post-Luban with fast finality", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = BSC.blocks["30000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Header
       await expect(blockPage.blockNumber).toBeVisible();
@@ -231,12 +186,12 @@ test.describe("BSC Block Page", () => {
     }
   });
 
-  test("block #30,000,000 more details shows hashes", async ({ page }) => {
+  test("block #30,000,000 more details shows hashes", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = BSC.blocks["30000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -249,12 +204,12 @@ test.describe("BSC Block Page", () => {
     }
   });
 
-  test("block #40,000,000 - Post-Feynman after BNB Chain Fusion", async ({ page }) => {
+  test("block #40,000,000 - Post-Feynman after BNB Chain Fusion", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = BSC.blocks["40000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Header
       await expect(blockPage.blockNumber).toBeVisible();
@@ -274,12 +229,12 @@ test.describe("BSC Block Page", () => {
     }
   });
 
-  test("block #40,000,000 more details shows hashes", async ({ page }) => {
+  test("block #40,000,000 more details shows hashes", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = BSC.blocks["40000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -292,12 +247,12 @@ test.describe("BSC Block Page", () => {
     }
   });
 
-  test("block #50,000,000 - Post-Maxwell with 0.75s block time", async ({ page }) => {
+  test("block #50,000,000 - Post-Maxwell with 0.75s block time", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = BSC.blocks["50000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Header
       await expect(blockPage.blockNumber).toBeVisible();
@@ -317,12 +272,12 @@ test.describe("BSC Block Page", () => {
     }
   });
 
-  test("block #50,000,000 more details shows hashes", async ({ page }) => {
+  test("block #50,000,000 more details shows hashes", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     const block = BSC.blocks["50000000"];
     await blockPage.goto(block.number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       const showMoreBtn = page.locator("text=Show More Details");
       if (await showMoreBtn.isVisible()) {
@@ -335,11 +290,11 @@ test.describe("BSC Block Page", () => {
     }
   });
 
-  test("block navigation buttons work", async ({ page }) => {
+  test("block navigation buttons work", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     await blockPage.goto(BSC.blocks["10000000"].number, CHAIN_ID);
 
-    const loaded = await waitForBlockContent(page);
+    const loaded = await waitForBlockContent(page, testInfo);
     if (loaded) {
       // Verify navigation buttons exist
       await expect(blockPage.navPrevBtn).toBeVisible();
@@ -347,7 +302,7 @@ test.describe("BSC Block Page", () => {
     }
   });
 
-  test("handles invalid block number gracefully", async ({ page }) => {
+  test("handles invalid block number gracefully", async ({ page }, testInfo) => {
     const blockPage = new BlockPage(page);
     await blockPage.goto(999999999999, CHAIN_ID);
 
@@ -365,13 +320,13 @@ test.describe("BSC Block Page", () => {
 // ============================================
 
 test.describe("BSC Transaction Page", () => {
-  test("displays transaction from block 20M with all details", async ({ page }) => {
+  test("displays transaction from block 20M with all details", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = BSC.transactions[BLOCK_20M_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Verify core transaction details
       await expect(page.locator("text=Transaction Hash:")).toBeVisible();
@@ -389,13 +344,13 @@ test.describe("BSC Transaction Page", () => {
     }
   });
 
-  test("shows correct from and to addresses for block 20M tx", async ({ page }) => {
+  test("shows correct from and to addresses for block 20M tx", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = BSC.transactions[BLOCK_20M_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Verify from address
       const from = await txPage.getFromAddress();
@@ -407,13 +362,13 @@ test.describe("BSC Transaction Page", () => {
     }
   });
 
-  test("displays legacy transaction type correctly (Type 0)", async ({ page }) => {
+  test("displays legacy transaction type correctly (Type 0)", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = BSC.transactions[BLOCK_20M_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Legacy transaction should show Transaction Type with value 0 or "Legacy"
       // Check for "Type:" which is how the UI displays it
@@ -423,13 +378,13 @@ test.describe("BSC Transaction Page", () => {
     }
   });
 
-  test("displays DEX swap transaction from block 40M", async ({ page }) => {
+  test("displays DEX swap transaction from block 40M", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = BSC.transactions[DEX_SWAP_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Verify core transaction details
       await expect(page.locator("text=Transaction Hash:")).toBeVisible();
@@ -444,13 +399,13 @@ test.describe("BSC Transaction Page", () => {
     }
   });
 
-  test("DEX swap shows correct addresses and gas details", async ({ page }) => {
+  test("DEX swap shows correct addresses and gas details", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = BSC.transactions[DEX_SWAP_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       const from = await txPage.getFromAddress();
       expect(from.toLowerCase()).toContain(tx.from.toLowerCase().slice(0, 10));
@@ -463,13 +418,13 @@ test.describe("BSC Transaction Page", () => {
     }
   });
 
-  test("displays DEX aggregator transaction from block 50M", async ({ page }) => {
+  test("displays DEX aggregator transaction from block 50M", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = BSC.transactions[DEX_AGGREGATOR_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Verify core transaction details
       await expect(page.locator("text=Transaction Hash:")).toBeVisible();
@@ -483,13 +438,13 @@ test.describe("BSC Transaction Page", () => {
     }
   });
 
-  test("displays transaction nonce and position for block 20M tx", async ({ page }) => {
+  test("displays transaction nonce and position for block 20M tx", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = BSC.transactions[BLOCK_20M_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Verify other attributes section
       await expect(page.locator("text=Other Attributes:")).toBeVisible();
@@ -501,13 +456,13 @@ test.describe("BSC Transaction Page", () => {
     }
   });
 
-  test("displays DEX swap nonce and position", async ({ page }) => {
+  test("displays DEX swap nonce and position", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = BSC.transactions[DEX_SWAP_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Nonce:")).toBeVisible();
       await expect(page.locator("text=Position:")).toBeVisible();
@@ -517,13 +472,13 @@ test.describe("BSC Transaction Page", () => {
     }
   });
 
-  test("displays DEX aggregator nonce and position", async ({ page }) => {
+  test("displays DEX aggregator nonce and position", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = BSC.transactions[DEX_AGGREGATOR_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Nonce:")).toBeVisible();
       await expect(page.locator("text=Position:")).toBeVisible();
@@ -536,26 +491,26 @@ test.describe("BSC Transaction Page", () => {
     }
   });
 
-  test("displays transaction fee", async ({ page }) => {
+  test("displays transaction fee", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = BSC.transactions[BLOCK_20M_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       // Verify transaction fee is displayed
       await expect(page.locator("text=Transaction Fee:")).toBeVisible();
     }
   });
 
-  test("displays block number link for transaction", async ({ page }) => {
+  test("displays block number link for transaction", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = BSC.transactions[DEX_SWAP_TX];
 
     await txPage.goto(tx.hash, CHAIN_ID);
 
-    const loaded = await waitForTxContent(page);
+    const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
       await expect(page.locator("text=Block:")).toBeVisible();
       const blockValue = await txPage.getBlockNumber();
@@ -563,7 +518,7 @@ test.describe("BSC Transaction Page", () => {
     }
   });
 
-  test("handles invalid tx hash gracefully", async ({ page }) => {
+  test("handles invalid tx hash gracefully", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     await txPage.goto("0xinvalid", CHAIN_ID);
 
@@ -581,13 +536,13 @@ test.describe("BSC Transaction Page", () => {
 // ============================================
 
 test.describe("BSC Address Page - Tokens", () => {
-  test("displays WBNB token contract", async ({ page }) => {
+  test("displays WBNB token contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BSC.addresses.wbnb;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as a contract
       const isContract = await addressPage.isContract();
@@ -600,13 +555,13 @@ test.describe("BSC Address Page - Tokens", () => {
     }
   });
 
-  test("displays USDT (BSC-USD) token contract", async ({ page }) => {
+  test("displays USDT (BSC-USD) token contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BSC.addresses.usdt;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as a contract
       const isContract = await addressPage.isContract();
@@ -614,13 +569,13 @@ test.describe("BSC Address Page - Tokens", () => {
     }
   });
 
-  test("displays BUSD token contract", async ({ page }) => {
+  test("displays BUSD token contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BSC.addresses.busd;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as a contract
       const isContract = await addressPage.isContract();
@@ -628,13 +583,13 @@ test.describe("BSC Address Page - Tokens", () => {
     }
   });
 
-  test("displays CAKE (PancakeSwap Token) contract", async ({ page }) => {
+  test("displays CAKE (PancakeSwap Token) contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BSC.addresses.cake;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as a contract
       const isContract = await addressPage.isContract();
@@ -642,13 +597,13 @@ test.describe("BSC Address Page - Tokens", () => {
     }
   });
 
-  test("displays USDC token contract", async ({ page }) => {
+  test("displays USDC token contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BSC.addresses.usdc;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as a contract
       const isContract = await addressPage.isContract();
@@ -656,13 +611,13 @@ test.describe("BSC Address Page - Tokens", () => {
     }
   });
 
-  test("displays DAI token contract", async ({ page }) => {
+  test("displays DAI token contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BSC.addresses.dai;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as a contract
       const isContract = await addressPage.isContract();
@@ -676,13 +631,13 @@ test.describe("BSC Address Page - Tokens", () => {
 // ============================================
 
 test.describe("BSC Address Page - DEX Contracts", () => {
-  test("displays PancakeSwap Router v2 contract", async ({ page }) => {
+  test("displays PancakeSwap Router v2 contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BSC.addresses.pancakeswapRouterV2;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as a contract
       const isContract = await addressPage.isContract();
@@ -693,13 +648,13 @@ test.describe("BSC Address Page - DEX Contracts", () => {
     }
   });
 
-  test("displays PancakeSwap Factory v2 contract", async ({ page }) => {
+  test("displays PancakeSwap Factory v2 contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BSC.addresses.pancakeswapFactoryV2;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as a contract
       const isContract = await addressPage.isContract();
@@ -710,13 +665,13 @@ test.describe("BSC Address Page - DEX Contracts", () => {
     }
   });
 
-  test("displays PancakeSwap Universal Router contract", async ({ page }) => {
+  test("displays PancakeSwap Universal Router contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BSC.addresses.pancakeswapUniversalRouter;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as a contract
       const isContract = await addressPage.isContract();
@@ -733,13 +688,13 @@ test.describe("BSC Address Page - DEX Contracts", () => {
 // ============================================
 
 test.describe("BSC Address Page - System Contracts", () => {
-  test("displays Validator Set system contract", async ({ page }) => {
+  test("displays Validator Set system contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BSC.addresses.validatorSet;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as a contract
       const isContract = await addressPage.isContract();
@@ -750,13 +705,13 @@ test.describe("BSC Address Page - System Contracts", () => {
     }
   });
 
-  test("displays System Reward contract", async ({ page }) => {
+  test("displays System Reward contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BSC.addresses.systemReward;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as a contract
       const isContract = await addressPage.isContract();
@@ -767,13 +722,13 @@ test.describe("BSC Address Page - System Contracts", () => {
     }
   });
 
-  test("displays Token Hub contract", async ({ page }) => {
+  test("displays Token Hub contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BSC.addresses.tokenHub;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as a contract
       const isContract = await addressPage.isContract();
@@ -784,13 +739,13 @@ test.describe("BSC Address Page - System Contracts", () => {
     }
   });
 
-  test("displays Stake Hub contract", async ({ page }) => {
+  test("displays Stake Hub contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BSC.addresses.stakeHub;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as a contract
       const isContract = await addressPage.isContract();
@@ -801,13 +756,13 @@ test.describe("BSC Address Page - System Contracts", () => {
     }
   });
 
-  test("displays Governor contract", async ({ page }) => {
+  test("displays Governor contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BSC.addresses.governor;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as a contract
       const isContract = await addressPage.isContract();
@@ -818,7 +773,7 @@ test.describe("BSC Address Page - System Contracts", () => {
     }
   });
 
-  test("handles invalid address gracefully", async ({ page }) => {
+  test("handles invalid address gracefully", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     await addressPage.goto("0xinvalid", CHAIN_ID);
 
@@ -836,13 +791,13 @@ test.describe("BSC Address Page - System Contracts", () => {
 // ============================================
 
 test.describe("BSC Address Page - Staking Contracts", () => {
-  test("displays PancakeSwap Main Staking contract", async ({ page }) => {
+  test("displays PancakeSwap Main Staking contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BSC.addresses.pancakeswapStaking;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as a contract
       const isContract = await addressPage.isContract();
@@ -853,13 +808,13 @@ test.describe("BSC Address Page - Staking Contracts", () => {
     }
   });
 
-  test("displays PancakeSwap Cake Pool contract", async ({ page }) => {
+  test("displays PancakeSwap Cake Pool contract", async ({ page }, testInfo) => {
     const addressPage = new AddressPage(page);
     const addr = BSC.addresses.pancakeswapCakePool;
 
     await addressPage.goto(addr.address, CHAIN_ID);
 
-    const loaded = await waitForAddressContent(page);
+    const loaded = await waitForAddressContent(page, testInfo);
     if (loaded) {
       // Verify it's identified as a contract
       const isContract = await addressPage.isContract();
