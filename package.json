@@ -23,6 +23,7 @@
 		"start": "NODE_ENV=development webpack serve --config webpack.config.js --mode development",
 		"build:production": "bash ./scripts/build-production.sh",
 		"build:staging": "bash ./scripts/build-staging.sh",
+		"build:plugin": "webpack --config webpack.config.js --mode development",
 		"test": "npx vitest",
 		"test:run": "npx vitest run",
 		"test:e2e": "playwright test",
