@@ -2832,7 +2832,7 @@
 }
 
 /* Version Warning Icon */
-.version-warning-icon {
+.build-warning-icon {
 	position: relative;
 	display: flex;
 	align-items: center;
@@ -2840,12 +2840,12 @@
 	transition: transform 0.2s ease;
 }
 
-.version-warning-icon:hover {
+.build-warning-icon:hover {
 	transform: scale(1.2);
 }
 
 /* Custom tooltip that appears instantly */
-.version-warning-tooltip {
+.build-warning-tooltip {
 	position: absolute;
 	top: 50%;
 	right: calc(100% + 8px);
@@ -2863,7 +2863,7 @@
 }
 
 /* Arrow pointing right (toward the icon) */
-.version-warning-tooltip::before {
+.build-warning-tooltip::before {
 	content: "";
 	position: absolute;
 	top: 50%;

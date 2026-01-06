@@ -4970,6 +4970,8 @@ code {
   transition: all 0.2s ease;
   box-shadow: 0 4px 12px var(--color-primary-alpha-30);
   font-family: 'Outfit', sans-serif;
+  width: fit-content;
+  margin: auto;
 }
 
 .settings-save-button:hover {

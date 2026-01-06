@@ -6,10 +6,13 @@
 
 ![Production IPFS Hash](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/openscan-explorer/explorer/meta/ipfs-hash.json)
 
-A trustless, open-source, standalone web-app, multi-chain blockchain explorer for Ethereum, Layer 2 networks, and local development chains, allowing the direct interaction with verified smart contracts.
+A trustless, open-source blockchain explorer for Ethereum and Layer 2 networks. OpenScan connects directly to blockchain nodes via RPC, giving you unfettered access to on-chain data without intermediaries or centralized services.
 
-**Official URL:** [https://openscan.eth.link/](https://openscan.eth.link/)  
-**GitHub Pages:** [https://openscan-explorer.github.io/explorer/](https://openscan.github.io/explorer/)
+> *We choose to build trustless systems even when it is harder.*
+> *We pay the cost of openness over the convenience of control.*
+
+**Official URL:** [https://openscan.eth.link/](https://openscan.eth.link/)
+**GitHub Pages:** [https://openscan-explorer.github.io/explorer/](https://openscan-explorer.github.io/explorer/)
 
 ## Features
 
@@ -60,7 +63,7 @@ A trustless, open-source, standalone web-app, multi-chain blockchain explorer fo
 
 ### Prerequisites
 
-- Node.js v22.21.1
+- Node.js v24.12.0
 - npm or yarn
 
 ### Installation
@@ -241,7 +244,7 @@ Default RPC endpoints:
 
 ### Tech Stack
 
-- **React 18** - UI framework
+- **React 19** - UI framework
 - **TypeScript** - Type safety
 - **React Router** - Client-side routing
 - **Custom RPC Service** - Direct JSON-RPC calls to blockchain nodes
@@ -286,6 +289,26 @@ src/
 - **Type Guards** - Runtime type checking for L2-specific fields
 - **RPC Storage** - Persistent storage for custom RPC configurations
 
+## Support OpenScan
+
+OpenScan is free for all users. The project is sustained by subscriptions from tokens, networks, apps, and organizations that recognize the value of open blockchain infrastructure.
+
+**Subscription tiers available for:**
+- Tokens – Verified contracts, metadata integration, token pages
+- Networks – Full RPC support, dedicated subdomain explorers
+- Crypto Apps – Verified branding for wallets, dApps, exchanges
+- Companies & Orgs – Recognition for infrastructure providers and supporters
+
+[View Subscription Options](https://openscan-explorer.github.io/explorer/#/subscriptions)
+
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) before submitting a Pull Request.
+
+- Report bugs and request features via [GitHub Issues](https://github.com/openscan-explorer/explorer/issues)
+- All code is publicly auditable and open for review
+- Community bounties available for bug fixes and documentation improvements
+
+## License
+
+OpenScan is licensed under the [MIT License](LICENSE).

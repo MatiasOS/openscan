@@ -3,7 +3,7 @@ import { useTheme } from "../../context/SettingsContext";
 import { useSearch } from "../../hooks/useSearch";
 import NavbarLogo from "./NavbarLogo";
 import { NetworkBlockIndicator } from "./NetworkBlockIndicator";
-import VersionWarningIcon from "./VersionWarningIcon";
+import BuildWarningIcon from "./BuildWarningIcon";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -84,7 +84,7 @@ const Navbar = () => {
 
         <div className="navbar-right">
           <NetworkBlockIndicator />
-          <VersionWarningIcon />
+          <BuildWarningIcon />
           <ul>
             <li>
               {/** biome-ignore lint/a11y/useButtonType: <TODO> */}

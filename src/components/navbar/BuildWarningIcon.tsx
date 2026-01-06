@@ -2,19 +2,19 @@ import type React from "react";
 import { useMemo, useState } from "react";
 import { ENVIRONMENT } from "../../utils/constants";
 
-interface VersionWarningIconProps {
+interface BuildWarningIconProps {
   readonly className?: string;
 }
 
 // Constants outside component to avoid recreating
-const TOOLTIP_TEXT = "This is not a production verified version";
+const TOOLTIP_TEXT = "This is not a production verified build";
 const ICON_COLORS = {
   development: "#ef4444",
   staging: "#f59e0b",
   default: "#6b7280",
 } as const;
 
-const VersionWarningIcon: React.FC<VersionWarningIconProps> = ({ className = "" }) => {
+const BuildWarningIcon: React.FC<BuildWarningIconProps> = ({ className = "" }) => {
   const [showTooltip, setShowTooltip] = useState(false);
 
   // Memoize color calculation
@@ -29,7 +29,7 @@ const VersionWarningIcon: React.FC<VersionWarningIconProps> = ({ className = "" 
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: <TODO>
     <div
-      className={`version-warning-icon ${className}`}
+      className={`build-warning-icon ${className}`}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
     >
@@ -49,9 +49,9 @@ const VersionWarningIcon: React.FC<VersionWarningIconProps> = ({ className = "" 
           strokeLinejoin="round"
         />
       </svg>
-      {showTooltip && <div className="version-warning-tooltip">{TOOLTIP_TEXT}</div>}
+      {showTooltip && <div className="build-warning-tooltip">{TOOLTIP_TEXT}</div>}
     </div>
   );
 };
 
-export default VersionWarningIcon;
+export default BuildWarningIcon;
