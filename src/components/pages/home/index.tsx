@@ -25,7 +25,9 @@ const NetworkCard: React.FC<NetworkCardProps> = ({ network }) => {
           <div className="network-card-info">
             <div className="network-card-title-row">
               <h3 className="network-card-title">{network.name}</h3>
-              <TierBadge subscription={network.subscription} size="small" />
+              {network.networkId !== 1 && (
+                <TierBadge subscription={network.subscription} size="small" />
+              )}
             </div>
             <div className="network-card-chain-id">Network ID: {network.networkId}</div>
           </div>
