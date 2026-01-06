@@ -69,7 +69,9 @@ const ProfileDisplay: React.FC<ProfileDisplayProps> = React.memo(({ network }) =
       {profileState === "collapsed" && (
         <button type="button" className="profile-expand-button" onClick={handleExpandClick}>
           <span className="profile-expand-text">More about {network?.name}</span>
-          <TierBadge subscription={network?.subscription} size="small" />
+          {network?.networkId !== 1 && (
+            <TierBadge subscription={network?.subscription} size="small" />
+          )}
           <span className="profile-expand-icon">▼</span>
         </button>
       )}
@@ -99,7 +101,9 @@ const ProfileDisplay: React.FC<ProfileDisplayProps> = React.memo(({ network }) =
           <div className="profile-header">
             <h2 className="profile-title">About {network?.name}</h2>
             <div className="profile-header-actions">
-              <TierBadge subscription={network?.subscription} size="medium" showSuffix />
+              {network?.networkId !== 1 && (
+                <TierBadge subscription={network?.subscription} size="medium" showSuffix />
+              )}
               <button
                 type="button"
                 className="profile-collapse-button"

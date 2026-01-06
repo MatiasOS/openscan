@@ -31,7 +31,7 @@ const ProfileNetworkDisplay: React.FC<ProfileNetworkDisplayProps> = ({ profile }
           <div className="profile-header-info">
             <div className="profile-title-row">
               <h1 className="profile-name">{profile.name}</h1>
-              {hasActiveSubscription && profile.subscription && (
+              {hasActiveSubscription && profile.subscription && profile.chainId !== 1 && (
                 <TierBadge subscription={profile.subscription} size="medium" />
               )}
               {profile.isTestnet && (
