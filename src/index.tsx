@@ -1,3 +1,5 @@
+// RainbowKit styles must be imported early to ensure they're loaded before components render
+import "@rainbow-me/rainbowkit/styles.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import ReactDOM from "react-dom/client";
