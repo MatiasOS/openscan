@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { RPCIndicator } from "../../../components/common/RPCIndicator";
 import { useDataService } from "../../../hooks/useDataService";
-import type { Transaction } from "../../../types";
+import { useProviderSelection } from "../../../hooks/useProviderSelection";
+import type { DataWithMetadata, Transaction } from "../../../types";
 import Loader from "../../common/Loader";
 
 const BLOCKS_PER_PAGE = 10;
@@ -12,9 +14,9 @@ export default function Txs() {
   const navigate = useNavigate();
   const numericNetworkId = Number(networkId) || 1;
   const dataService = useDataService(numericNetworkId);
-  const [transactions, setTransactions] = useState<Array<Transaction & { blockNumber: string }>>(
-    [],
-  );
+  const [transactionsResult, setTransactionsResult] = useState<
+    DataWithMetadata<Array<Transaction & { blockNumber: string }>>
+  >({ data: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [latestBlockNumber, setLatestBlockNumber] = useState<number | null>(null);
@@ -22,6 +24,37 @@ export default function Txs() {
     from: number;
     to: number;
   } | null>(null);
+
+  // Provider selection state
+  const [selectedProvider, setSelectedProvider] = useProviderSelection(`txs_${numericNetworkId}`);
+
+  // Extract actual transactions data based on selected provider
+  const transactions = useMemo(() => {
+    if (!transactionsResult) return [];
+
+    // No metadata = fallback mode, return data as-is
+    if (!transactionsResult.metadata) {
+      return transactionsResult.data;
+    }
+
+    // No provider selected = use default (first successful)
+    if (!selectedProvider) {
+      return transactionsResult.data;
+    }
+
+    // Find selected provider's response
+    const providerResponse = transactionsResult.metadata.responses.find(
+      (r) => r.url === selectedProvider && r.status === "success",
+    );
+
+    if (!providerResponse || !providerResponse.data) {
+      // Fallback to default if selected provider not found
+      return transactionsResult.data;
+    }
+
+    // Return the selected provider's data
+    return providerResponse.data;
+  }, [transactionsResult, selectedProvider]);
 
   // Get fromBlock from URL params, default to null (latest)
   const fromBlockParam = searchParams.get("fromBlock");
@@ -56,7 +89,12 @@ export default function Txs() {
         );
 
         console.log("Fetched transactions:", fetchedTransactions);
-        setTransactions(fetchedTransactions);
+        // Wrap in DataWithMetadata structure if it's not already
+        if (Array.isArray(fetchedTransactions)) {
+          setTransactionsResult({ data: fetchedTransactions });
+        } else {
+          setTransactionsResult(fetchedTransactions);
+        }
         // biome-ignore lint/suspicious/noExplicitAny: <TODO>
       } catch (err: any) {
         console.error("Error fetching transactions:", err);
@@ -128,18 +166,30 @@ export default function Txs() {
 
   if (loading) {
     return (
-      <div className="container-wide page-container-padded text-center page-card">
-        <h1 className="page-title-small">Latest Transactions</h1>
-        <Loader text="Loading transactions..." />
+      <div className="container-wide">
+        <div className="block-display-card">
+          <div className="blocks-header">
+            <span className="block-label">Latest Transactions</span>
+          </div>
+          <div className="card-content-loading">
+            <Loader text="Loading transactions..." />
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container-wide page-container-padded text-center page-card">
-        <h1 className="page-title-small">Latest Transactions</h1>
-        <p className="error-text">Error: {error}</p>
+      <div className="container-wide">
+        <div className="block-display-card">
+          <div className="blocks-header">
+            <span className="block-label">Latest Transactions</span>
+          </div>
+          <div className="card-content">
+            <p className="text-error margin-0">Error: {error}</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -179,86 +229,103 @@ export default function Txs() {
     );
   };
 
+  // Get metadata from first transaction result if available
+  const metadata = transactionsResult?.metadata;
+
   return (
-    <div className="container-wide page-container-padded text-center page-card">
-      <h1 className="page-title-small">Latest Transactions</h1>
-      <p className="page-subtitle-text no-margin-bottom">
-        {isAtLatest
-          ? `Showing ${transactions.length} transactions from the last ${BLOCKS_PER_PAGE} blocks`
-          : blockRange
-            ? `Showing ${transactions.length} transactions from blocks ${blockRange.from.toLocaleString()} - ${blockRange.to.toLocaleString()}`
-            : `Showing ${transactions.length} transactions`}
-      </p>
+    <div className="container-wide">
+      <div className="block-display-card">
+        <div className="blocks-header">
+          <div className="blocks-header-main">
+            <span className="block-label">Latest Transactions</span>
+            <span className="block-header-divider">•</span>
+            <span className="blocks-header-info">
+              {isAtLatest
+                ? `Showing ${transactions.length} transactions from the last ${BLOCKS_PER_PAGE} blocks`
+                : blockRange
+                  ? `Showing ${transactions.length} transactions from blocks ${blockRange.from.toLocaleString()} - ${blockRange.to.toLocaleString()}`
+                  : `Showing ${transactions.length} transactions`}
+            </span>
+          </div>
+          {metadata && selectedProvider !== undefined && (
+            <RPCIndicator
+              metadata={metadata}
+              selectedProvider={selectedProvider}
+              onProviderSelect={setSelectedProvider}
+            />
+          )}
+        </div>
 
-      <Pagination />
+        <Pagination />
 
-      {transactions.length === 0 ? (
-        <p className="table-cell-muted">No transactions found in the selected block range</p>
-      ) : (
-        <div className="table-wrapper">
-          <table className="dash-table">
-            <thead>
-              <tr>
-                <th>Tx Hash</th>
-                <th>Block</th>
-                <th>From</th>
-                <th>To</th>
-                <th>Value</th>
-                <th>Gas Price</th>
-                <th>Gas</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((transaction) => (
-                <tr key={transaction.hash}>
-                  <td>
-                    <Link
-                      to={`/${networkId}/tx/${transaction.hash}`}
-                      className="table-cell-hash"
-                      title={transaction.hash}
-                    >
-                      {truncate(transaction.hash)}
-                    </Link>
-                  </td>
-                  <td>
-                    <Link
-                      to={`/${networkId}/block/${transaction.blockNumber}`}
-                      className="table-cell-value"
-                    >
-                      {transaction.blockNumber}
-                    </Link>
-                  </td>
-                  <td className="table-cell-mono" title={transaction.from}>
-                    <Link
-                      to={`/${networkId}/address/${transaction.from}`}
-                      className="table-cell-address"
-                    >
-                      {truncate(transaction.from)}
-                    </Link>
-                  </td>
-                  <td className="table-cell-mono" title={transaction.to}>
-                    {transaction.to ? (
+        {transactions.length === 0 ? (
+          <p className="table-cell-muted">No transactions found in the selected block range</p>
+        ) : (
+          <div className="table-wrapper">
+            <table className="dash-table">
+              <thead>
+                <tr>
+                  <th>Tx Hash</th>
+                  <th>Block</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Value</th>
+                  <th>Gas Price</th>
+                  <th>Gas</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.map((transaction: Transaction & { blockNumber: string }) => (
+                  <tr key={transaction.hash}>
+                    <td>
                       <Link
-                        to={`/${networkId}/address/${transaction.to}`}
+                        to={`/${networkId}/tx/${transaction.hash}`}
+                        className="table-cell-hash"
+                        title={transaction.hash}
+                      >
+                        {truncate(transaction.hash)}
+                      </Link>
+                    </td>
+                    <td>
+                      <Link
+                        to={`/${networkId}/block/${transaction.blockNumber}`}
+                        className="table-cell-value"
+                      >
+                        {transaction.blockNumber}
+                      </Link>
+                    </td>
+                    <td className="table-cell-mono" title={transaction.from}>
+                      <Link
+                        to={`/${networkId}/address/${transaction.from}`}
                         className="table-cell-address"
                       >
-                        {truncate(transaction.to)}
+                        {truncate(transaction.from)}
                       </Link>
-                    ) : (
-                      <span className="table-cell-italic">Contract Creation</span>
-                    )}
-                  </td>
-                  <td className="table-cell-value">{formatValue(transaction.value)}</td>
-                  <td className="table-cell-muted">{formatGasPrice(transaction.gasPrice)}</td>
-                  <td className="table-cell-muted">{Number(transaction.gas).toLocaleString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+                    </td>
+                    <td className="table-cell-mono" title={transaction.to}>
+                      {transaction.to ? (
+                        <Link
+                          to={`/${networkId}/address/${transaction.to}`}
+                          className="table-cell-address"
+                        >
+                          {truncate(transaction.to)}
+                        </Link>
+                      ) : (
+                        <span className="table-cell-italic">Contract Creation</span>
+                      )}
+                    </td>
+                    <td className="table-cell-value">{formatValue(transaction.value)}</td>
+                    <td className="table-cell-muted">{formatGasPrice(transaction.gasPrice)}</td>
+                    <td className="table-cell-muted">{Number(transaction.gas).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-      <Pagination />
+        <Pagination />
+      </div>
     </div>
   );
 }
