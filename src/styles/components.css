@@ -1074,6 +1074,29 @@
 	margin-bottom: 0.5rem;
 }
 
+.blocks-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 20px;
+	padding-bottom: 16px;
+	border-bottom: 2px solid var(--color-primary-alpha-20);
+	flex-wrap: wrap;
+}
+
+.blocks-header-main {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.blocks-header-info {
+	color: var(--text-secondary);
+	font-size: 0.95rem;
+}
+
 /* Feature Cards */
 .feature-card {
 	background: rgba(255, 255, 255, 0.03);
@@ -4665,3 +4688,15 @@
 	text-decoration: underline;
 }
 
+/* Blocks page responsive styles */
+@media (max-width: 480px) {
+	.blocks-header {
+		gap: 8px;
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.blocks-header-main {
+		gap: 8px;
+	}
+}
