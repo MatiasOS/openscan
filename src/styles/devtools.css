@@ -416,11 +416,23 @@
 	gap: 8px;
 }
 
+.devtools-tool-header-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	margin-bottom: 16px;
+	flex-wrap: wrap;
+}
+
 .devtools-tool-header {
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	margin-bottom: 16px;
+}
+
+.devtools-tool-header-row > .devtools-tool-header {
+	margin-bottom: 0;
 }
 
 .devtools-tool-header:hover .devtools-section-toggle {

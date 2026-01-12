@@ -11,6 +11,8 @@ import {
 } from "ethers";
 import type React from "react";
 import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
+import WalletConnectButton from "../../common/WalletConnectButton";
 
 const NETWORKS: Record<number, { name: string; rpc: string }> = {
   1: { name: "Ethereum Mainnet", rpc: "https://eth.llamarpc.com" },
@@ -21,6 +23,7 @@ const NETWORKS: Record<number, { name: string; rpc: string }> = {
 };
 
 const TransactionsSection: React.FC = () => {
+  const { address: walletAddress, isConnected } = useAccount();
   const [showTransactionBuilder, setShowTransactionBuilder] = useState(true);
   const [txFrom, setTxFrom] = useState("");
   const [txTo, setTxTo] = useState("");
@@ -51,6 +54,8 @@ const TransactionsSection: React.FC = () => {
   const [builtTx, setBuiltTx] = useState<string | null>(null);
   const [showAdvancedRaw, setShowAdvancedRaw] = useState(false);
   const [rawRlp, setRawRlp] = useState("");
+  const [fetchingNonce, setFetchingNonce] = useState(false);
+  const [nonceError, setNonceError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchEthPrice = async () => {
@@ -145,7 +150,15 @@ const TransactionsSection: React.FC = () => {
     }
   };
 
-  const fetchNonceForAddress = async (address: string, chainId?: number) => {
+  const fetchNonceForAddress = async (address: string | undefined, chainId?: number) => {
+    setNonceError(null);
+
+    if (!address) {
+      setNonceError("No wallet address available. Please connect your wallet first.");
+      return undefined;
+    }
+
+    setFetchingNonce(true);
     try {
       const cid = chainId || txChainId || 1;
       const net = NETWORKS[cid];
@@ -154,8 +167,12 @@ const TransactionsSection: React.FC = () => {
       const n = await provider.getTransactionCount(address);
       setTxNonce(n);
       return n;
-    } catch (_err) {
+      // biome-ignore lint/suspicious/noExplicitAny: <TODO>
+    } catch (err: any) {
+      setNonceError(err.message || "Failed to fetch nonce");
       return undefined;
+    } finally {
+      setFetchingNonce(false);
     }
   };
 
@@ -277,14 +294,17 @@ const TransactionsSection: React.FC = () => {
   return (
     <div className="devtools-section">
       <div className="devtools-card">
-        {/** biome-ignore lint/a11y/noStaticElementInteractions: <TODO> */}
-        {/** biome-ignore lint/a11y/useKeyWithClickEvents: <TODO> */}
-        <div
-          className="devtools-tool-header cursor-pointer"
-          onClick={() => setShowTransactionBuilder(!showTransactionBuilder)}
-        >
-          <h3 className="devtools-tool-title">🧾 Transaction Builder</h3>
-          <span className="devtools-section-toggle">{showTransactionBuilder ? "▼" : "▶"}</span>
+        <div className="devtools-tool-header-row">
+          {/** biome-ignore lint/a11y/noStaticElementInteractions: <TODO> */}
+          {/** biome-ignore lint/a11y/useKeyWithClickEvents: <TODO> */}
+          <div
+            className="devtools-tool-header cursor-pointer"
+            onClick={() => setShowTransactionBuilder(!showTransactionBuilder)}
+          >
+            <h3 className="devtools-tool-title">🧾 Transaction Builder</h3>
+            <span className="devtools-section-toggle">{showTransactionBuilder ? "▼" : "▶"}</span>
+          </div>
+          <WalletConnectButton />
         </div>
         {showTransactionBuilder && (
           <div className="devtools-flex-column devtools-gap-10">
@@ -355,6 +375,8 @@ const TransactionsSection: React.FC = () => {
                 />
               </div>
             </div>
+
+            {nonceError && <div className="devtools-error">⚠️ {nonceError}</div>}
 
             <div className="devtools-flex-column">
               {/** biome-ignore lint/a11y/noLabelWithoutControl: <TODO> */}
@@ -467,18 +489,11 @@ const TransactionsSection: React.FC = () => {
               {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
               <button
                 className="devtools-button"
-                onClick={() => {
-                  // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-                  if ((window as any).ethereum)
-                    fetchNonceForAddress(
-                      // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-                      (window as any).ethereum.selectedAddress ||
-                        // biome-ignore lint/suspicious/noExplicitAny: <TODO>
-                        (window as any).ethereum?.accounts?.[0],
-                    );
-                }}
+                disabled={fetchingNonce || !isConnected}
+                onClick={() => fetchNonceForAddress(walletAddress)}
+                title={!isConnected ? "Connect your wallet first" : undefined}
               >
-                Fetch Nonce
+                {fetchingNonce ? "Fetching..." : "Fetch Nonce"}
               </button>
               {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
               <button className="devtools-button" onClick={buildTransaction}>

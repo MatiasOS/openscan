@@ -1,0 +1,82 @@
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import type React from "react";
+
+interface WalletConnectButtonProps {
+  showChainSelector?: boolean;
+}
+
+/**
+ * Reusable wallet connect button using RainbowKit.
+ * Shows connect button when disconnected, chain selector and account when connected.
+ */
+const WalletConnectButton: React.FC<WalletConnectButtonProps> = ({ showChainSelector = true }) => {
+  return (
+    <ConnectButton.Custom>
+      {({
+        account,
+        chain,
+        openAccountModal,
+        openChainModal,
+        openConnectModal,
+        authenticationStatus,
+        mounted,
+      }: Parameters<Parameters<typeof ConnectButton.Custom>[0]["children"]>[0]) => {
+        const ready = mounted && authenticationStatus !== "loading";
+        const connected =
+          ready &&
+          account &&
+          chain &&
+          (!authenticationStatus || authenticationStatus === "authenticated");
+
+        return (
+          <div
+            {...(!ready && {
+              "aria-hidden": true,
+              className: "wallet-hidden",
+            })}
+          >
+            {(() => {
+              if (!connected) {
+                return (
+                  <button onClick={openConnectModal} type="button" className="btn-connect-wallet">
+                    Connect Wallet
+                  </button>
+                );
+              }
+
+              if (chain.unsupported) {
+                return (
+                  <button onClick={openChainModal} type="button" className="btn-wrong-network">
+                    Wrong Network
+                  </button>
+                );
+              }
+
+              return (
+                <div className="wallet-connected-container">
+                  {showChainSelector && (
+                    <button onClick={openChainModal} type="button" className="btn-chain-selector">
+                      {chain.hasIcon && chain.iconUrl && (
+                        <img
+                          alt={chain.name ?? "Chain icon"}
+                          src={chain.iconUrl}
+                          className="chain-icon"
+                        />
+                      )}
+                      {chain.name}
+                    </button>
+                  )}
+                  <button onClick={openAccountModal} type="button" className="btn-account">
+                    {account.displayName}
+                  </button>
+                </div>
+              );
+            })()}
+          </div>
+        );
+      }}
+    </ConnectButton.Custom>
+  );
+};
+
+export default WalletConnectButton;
