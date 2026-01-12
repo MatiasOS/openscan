@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { RPCIndicator } from "../../common/RPCIndicator";
 import { useDataService } from "../../../hooks/useDataService";
-import type { Block } from "../../../types";
+import { useProviderSelection } from "../../../hooks/useProviderSelection";
+import type { Block, DataWithMetadata } from "../../../types";
 import Loader from "../../common/Loader";
 
 const BLOCKS_PER_PAGE = 10;
@@ -12,10 +14,45 @@ export default function Blocks() {
   const navigate = useNavigate();
   const numericNetworkId = Number(networkId) || 1;
   const dataService = useDataService(numericNetworkId);
-  const [blocks, setBlocks] = useState<Block[]>([]);
+  const [blocksResult, setBlocksResult] = useState<DataWithMetadata<Block>[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [latestBlockNumber, setLatestBlockNumber] = useState<number | null>(null);
+
+  // Provider selection state
+  const [selectedProvider, setSelectedProvider] = useProviderSelection(
+    `blocks_${numericNetworkId}`,
+  );
+
+  // Extract actual blocks data based on selected provider
+  const blocks = useMemo(() => {
+    return blocksResult.map((result) => {
+      if (!result) return null;
+
+      // No metadata = fallback mode, return data as-is
+      if (!result.metadata) {
+        return result.data;
+      }
+
+      // No provider selected = use default (first successful)
+      if (!selectedProvider) {
+        return result.data;
+      }
+
+      // Find selected provider's response
+      const providerResponse = result.metadata.responses.find(
+        (r) => r.url === selectedProvider && r.status === "success",
+      );
+
+      if (!providerResponse || !providerResponse.data) {
+        // Fallback to default if selected provider not found
+        return result.data;
+      }
+
+      // Return the selected provider's data
+      return providerResponse.data;
+    });
+  }, [blocksResult, selectedProvider]);
 
   // Get fromBlock from URL params, default to null (latest)
   const fromBlockParam = searchParams.get("fromBlock");
@@ -51,8 +88,8 @@ export default function Blocks() {
         );
 
         console.log("Fetched blocks:", blockResults);
-        // Extract data from results
-        setBlocks(blockResults.map((result) => result.data));
+        // Store complete results with metadata
+        setBlocksResult(blockResults);
         // biome-ignore lint/suspicious/noExplicitAny: <TODO>
       } catch (err: any) {
         console.error("Error fetching blocks:", err);
@@ -120,102 +157,134 @@ export default function Blocks() {
 
   if (loading) {
     return (
-      <div className="container-wide page-container-padded text-center page-card">
-        <h1 className="page-title-small">Latest Blocks</h1>
-        <Loader text="Loading blocks..." />
+      <div className="container-wide">
+        <div className="block-display-card">
+          <div className="blocks-header">
+            <span className="block-label">Latest Blocks</span>
+          </div>
+          <div className="card-content-loading">
+            <Loader text="Loading blocks..." />
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container-wide page-container-padded text-center page-card">
-        <h1 className="page-title-small">Latest Blocks</h1>
-        <p className="error-text">Error: {error}</p>
+      <div className="container-wide">
+        <div className="block-display-card">
+          <div className="blocks-header">
+            <span className="block-label">Latest Blocks</span>
+          </div>
+          <div className="card-content">
+            <p className="text-error margin-0">Error: {error}</p>
+          </div>
+        </div>
       </div>
     );
   }
 
+  // Get metadata from first block result if available
+  const metadata = blocksResult[0]?.metadata;
+
   return (
-    <div className="container-wide page-container-padded text-center page-card">
-      <h1 className="page-title-small">Latest Blocks</h1>
-      <p className="page-subtitle-text">
-        {isAtLatest
-          ? `Showing ${blocks.length} most recent blocks`
-          : `Showing blocks ${Number(blocks[blocks.length - 1]?.number || 0).toLocaleString()} - ${Number(blocks[0]?.number || 0).toLocaleString()}`}
-      </p>
+    <div className="container-wide">
+      <div className="block-display-card">
+        <div className="blocks-header">
+          <div className="blocks-header-main">
+            <span className="block-label">Latest Blocks</span>
+            <span className="block-header-divider">•</span>
+            <span className="blocks-header-info">
+              {isAtLatest
+                ? `Showing ${blocks.length} most recent blocks`
+                : `Showing blocks ${Number(blocks[blocks.length - 1]?.number || 0).toLocaleString()} - ${Number(blocks[0]?.number || 0).toLocaleString()}`}
+            </span>
+          </div>
+          {metadata && selectedProvider !== undefined && (
+            <RPCIndicator
+              metadata={metadata}
+              selectedProvider={selectedProvider}
+              onProviderSelect={setSelectedProvider}
+            />
+          )}
+        </div>
 
-      <div className="table-wrapper">
-        <table className="dash-table">
-          <thead>
-            <tr>
-              <th>Block</th>
-              <th>Timestamp</th>
-              <th>Txns</th>
-              <th>Miner</th>
-              <th>Gas Used</th>
-              <th>Gas Limit</th>
-              <th>Size</th>
-            </tr>
-          </thead>
-          <tbody>
-            {blocks.map((block) => (
-              <tr key={block.number}>
-                <td>
-                  <Link
-                    to={`/${networkId}/block/${Number(block.number).toString()}`}
-                    className="table-cell-number"
-                  >
-                    {Number(block.number).toLocaleString()}
-                  </Link>
-                </td>
-                <td className="table-cell-text">{formatTime(block.timestamp)}</td>
-                <td className="table-cell-value">
-                  {block.transactions ? block.transactions.length : 0}
-                </td>
-                <td className="table-cell-mono" title={block.miner}>
-                  <Link to={`/${networkId}/address/${block.miner}`} className="table-cell-address">
-                    {truncate(block.miner)}
-                  </Link>
-                </td>
-                <td className="table-cell-text">{Number(block.gasUsed).toLocaleString()}</td>
-                <td className="table-cell-muted">{Number(block.gasLimit).toLocaleString()}</td>
-                <td className="table-cell-muted">{Number(block.size).toLocaleString()} bytes</td>
+        <div className="table-wrapper">
+          <table className="dash-table">
+            <thead>
+              <tr>
+                <th>Block</th>
+                <th>Timestamp</th>
+                <th>Txns</th>
+                <th>Miner</th>
+                <th>Gas Used</th>
+                <th>Gas Limit</th>
+                <th>Size</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {blocks.map((block) => (
+                <tr key={block.number}>
+                  <td>
+                    <Link
+                      to={`/${networkId}/block/${Number(block.number).toString()}`}
+                      className="table-cell-number"
+                    >
+                      {Number(block.number).toLocaleString()}
+                    </Link>
+                  </td>
+                  <td className="table-cell-text">{formatTime(block.timestamp)}</td>
+                  <td className="table-cell-value">
+                    {block.transactions ? block.transactions.length : 0}
+                  </td>
+                  <td className="table-cell-mono" title={block.miner}>
+                    <Link
+                      to={`/${networkId}/address/${block.miner}`}
+                      className="table-cell-address"
+                    >
+                      {truncate(block.miner)}
+                    </Link>
+                  </td>
+                  <td className="table-cell-text">{Number(block.gasUsed).toLocaleString()}</td>
+                  <td className="table-cell-muted">{Number(block.gasLimit).toLocaleString()}</td>
+                  <td className="table-cell-muted">{Number(block.size).toLocaleString()} bytes</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-      {/* Pagination */}
-      <div className="pagination-container">
-        {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-        <button
-          onClick={goToLatest}
-          disabled={isAtLatest}
-          className="pagination-btn"
-          title="Go to latest blocks"
-        >
-          Latest
-        </button>
-        {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-        <button
-          onClick={goToNewerBlocks}
-          disabled={!canGoNewer}
-          className="pagination-btn"
-          title="View newer blocks"
-        >
-          ← Newer
-        </button>
-        {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-        <button
-          onClick={goToOlderBlocks}
-          disabled={!canGoOlder}
-          className="pagination-btn"
-          title="View older blocks"
-        >
-          Older →
-        </button>
+        {/* Pagination */}
+        <div className="pagination-container">
+          {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
+          <button
+            onClick={goToLatest}
+            disabled={isAtLatest}
+            className="pagination-btn"
+            title="Go to latest blocks"
+          >
+            Latest
+          </button>
+          {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
+          <button
+            onClick={goToNewerBlocks}
+            disabled={!canGoNewer}
+            className="pagination-btn"
+            title="View newer blocks"
+          >
+            ← Newer
+          </button>
+          {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
+          <button
+            onClick={goToOlderBlocks}
+            disabled={!canGoOlder}
+            className="pagination-btn"
+            title="View older blocks"
+          >
+            Older →
+          </button>
+        </div>
       </div>
     </div>
   );

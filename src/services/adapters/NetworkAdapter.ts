@@ -126,12 +126,12 @@ export abstract class NetworkAdapter {
    * Get transactions from a range of blocks
    * @param fromBlock - Starting block number
    * @param blockCount - Number of blocks to scan
-   * @returns Array of transactions with block numbers
+   * @returns Array of transactions with block numbers and metadata
    */
   abstract getTransactionsFromBlockRange(
     fromBlock: number,
     blockCount?: number,
-  ): Promise<Array<Transaction & { blockNumber: string }>>;
+  ): Promise<DataWithMetadata<Array<Transaction & { blockNumber: string }>>>;
 
   /**
    * Get chain ID

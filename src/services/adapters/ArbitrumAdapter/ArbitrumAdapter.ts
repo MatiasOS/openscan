@@ -15,6 +15,7 @@ import {
 } from "./utils";
 import { extractData } from "../shared/extractData";
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
+import { mergeMetadata } from "../shared/mergeMetadata";
 import type { ArbitrumClient } from "explorer-network-connectors";
 
 /**
@@ -207,21 +208,28 @@ export class ArbitrumAdapter extends NetworkAdapter {
     blockCount = 10,
   ): Promise<Array<Transaction & { blockNumber: string }>> {
     const latestBlockNumber = await this.getLatestBlockNumber();
-    return this.getTransactionsFromBlockRange(latestBlockNumber, blockCount);
+    const result = await this.getTransactionsFromBlockRange(latestBlockNumber, blockCount);
+    return result.data;
   }
 
   async getTransactionsFromBlockRange(
     fromBlock: number,
     blockCount = 10,
-  ): Promise<Array<Transaction & { blockNumber: string }>> {
+  ): Promise<DataWithMetadata<Array<Transaction & { blockNumber: string }>>> {
     const transactions: Array<Transaction & { blockNumber: string }> = [];
+    const metadataList: Array<DataWithMetadata<Block>["metadata"]> = [];
 
     for (let i = 0; i < blockCount; i++) {
       const blockNum = fromBlock - i;
       if (blockNum < 0) break;
 
       try {
+        const blockResult = await this.getBlock(blockNum);
         const blockWithTxs = await this.getBlockWithTransactions(blockNum);
+
+        // Collect metadata from block fetch
+        metadataList.push(blockResult.metadata);
+
         for (const tx of blockWithTxs.transactionDetails) {
           transactions.push({
             ...tx,
@@ -233,7 +241,14 @@ export class ArbitrumAdapter extends NetworkAdapter {
       }
     }
 
-    return transactions;
+    // Merge metadata from all block fetches
+    const mergedMetadata =
+      mergeMetadata<Array<Transaction & { blockNumber: string }>>(metadataList);
+
+    return {
+      data: transactions,
+      metadata: mergedMetadata,
+    };
   }
 
   getChainId(): number {
