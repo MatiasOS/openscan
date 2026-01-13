@@ -58,6 +58,20 @@ export class TxsPage {
     });
   }
 
+  /**
+   * Wait for navigation to complete after clicking a pagination button.
+   * This waits for loading to start (old content disappears) and finish (new content appears).
+   */
+  async waitForNavigationLoad() {
+    // First wait for loading state to start (blocksHeaderInfo disappears)
+    await this.blocksHeaderInfo.waitFor({
+      state: "hidden",
+      timeout: DEFAULT_TIMEOUT * 2,
+    });
+    // Then wait for loading to complete (blocksHeaderInfo reappears)
+    await this.waitForLoad();
+  }
+
   async getTransactionCount(): Promise<number> {
     const rows = await this.txTable.locator("tbody tr").count();
     return rows;

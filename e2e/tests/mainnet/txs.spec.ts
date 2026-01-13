@@ -106,8 +106,11 @@ test.describe("Transactions Page", () => {
     // Click Older button
     await txsPage.olderBtn.first().click();
 
-    // Wait for new transactions to load
-    await txsPage.waitForLoad();
+    // Wait for URL to change (indicates navigation happened)
+    await expect(page).toHaveURL(/fromBlock=/);
+
+    // Wait for navigation to complete (loading starts then finishes)
+    await txsPage.waitForNavigationLoad();
 
     // Now Newer should be enabled
     await expect(txsPage.newerBtn.first()).toBeEnabled();
@@ -121,14 +124,16 @@ test.describe("Transactions Page", () => {
 
     // Navigate to older transactions
     await txsPage.olderBtn.first().click();
-    await txsPage.waitForLoad();
+    await expect(page).toHaveURL(/fromBlock=/);
+    await txsPage.waitForNavigationLoad();
 
     // Verify transactions are still displayed
     await expect(txsPage.txTable).toBeVisible();
 
     // Navigate back to latest
     await txsPage.latestBtn.first().click();
-    await txsPage.waitForLoad();
+    await expect(page).not.toHaveURL(/fromBlock=/);
+    await txsPage.waitForNavigationLoad();
 
     // Verify we're back on latest transactions
     await expect(txsPage.txTable).toBeVisible();
