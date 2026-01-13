@@ -74,21 +74,33 @@ export function useSearch(): UseSearchResult {
         return;
       }
 
-      // Need networkId for non-ENS searches
-      if (!networkId) return;
+      // Determine what type of search this is
+      const isTransactionHash = /^0x[a-fA-F0-9]{64}$/.test(term);
+      const isAddress = /^0x[a-fA-F0-9]{40}$/.test(term);
+      const isBlockNumber = /^\d+$/.test(term);
 
-      // Check if it's a transaction hash (0x followed by 64 hex chars)
-      if (/^0x[a-fA-F0-9]{64}$/.test(term)) {
+      // If pattern doesn't match any valid type, show error immediately
+      if (!isTransactionHash && !isAddress && !isBlockNumber) {
+        setError(
+          "Invalid search. Enter an address (0x...), transaction hash, block number, or ENS name.",
+        );
+        return;
+      }
+
+      // Valid pattern but need networkId to navigate
+      if (!networkId) {
+        setError("Please select a network first to search for this item.");
+        return;
+      }
+
+      // Navigate to the appropriate page
+      if (isTransactionHash) {
         navigate(`/${networkId}/tx/${term}`);
         setSearchTerm("");
-      }
-      // Check if it's an address (0x followed by 40 hex chars)
-      else if (/^0x[a-fA-F0-9]{40}$/.test(term)) {
+      } else if (isAddress) {
         navigate(`/${networkId}/address/${term}`);
         setSearchTerm("");
-      }
-      // Check if it's a block number
-      else if (/^\d+$/.test(term)) {
+      } else if (isBlockNumber) {
         navigate(`/${networkId}/block/${term}`);
         setSearchTerm("");
       }

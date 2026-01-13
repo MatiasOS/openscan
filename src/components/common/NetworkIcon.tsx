@@ -10,7 +10,7 @@ interface NetworkIconProps {
 
 // Fallback Ethereum SVG icon (used when logo fails to load)
 const EthereumIcon: React.FC<{ color: string; size: number }> = ({ color, size }) => (
-  // biome-ignore lint/a11y/noSvgWithoutTitle: <TODO>
+  // biome-ignore lint/a11y/noSvgWithoutTitle: decorative icon
   <svg width={size} height={size} viewBox="0 0 256 417" xmlns="http://www.w3.org/2000/svg">
     <path fill={color} d="m127.961 0-2.795 9.5v275.668l2.795 2.79 127.962-75.638z" />
     <path fill={`${color}99`} d="M127.962 0 0 212.32l127.962 75.639V154.158z" />
@@ -19,8 +19,35 @@ const EthereumIcon: React.FC<{ color: string; size: number }> = ({ color, size }
   </svg>
 );
 
+// Localhost terminal icon
+const LocalhostIcon: React.FC<{ color: string; size: number }> = ({ color, size }) => (
+  // biome-ignore lint/a11y/noSvgWithoutTitle: decorative icon
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect x="2" y="4" width="20" height="16" rx="2" stroke={color} strokeWidth="2" fill="none" />
+    <path
+      d="M6 9l3 3-3 3"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path d="M12 15h5" stroke={color} strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
+
 export const NetworkIcon: React.FC<NetworkIconProps> = ({ network, size = 32 }) => {
   const [imageError, setImageError] = useState(false);
+
+  // Use local SVG for localhost (networkId 31337)
+  if (network.networkId === 31337) {
+    return <LocalhostIcon color={network.color ?? "#4A5568"} size={size} />;
+  }
 
   // If logo failed to load, show fallback
   if (imageError || !network.logo) {
