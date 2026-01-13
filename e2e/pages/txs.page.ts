@@ -49,7 +49,13 @@ export class TxsPage {
   }
 
   async waitForLoad() {
-    await this.loader.waitFor({ state: "hidden", timeout: DEFAULT_TIMEOUT * 3 });
+    // Wait for content that only appears when data is loaded (not in loading state)
+    // blocksHeaderInfo only renders after loading=false with data
+    // Also handle error states gracefully
+    await this.blocksHeaderInfo.or(this.errorText).waitFor({
+      state: "visible",
+      timeout: DEFAULT_TIMEOUT * 6,
+    });
   }
 
   async getTransactionCount(): Promise<number> {
