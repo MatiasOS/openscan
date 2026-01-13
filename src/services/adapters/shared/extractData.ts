@@ -13,13 +13,8 @@ export function extractData<T>(strategyResultData: T | any): T {
     const firstItem = strategyResultData[0];
 
     // Check if it has the RPCProviderResponse structure
-    if (
-      firstItem &&
-      typeof firstItem === "object" &&
-      "url" in firstItem &&
-      "status" in firstItem &&
-      "data" in firstItem
-    ) {
+    // Note: error responses may not have 'data' field, so we check for url+status
+    if (firstItem && typeof firstItem === "object" && "url" in firstItem && "status" in firstItem) {
       // Find the first successful response
       const successfulResponse = strategyResultData.find(
         // biome-ignore lint/suspicious/noExplicitAny: Provider response type is dynamic
