@@ -1,9 +1,13 @@
-import type { AIAnalysisType } from "../types";
+import type { AIAnalysisType, PromptVersion } from "../types";
+
+type UserMode = "regular" | "power";
 
 interface PromptContext {
   networkName: string;
   networkCurrency: string;
   language?: string;
+  userMode?: UserMode;
+  version?: PromptVersion;
 }
 
 interface PromptPair {
@@ -33,15 +37,19 @@ export function buildPrompt(
   context: Record<string, unknown>,
   promptContext: PromptContext,
 ): PromptPair {
+  const userMode = promptContext.userMode ?? "power";
+  const version = promptContext.version ?? "stable";
+  const config = PROMPT_REGISTRY[version][userMode][type];
+
   switch (type) {
     case "transaction":
-      return buildTransactionPrompt(context, promptContext);
+      return buildTransactionPrompt(config, context, promptContext);
     case "account":
-      return buildAccountPrompt(context, promptContext);
+      return buildAccountPrompt(config, context, promptContext);
     case "contract":
-      return buildContractPrompt(context, promptContext);
+      return buildContractPrompt(config, context, promptContext);
     case "block":
-      return buildBlockPrompt(context, promptContext);
+      return buildBlockPrompt(config, context, promptContext);
   }
 }
 
@@ -66,7 +74,8 @@ const SHARED_RULES = {
   LANGUAGE: (lang?: string) => languageInstruction(lang),
 };
 
-const PROMPT_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
+// --- Power User Stable Configs (original prompts) ---
+const POWER_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
   transaction: {
     role: "blockchain analyst",
     conciseness: "3-5 sentences",
@@ -119,6 +128,69 @@ const PROMPT_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
   },
 };
 
+// --- Regular User Stable Configs (simpler prompts for non-super-users) ---
+const REGULAR_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
+  transaction: {
+    role: "blockchain educator",
+    conciseness: "2-3 sentences",
+    focusAreas: "what happened, who was involved, and key details",
+    audience: "general user",
+    task: "Explain this transaction in simple, easy-to-understand language",
+    sections: ["What Happened", "Who Was Involved", "Key Details"],
+    customRules:
+      "Use simple language. Avoid jargon when possible, or briefly explain technical terms. If ERC-7730 fields include a formatted token amount, use that. If callTargetToken is provided, use its symbol/name.",
+  },
+  account: {
+    role: "blockchain educator",
+    conciseness: "2-3 sentences",
+    focusAreas: "what this address is and its recent activity",
+    audience: "general user",
+    task: "Provide a simple overview of this address",
+    sections: ["Overview", "Recent Activity", "Balance"],
+  },
+  contract: {
+    role: "blockchain educator",
+    conciseness: "3-5 sentences",
+    focusAreas: "what this contract does and its main purpose",
+    audience: "general user",
+    task: "Explain this smart contract in simple terms",
+    sections: ["What This Contract Does", "Main Features", "Safety Notes"],
+    customRules: "Explain technical concepts in beginner-friendly terms.",
+  },
+  block: {
+    role: "blockchain educator",
+    conciseness: "2-3 sentences",
+    focusAreas: "what happened in this block and how busy it was",
+    audience: "general user",
+    task: "Summarize this block in simple terms",
+    sections: ["Block Summary", "Activity Level", "Highlights"],
+  },
+};
+
+// --- Latest Configs (initially copies of stable; experiment here) ---
+const POWER_LATEST_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
+  ...structuredClone(POWER_STABLE_CONFIGS),
+};
+
+const REGULAR_LATEST_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
+  ...structuredClone(REGULAR_STABLE_CONFIGS),
+};
+
+// --- Prompt Registry: O(1) lookup by version → mode → type ---
+const PROMPT_REGISTRY: Record<
+  PromptVersion,
+  Record<UserMode, Record<AIAnalysisType, PromptConfig>>
+> = {
+  stable: {
+    power: POWER_STABLE_CONFIGS,
+    regular: REGULAR_STABLE_CONFIGS,
+  },
+  latest: {
+    power: POWER_LATEST_CONFIGS,
+    regular: REGULAR_LATEST_CONFIGS,
+  },
+};
+
 function buildSystemPrompt(
   config: PromptConfig,
   { networkName, networkCurrency, language }: PromptContext,
@@ -143,6 +215,7 @@ function buildSystemPrompt(
 }
 
 function buildTransactionPrompt(
+  config: PromptConfig,
   context: Record<string, unknown>,
   promptContext: PromptContext,
 ): PromptPair {
@@ -152,37 +225,40 @@ function buildTransactionPrompt(
     : "";
 
   return {
-    system: buildSystemPrompt(PROMPT_CONFIGS.transaction, promptContext, preAnalysisHint),
+    system: buildSystemPrompt(config, promptContext, preAnalysisHint),
     user: formatContext(context),
   };
 }
 
 function buildAccountPrompt(
+  config: PromptConfig,
   context: Record<string, unknown>,
   promptContext: PromptContext,
 ): PromptPair {
   return {
-    system: buildSystemPrompt(PROMPT_CONFIGS.account, promptContext),
+    system: buildSystemPrompt(config, promptContext),
     user: formatContext(context),
   };
 }
 
 function buildContractPrompt(
+  config: PromptConfig,
   context: Record<string, unknown>,
   promptContext: PromptContext,
 ): PromptPair {
   return {
-    system: buildSystemPrompt(PROMPT_CONFIGS.contract, promptContext),
+    system: buildSystemPrompt(config, promptContext),
     user: formatContext(context),
   };
 }
 
 function buildBlockPrompt(
+  config: PromptConfig,
   context: Record<string, unknown>,
   promptContext: PromptContext,
 ): PromptPair {
   return {
-    system: buildSystemPrompt(PROMPT_CONFIGS.block, promptContext),
+    system: buildSystemPrompt(config, promptContext),
     user: formatContext(context),
   };
 }

@@ -1,4 +1,4 @@
-import type { AIAnalysisResult, AIAnalysisType, AIProviderConfig } from "../types";
+import type { AIAnalysisResult, AIAnalysisType, AIProviderConfig, PromptVersion } from "../types";
 import { logger } from "../utils/logger";
 import { buildPrompt } from "./AIPromptTemplates";
 
@@ -30,11 +30,13 @@ export interface AIAnalysisRequest {
   networkName: string;
   networkCurrency: string;
   language?: string;
+  isSuperUser?: boolean;
+  promptVersion?: PromptVersion;
 }
 
 /**
  * Provider-agnostic AI analysis service.
- * Supports OpenAI-compatible APIs (Groq, OpenAI, Together AI) and Anthropic.
+ * Supports OpenAI-compatible APIs (Groq, OpenAI, Perplexity), Anthropic, and Gemini.
  */
 export class AIService {
   private readonly provider: AIProviderConfig;
@@ -46,10 +48,15 @@ export class AIService {
   }
 
   async analyze(request: AIAnalysisRequest): Promise<AIAnalysisResult> {
+    const userMode = request.isSuperUser ? "power" : "regular";
+    const version = request.promptVersion ?? "stable";
+
     const { system, user } = buildPrompt(request.type, request.context, {
       networkName: request.networkName,
       networkCurrency: request.networkCurrency,
       language: request.language,
+      userMode,
+      version,
     });
 
     try {
@@ -73,6 +80,9 @@ export class AIService {
   private async callAPI(system: string, user: string): Promise<string> {
     if (this.provider.id === "anthropic") {
       return this.callAnthropic(system, user);
+    }
+    if (this.provider.id === "gemini") {
+      return this.callGemini(system, user);
     }
     return this.callOpenAICompatible(system, user);
   }
@@ -132,6 +142,34 @@ export class AIService {
     const content = data?.content?.[0]?.text;
     if (typeof content !== "string") {
       logger.error("Unexpected Anthropic response format:", data);
+      throw new AIServiceError("Failed to parse AI response", "parse_error");
+    }
+    return content;
+  }
+
+  private async callGemini(system: string, user: string): Promise<string> {
+    const url =
+      `${this.provider.baseUrl}/models/${this.provider.defaultModel}:generateContent` +
+      `?key=${this.apiKey}`;
+    const body = {
+      contents: [{ role: "user", parts: [{ text: user }] }],
+      systemInstruction: { parts: [{ text: system }] },
+      generationConfig: {
+        maxOutputTokens: MAX_TOKENS,
+        temperature: 0.3,
+      },
+    };
+
+    const response = await this.fetchWithRetry(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    const data = await response.json();
+    const content = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (typeof content !== "string") {
+      logger.error("Unexpected Gemini response format:", data);
       throw new AIServiceError("Failed to parse AI response", "parse_error");
     }
     return content;
