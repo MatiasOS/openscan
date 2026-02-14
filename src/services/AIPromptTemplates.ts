@@ -64,7 +64,7 @@ const ROLE_INSTRUCTION = (role: string, networkName: string, networkCurrency: st
   `You are a ${role} for the ${networkName} network (native currency: ${networkCurrency}).`;
 
 const CONCISENESS_INSTRUCTION = (range: string) =>
-  `Be concise (${range}). Use markdown formatting.`;
+  `Be concise (${range}). Use markdown formatting. Take your time to analyze the context carefully and provide a thoughtful, thorough response that adheres to the specified conciseness.`;
 
 const FOCUS_INSTRUCTION = (focusAreas: string) => `Focus on: ${focusAreas}.`;
 
@@ -86,7 +86,7 @@ const POWER_STABLE_CONFIGS: Record<AIAnalysisType, PromptConfig> = {
     sections: [
       "Transaction Analysis",
       "Participants",
-      "intent vs what happen in the tx",
+      "User Intent vs Execution",
       "Notable Aspects",
     ],
     customRules:
