@@ -4,6 +4,7 @@ import { buildPrompt } from "./AIPromptTemplates";
 
 const MAX_TOKENS = 4096;
 const RETRY_DELAY_MS = 5000;
+const REQUEST_TIMEOUT_MS = 30_000;
 
 export type AIErrorType =
   | "rate_limited"
@@ -199,10 +200,17 @@ export class AIService {
   }
 
   private async doFetch(url: string, init: RequestInit): Promise<Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     try {
-      return await fetch(url, init);
-    } catch {
+      return await fetch(url, { ...init, signal: controller.signal });
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        throw new AIServiceError("Request timed out", "network_error");
+      }
       throw new AIServiceError("Network error connecting to AI service", "network_error");
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 

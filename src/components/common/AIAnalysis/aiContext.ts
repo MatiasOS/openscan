@@ -183,10 +183,15 @@ const PROTOCOL_HINTS: Array<{ pattern: RegExp; label: string }> = [
 
 function extractProtocolHints(sourceFiles?: string[]): string[] {
   if (!sourceFiles || sourceFiles.length === 0) return [];
-  const joined = sourceFiles.join("\n");
+  // Only match against directory segments (strip filename) to avoid false positives
+  // from contracts whose names happen to include protocol names (e.g. MyUniswapFork.sol)
+  const dirSegments = sourceFiles
+    .map((f) => f.split("/").slice(0, -1).join("/"))
+    .filter((d) => d.length > 0)
+    .join("\n");
   const hints: string[] = [];
   for (const { pattern, label } of PROTOCOL_HINTS) {
-    if (pattern.test(joined)) {
+    if (pattern.test(dirSegments)) {
       hints.push(label);
     }
   }
