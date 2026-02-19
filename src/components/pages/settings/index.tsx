@@ -449,7 +449,7 @@ const Settings: React.FC = () => {
     });
   }, []);
 
-  const primaryAIProviderId: AIProvider = "groq";
+  const primaryAIProviderId = AI_PROVIDER_ORDER[0] ?? ("groq" as AIProvider);
   const otherAIProviderIds = AI_PROVIDER_ORDER.filter(
     (providerId) => providerId !== primaryAIProviderId,
   );

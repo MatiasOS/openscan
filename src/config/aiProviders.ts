@@ -23,7 +23,7 @@ export const AI_PROVIDERS: Record<AIProvider, AIProviderConfig> = {
     id: "anthropic",
     name: "Anthropic",
     baseUrl: "https://api.anthropic.com/v1",
-    defaultModel: "claude-sonnet-4-5-20250929",
+    defaultModel: "claude-sonnet-4-6",
     keyUrl: "https://console.anthropic.com/settings/keys",
   },
   perplexity: {
