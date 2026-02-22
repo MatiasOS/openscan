@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import { AppContext } from "../../context/AppContext";
 import { useSettings } from "../../context/SettingsContext";
 import type { RPCMetadata } from "../../types";
-import { logger } from "../../utils";
 
 interface RPCIndicatorProps {
   metadata: RPCMetadata;
@@ -61,7 +60,6 @@ export function RPCIndicator({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  logger.debug("RPCIndicator settings.maxParallelRequests", settings.maxParallelRequests )
   return (
     <div className={`rpc-indicator ${className || ""}`} ref={dropdownRef}>
       {/* Compact Badge */}
