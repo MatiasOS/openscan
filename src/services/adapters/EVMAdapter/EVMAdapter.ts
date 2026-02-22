@@ -12,6 +12,8 @@ import { extractData } from "../shared/extractData";
 import { normalizeBlockNumber } from "../shared/normalizeBlockNumber";
 import { mergeMetadata } from "../shared/mergeMetadata";
 import type { EthereumClient, SupportedChainId } from "@openscan/network-connectors";
+import { getRethClient, NONCE_LOOKUP_CHAIN_ID } from "../../../config/rethProviders";
+import { NonceLookupService } from "../../NonceLookupService";
 
 /**
  * EVM-compatible blockchain service
@@ -23,7 +25,14 @@ export class EVMAdapter extends NetworkAdapter {
   constructor(networkId: SupportedChainId | 11155111 | 97 | 31337, client: EthereumClient) {
     super(networkId);
     this.client = client;
-    this.initTxSearch(client);
+
+    if (networkId === NONCE_LOOKUP_CHAIN_ID) {
+      const rethClient = getRethClient();
+      const nonceLookup = new NonceLookupService(rethClient);
+      this.initTxSearch(client, nonceLookup);
+    } else {
+      this.initTxSearch(client);
+    }
   }
 
   protected getClient(): EthereumClient {
@@ -193,11 +202,14 @@ export class EVMAdapter extends NetworkAdapter {
   async getTransactionsFromBlockRange(
     fromBlock: number,
     blockCount = 10,
+    maxTransactions?: number,
   ): Promise<DataWithMetadata<Array<Transaction & { blockNumber: string }>>> {
     const transactions: Array<Transaction & { blockNumber: string }> = [];
     const metadataList: Array<DataWithMetadata<Block>["metadata"]> = [];
 
     for (let i = 0; i < blockCount; i++) {
+      if (maxTransactions && transactions.length >= maxTransactions) break;
+
       const blockNum = fromBlock - i;
       if (blockNum < 0) break;
 

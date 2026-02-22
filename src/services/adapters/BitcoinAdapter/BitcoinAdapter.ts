@@ -257,6 +257,30 @@ export class BitcoinAdapter {
   }
 
   /**
+   * Get all transactions from a specific block height
+   * Fetches the block with verbosity 2 and transforms all transactions
+   */
+  async getBlockTransactions(blockHeight: number): Promise<BitcoinTransaction[]> {
+    const hashResult = await this.client.getBlockHash(blockHeight);
+    const blockHash = extractData<string>(hashResult.data);
+
+    if (!blockHash) {
+      throw new Error(`Block at height ${blockHeight} not found`);
+    }
+
+    const blockResult = await this.client.getBlock(blockHash, 2);
+    // biome-ignore lint/suspicious/noExplicitAny: RPC response type varies
+    const blockData = extractData<any>(blockResult.data);
+
+    if (!blockData?.tx) {
+      return [];
+    }
+
+    // biome-ignore lint/suspicious/noExplicitAny: RPC response type varies
+    return blockData.tx.map((rawTx: any) => this.transformTransaction(rawTx));
+  }
+
+  /**
    * Check if this is a Bitcoin network
    */
   isBitcoin(): boolean {
