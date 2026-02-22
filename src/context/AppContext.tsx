@@ -124,7 +124,17 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
       }
 
       setNetworks(loadedNetworks);
-      // Update RPC URLs with the newly loaded network defaults
+
+      // Fetch metadata RPCs if cache is stale or missing, then update RPC state
+      if (!isMetadataRpcCacheFresh()) {
+        try {
+          const rpcs = await fetchAllRpcs();
+          saveMetadataRpcsToStorage(rpcs);
+        } catch (err) {
+          logger.warn("Failed to fetch metadata RPCs:", err);
+        }
+      }
+
       setRpcUrlsState(getEffectiveRpcUrls());
     } catch (err) {
       setNetworksError(err instanceof Error ? err.message : "Failed to load networks");
@@ -142,24 +152,10 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     setIsHydrated(true);
   }, []);
 
-  // Load networks on mount
+  // Load networks and metadata RPCs on mount
   // biome-ignore lint/correctness/useExhaustiveDependencies: only run once on mount
   useEffect(() => {
     loadNetworkData();
-  }, []);
-
-  // Fetch metadata RPCs on mount if cache is stale or missing
-  useEffect(() => {
-    if (isMetadataRpcCacheFresh()) return;
-
-    fetchAllRpcs()
-      .then((rpcs) => {
-        saveMetadataRpcsToStorage(rpcs);
-        setRpcUrlsState(getEffectiveRpcUrls());
-      })
-      .catch((err) => {
-        logger.warn("Failed to fetch metadata RPCs:", err);
-      });
   }, []);
 
   useEffect(() => {

@@ -49,6 +49,13 @@ export function isMetadataRpcCacheFresh(): boolean {
 }
 
 /**
+ * Clear the metadata RPC cache from localStorage
+ */
+export function clearMetadataRpcCache(): void {
+  localStorage.removeItem(METADATA_RPC_STORAGE_KEY);
+}
+
+/**
  * Get the full endpoint map from cached metadata RPCs
  * For use in Settings page to look up tracking/openSource per URL
  */

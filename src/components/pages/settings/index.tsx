@@ -14,7 +14,7 @@ import { AI_PROVIDERS, AI_PROVIDER_ORDER } from "../../../config/aiProviders";
 import { clearAICache } from "../../common/AIAnalysis/aiCache";
 import { logger } from "../../../utils/logger";
 import { getChainIdFromNetwork } from "../../../utils/networkResolver";
-import { getMetadataEndpointMap } from "../../../utils/rpcStorage";
+import { clearMetadataRpcCache, getMetadataEndpointMap } from "../../../utils/rpcStorage";
 
 // Infura network slugs by chain ID
 const INFURA_NETWORKS: Record<number, string> = {
@@ -120,6 +120,8 @@ const Settings: React.FC = () => {
   const clearAllCaches = useCallback(() => {
     // Clear metadata service caches
     clearSupportersCache();
+    // Clear metadata RPC cache
+    clearMetadataRpcCache();
     // Clear localStorage caches if any
     localStorage.removeItem("openscan_cache");
     // Clear AI analysis cache
