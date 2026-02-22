@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { AppContext } from "../../context/AppContext";
 import { useSettings } from "../../context/SettingsContext";
 import type { RPCMetadata } from "../../types";
+import { logger } from "../../utils";
 
 interface RPCIndicatorProps {
   metadata: RPCMetadata;
@@ -25,7 +26,7 @@ export function RPCIndicator({
   const [isExpanded, setIsExpanded] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { networkId } = useParams<{ networkId?: string }>();
-  const { rpcUrls } = useContext(AppContext);
+  const { rpcUrls, getNetwork } = useContext(AppContext);
   const { settings } = useSettings();
   const { t } = useTranslation();
 
@@ -35,7 +36,9 @@ export function RPCIndicator({
   const isRaceMode = metadata.strategy === "race";
 
   // For race mode, get the actual total number of providers queried
-  const networkRpcUrls = rpcUrls[Number(networkId) || 1] || [];
+  // rpcUrls keys use network ID format (e.g. "eip155:1"), so we resolve the network first
+  const network = getNetwork(Number(networkId) || 1);
+  const networkRpcUrls = network ? (rpcUrls[network.networkId] ?? []) : [];
   const totalProviders = isRaceMode
     ? settings.maxParallelRequests && settings.maxParallelRequests > 0
       ? Math.min(networkRpcUrls.length, settings.maxParallelRequests)
@@ -58,6 +61,7 @@ export function RPCIndicator({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  logger.debug("RPCIndicator settings.maxParallelRequests", settings.maxParallelRequests )
   return (
     <div className={`rpc-indicator ${className || ""}`} ref={dropdownRef}>
       {/* Compact Badge */}
