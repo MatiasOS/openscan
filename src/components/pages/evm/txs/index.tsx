@@ -1,14 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { RPCIndicator } from "../../../../components/common/RPCIndicator";
 import { useDataService } from "../../../../hooks/useDataService";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
-import type { DataWithMetadata, Transaction } from "../../../../types";
+import type { Block, DataWithMetadata, Transaction } from "../../../../types";
 import { logger } from "../../../../utils/logger";
 import Loader from "../../../common/Loader";
-
-const BLOCKS_PER_PAGE = 10;
 
 export default function Txs() {
   const { networkId } = useParams<{ networkId?: string }>();
@@ -16,53 +14,21 @@ export default function Txs() {
   const navigate = useNavigate();
   const numericNetworkId = Number(networkId) || 1;
   const dataService = useDataService(numericNetworkId);
-  const [transactionsResult, setTransactionsResult] = useState<
-    DataWithMetadata<Array<Transaction & { blockNumber: string }>>
-  >({ data: [] });
+  const [blockResult, setBlockResult] = useState<DataWithMetadata<Block> | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [latestBlockNumber, setLatestBlockNumber] = useState<number | null>(null);
-  const [blockRange, setBlockRange] = useState<{
-    from: number;
-    to: number;
-  } | null>(null);
+  const [currentBlock, setCurrentBlock] = useState<number | null>(null);
 
   // Provider selection state
   const [selectedProvider, setSelectedProvider] = useProviderSelection(`txs_${numericNetworkId}`);
 
   const { t } = useTranslation("transaction");
 
-  // Extract actual transactions data based on selected provider
-  const transactions = useMemo(() => {
-    if (!transactionsResult) return [];
-
-    // No metadata = fallback mode, return data as-is
-    if (!transactionsResult.metadata) {
-      return transactionsResult.data;
-    }
-
-    // No provider selected = use default (first successful)
-    if (!selectedProvider) {
-      return transactionsResult.data;
-    }
-
-    // Find selected provider's response
-    const providerResponse = transactionsResult.metadata.responses.find(
-      (r) => r.url === selectedProvider && r.status === "success",
-    );
-
-    if (!providerResponse || !providerResponse.data) {
-      // Fallback to default if selected provider not found
-      return transactionsResult.data;
-    }
-
-    // Return the selected provider's data
-    return providerResponse.data;
-  }, [transactionsResult, selectedProvider]);
-
-  // Get fromBlock from URL params, default to null (latest)
-  const fromBlockParam = searchParams.get("fromBlock");
-  const fromBlock = fromBlockParam ? Number(fromBlockParam) : null;
+  // Get block from URL params, default to null (latest)
+  const blockParam = searchParams.get("block");
+  const requestedBlock = blockParam ? Number(blockParam) : null;
 
   useEffect(() => {
     if (!dataService) {
@@ -79,21 +45,19 @@ export default function Txs() {
         const latestBlock = await dataService.networkAdapter.getLatestBlockNumber();
         setLatestBlockNumber(latestBlock);
 
-        // Determine starting block
-        const startBlock = fromBlock !== null ? fromBlock : latestBlock;
+        // Determine which block to fetch
+        const blockNum = requestedBlock !== null ? requestedBlock : latestBlock;
+        setCurrentBlock(blockNum);
 
-        // Calculate block range
-        const endBlock = Math.max(startBlock - BLOCKS_PER_PAGE + 1, 0);
-        setBlockRange({ from: endBlock, to: startBlock });
+        // Fetch block with transactions
+        const blockWithTxs = await dataService.networkAdapter.getBlockWithTransactions(blockNum);
+        logger.debug("Fetched block with transactions:", blockWithTxs);
 
-        // Fetch transactions from block range
-        const fetchedTransactions = await dataService.networkAdapter.getTransactionsFromBlockRange(
-          startBlock,
-          BLOCKS_PER_PAGE,
-        );
+        // Get block metadata separately
+        const blockData = await dataService.networkAdapter.getBlock(blockNum);
+        setBlockResult(blockData);
 
-        logger.debug("Fetched transactions:", fetchedTransactions);
-        setTransactionsResult(fetchedTransactions);
+        setTransactions(blockWithTxs.transactionDetails);
         // biome-ignore lint/suspicious/noExplicitAny: <TODO>
       } catch (err: any) {
         logger.error("Error fetching transactions:", err);
@@ -104,7 +68,7 @@ export default function Txs() {
     };
 
     fetchTransactions();
-  }, [dataService, fromBlock, t]);
+  }, [dataService, requestedBlock, t]);
 
   const truncate = (str: string, start = 10, end = 8) => {
     if (!str) return "";
@@ -131,24 +95,23 @@ export default function Txs() {
   };
 
   // Navigation handlers
-  const goToNewerBlocks = () => {
-    if (!blockRange || latestBlockNumber === null) return;
-    const newFromBlock = Math.min(blockRange.to + BLOCKS_PER_PAGE, latestBlockNumber);
+  const goToNewerBlock = () => {
+    if (currentBlock === null || latestBlockNumber === null) return;
+    const newBlock = currentBlock + 1;
 
-    if (newFromBlock >= latestBlockNumber) {
-      // Go to latest (remove fromBlock param)
+    if (newBlock >= latestBlockNumber) {
       navigate(`/${networkId}/txs`);
     } else {
-      navigate(`/${networkId}/txs?fromBlock=${newFromBlock}`);
+      navigate(`/${networkId}/txs?block=${newBlock}`);
     }
   };
 
-  const goToOlderBlocks = () => {
-    if (!blockRange) return;
-    const newFromBlock = blockRange.from - 1;
+  const goToOlderBlock = () => {
+    if (currentBlock === null) return;
+    const newBlock = currentBlock - 1;
 
-    if (newFromBlock >= 0) {
-      navigate(`/${networkId}/txs?fromBlock=${newFromBlock}`);
+    if (newBlock >= 0) {
+      navigate(`/${networkId}/txs?block=${newBlock}`);
     }
   };
 
@@ -158,10 +121,9 @@ export default function Txs() {
 
   // Determine if we can navigate
   const canGoNewer =
-    fromBlock !== null && latestBlockNumber !== null && fromBlock < latestBlockNumber;
-  const canGoOlder = blockRange !== null && blockRange.from > 0;
-  const isAtLatest =
-    fromBlock === null || (latestBlockNumber !== null && fromBlock >= latestBlockNumber);
+    currentBlock !== null && latestBlockNumber !== null && currentBlock < latestBlockNumber;
+  const canGoOlder = currentBlock !== null && currentBlock > 0;
+  const isAtLatest = requestedBlock === null;
 
   if (loading) {
     return (
@@ -194,7 +156,6 @@ export default function Txs() {
   }
 
   const Pagination = () => {
-    // Pagination
     return (
       <div className="pagination-container no-margin-top">
         {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
@@ -210,7 +171,7 @@ export default function Txs() {
 
         {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
         <button
-          onClick={goToNewerBlocks}
+          onClick={goToNewerBlock}
           disabled={!canGoNewer}
           className="pagination-btn"
           title={t("txs.pagination.newerTitle")}
@@ -221,7 +182,7 @@ export default function Txs() {
 
         {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
         <button
-          onClick={goToOlderBlocks}
+          onClick={goToOlderBlock}
           disabled={!canGoOlder}
           className="pagination-btn"
           title={t("txs.pagination.olderTitle")}
@@ -233,22 +194,18 @@ export default function Txs() {
     );
   };
 
-  // Get metadata from first transaction result if available
-  const metadata = transactionsResult?.metadata;
+  // Get metadata from block result if available
+  const metadata = blockResult?.metadata;
+  const formattedBlock = currentBlock !== null ? currentBlock.toLocaleString() : "";
   const message = isAtLatest
     ? t("txs.latest", {
         count: transactions.length,
-        blocks: BLOCKS_PER_PAGE,
+        block: formattedBlock,
       })
-    : blockRange
-      ? t("txs.range", {
-          count: transactions.length,
-          from: blockRange.from.toLocaleString(),
-          to: blockRange.to.toLocaleString(),
-        })
-      : t("txs.default", {
-          count: transactions.length,
-        });
+    : t("txs.range", {
+        count: transactions.length,
+        block: formattedBlock,
+      });
 
   return (
     <div className="container-wide">
@@ -287,7 +244,7 @@ export default function Txs() {
                 </tr>
               </thead>
               <tbody>
-                {transactions.map((transaction: Transaction & { blockNumber: string }) => (
+                {transactions.map((transaction: Transaction) => (
                   <tr key={transaction.hash}>
                     <td>
                       <Link
@@ -299,11 +256,8 @@ export default function Txs() {
                       </Link>
                     </td>
                     <td>
-                      <Link
-                        to={`/${networkId}/block/${transaction.blockNumber}`}
-                        className="table-cell-value"
-                      >
-                        {transaction.blockNumber}
+                      <Link to={`/${networkId}/block/${currentBlock}`} className="table-cell-value">
+                        {formattedBlock}
                       </Link>
                     </td>
                     <td className="table-cell-mono" title={transaction.from}>
