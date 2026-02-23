@@ -68,9 +68,9 @@
   },
   "txs": {
     "failedToFetch": "No se pudieron obtener las transacciones",
-    "latests": "Últimas Transacciones",
+    "latests": "Transacciones de {{network}}",
     "loading": "Cargando transacciones...",
-    "notFound": "No se encontraron transacciones en el rango de bloques seleccionado",
+    "notFound": "No se encontraron transacciones en este bloque",
     "block": "Bloque",
     "from": "Desde",
     "to": "Hacia",
@@ -78,9 +78,8 @@
     "gasPrice": "Gas Price",
     "gas": "Gas",
     "contractCreation": "Creación de Contrato",
-    "latest": "Mostrando {{count}} transacciones de los últimos {{blocks}} bloques",
-    "range": "Mostrando {{count}} transacciones de los bloques {{from}} - {{to}}",
-    "default": "Mostrando {{count}} transacciones",
+    "latest": "Mostrando {{count}} transacciones en el último bloque #{{block}}",
+    "range": "Mostrando {{count}} transacciones en el bloque #{{block}}",
     "pagination": {
       "latest": "Últimas",
       "latestTitle": "Ir a las últimas transacciones",
@@ -88,6 +87,39 @@
       "newerTitle": "Ver transacciones más nuevas",
       "older": "Más viejas →",
       "olderTitle": "Ver transacciones más viejas"
+    }
+  },
+  "aiAnalysis": {
+    "sectionTitle": "Análisis IA"
+  },
+  "btcTxs": {
+    "title": "Transacciones de {{network}}",
+    "loading": "Cargando transacciones...",
+    "failedToFetch": "No se pudieron obtener las transacciones",
+    "notFound": "No se encontraron transacciones en este bloque",
+    "latest": "Mostrando transacciones {{from}}–{{to}} de {{total}} en el último bloque #{{block}}",
+    "range": "Mostrando transacciones {{from}}–{{to}} de {{total}} en el bloque #{{block}}",
+    "txId": "ID de Transacción",
+    "block": "Bloque",
+    "time": "Tiempo",
+    "inputs": "Entradas",
+    "outputs": "Salidas",
+    "value": "Valor",
+    "size": "Tamaño",
+    "coinbase": "Coinbase",
+    "pending": "Pendiente",
+    "pagination": {
+      "latest": "Últimas",
+      "latestTitle": "Ir a las últimas transacciones",
+      "newerBlock": "↑ Bloque Más Nuevo",
+      "newerBlockTitle": "Ver bloque más nuevo",
+      "olderBlock": "↓ Bloque Más Viejo",
+      "olderBlockTitle": "Ver bloque más viejo",
+      "prev": "← Anterior",
+      "prevTitle": "Ver transacciones anteriores",
+      "next": "Siguiente →",
+      "nextTitle": "Ver siguientes transacciones",
+      "pageInfo": "Página {{page}} de {{totalPages}}"
     }
   },
   "opcodeTrace": {

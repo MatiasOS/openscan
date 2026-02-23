@@ -15,10 +15,14 @@ import { getAllNetworks } from "../config/networks";
  * @returns DataService instance or null if network not found
  */
 export function useDataService(networkIdOrConfig: string | number | NetworkConfig) {
-  const { rpcUrls } = useContext(AppContext);
+  const { rpcUrls, networksLoading } = useContext(AppContext);
   const { settings } = useSettings();
 
   const dataService = useMemo(() => {
+    // Wait for the initial metadata RPC fetch to complete before creating DataService.
+    // On first load rpcUrls starts as {} and gets populated once loadNetworkData() finishes.
+    if (networksLoading) return null;
+
     // Resolve network config if needed
     let network: NetworkConfig | undefined;
     if (typeof networkIdOrConfig === "object") {
@@ -51,7 +55,13 @@ export function useDataService(networkIdOrConfig: string | number | NetworkConfi
     }
 
     return new DataService(network, limitedRpcUrls, settings.rpcStrategy);
-  }, [networkIdOrConfig, rpcUrls, settings.rpcStrategy, settings.maxParallelRequests]);
+  }, [
+    networkIdOrConfig,
+    rpcUrls,
+    networksLoading,
+    settings.rpcStrategy,
+    settings.maxParallelRequests,
+  ]);
 
   return dataService;
 }

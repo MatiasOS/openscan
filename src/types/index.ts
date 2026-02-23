@@ -401,9 +401,6 @@ export interface NetworkConfig {
   logo?: string;
   profile?: string;
   explorer?: NetworkExplorer;
-  rpc?: {
-    public: string[];
-  };
   links?: NetworkLink[];
 }
 
@@ -419,12 +416,54 @@ export type RpcUrlsContextType = Record<string, RPCUrls>;
 // ==================== SETTINGS TYPES ====================
 
 /**
- * API keys for RPC providers
+ * API keys for RPC providers and AI providers
  */
 export interface ApiKeys {
   infura?: string;
   alchemy?: string;
+  groq?: string;
+  openai?: string;
+  anthropic?: string;
+  perplexity?: string;
+  gemini?: string;
 }
+
+/**
+ * Supported AI providers for blockchain analysis
+ */
+export type AIProvider = "groq" | "openai" | "anthropic" | "perplexity" | "gemini";
+
+/**
+ * Configuration for an AI provider
+ */
+export interface AIProviderConfig {
+  id: AIProvider;
+  name: string;
+  baseUrl: string;
+  defaultModel: string;
+  keyUrl: string;
+}
+
+/**
+ * Result of an AI analysis request
+ */
+export interface AIAnalysisResult {
+  summary: string;
+  timestamp: number;
+  model: string;
+  provider: AIProvider;
+  cached: boolean;
+}
+
+/**
+ * Analysis types for the AI analyzer
+ */
+export type AIAnalysisType = "transaction" | "account" | "contract" | "block";
+
+/**
+ * Prompt version for AI analysis
+ */
+export type PromptVersion = "stable" | "latest";
 
 /**
  * User settings for the application
@@ -435,19 +474,21 @@ export interface UserSettings {
   rpcStrategy?: "fallback" | "parallel" | "race";
   maxParallelRequests?: number;
   apiKeys?: ApiKeys;
-  superUserMode?: boolean;
+  isSuperUser?: boolean;
+  promptVersion?: PromptVersion;
 }
 
 /**
  * Default user settings
  */
 export const DEFAULT_SETTINGS: UserSettings = {
-  theme: "auto",
+  theme: "dark",
   showBackgroundBlocks: true,
   rpcStrategy: "fallback",
   maxParallelRequests: 3,
   apiKeys: {},
-  superUserMode: false,
+  isSuperUser: false,
+  promptVersion: "stable",
 };
 
 /**

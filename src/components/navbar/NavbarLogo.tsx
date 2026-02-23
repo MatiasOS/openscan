@@ -99,8 +99,8 @@ export default function NavbarLogo() {
         window.location.href = baseDomainUrl;
       }
     } else {
-      // If on path, just go to root
-      window.location.href = "/";
+      // If on path, just go to root (respects base path for GitHub Pages)
+      window.location.href = import.meta.env.BASE_URL;
     }
     setIsDropdownOpen(false);
   }, [isOnSubdomain]);

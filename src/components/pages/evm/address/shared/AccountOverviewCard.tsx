@@ -9,7 +9,7 @@ import {
 
 interface AccountOverviewCardProps {
   balance: string;
-  txCount: number;
+  txCount?: number;
   currency?: string;
   nativeTokenPrice?: number | null;
   priceLoading?: boolean;
@@ -110,10 +110,12 @@ const AccountOverviewCard: React.FC<AccountOverviewCardProps> = ({
         </span>
       </div>
 
-      <div className="account-card-row">
-        <span className="account-card-label">{t("nonce")}:</span>
-        <span className="account-card-value">{txCount.toLocaleString()}</span>
-      </div>
+      {txCount && (
+        <div className="account-card-row">
+          <span className="account-card-label">{t("nonce")}:</span>
+          <span className="account-card-value">{txCount.toLocaleString()}</span>
+        </div>
+      )}
 
       {eip7702Delegate && (
         <div className="account-card-row">

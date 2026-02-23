@@ -194,11 +194,14 @@ export class BaseAdapter extends NetworkAdapter {
   async getTransactionsFromBlockRange(
     fromBlock: number,
     blockCount = 10,
+    maxTransactions?: number,
   ): Promise<DataWithMetadata<Array<Transaction & { blockNumber: string }>>> {
     const transactions: Array<Transaction & { blockNumber: string }> = [];
     const metadataList: Array<DataWithMetadata<Block>["metadata"]> = [];
 
     for (let i = 0; i < blockCount; i++) {
+      if (maxTransactions && transactions.length >= maxTransactions) break;
+
       const blockNum = fromBlock - i;
       if (blockNum < 0) break;
 

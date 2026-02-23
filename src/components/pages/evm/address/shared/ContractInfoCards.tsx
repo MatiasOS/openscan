@@ -63,7 +63,6 @@ const ContractInfoCards: React.FC<ContractInfoCardsProps> = ({
     <div className="account-info-cards">
       <AccountOverviewCard
         balance={address.balance}
-        txCount={Number(address.txCount)}
         currency={currency}
         nativeTokenPrice={nativeTokenPrice}
         priceLoading={priceLoading}
