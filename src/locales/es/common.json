@@ -26,7 +26,8 @@
     "disableSuperUser": "Desactivar modo Super Usuario",
     "enableSuperUser": "Activar modo Super Usuario",
     "mempool": "Mempool",
-    "txs": "Transacciones"
+    "txs": "Transacciones",
+    "superUserBadge": "Super Usuario"
   },
   "footer": {
     "about": "Acerca de",

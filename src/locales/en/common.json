@@ -26,7 +26,8 @@
     "disableSuperUser": "Disable Super User Mode",
     "enableSuperUser": "Enable Super User Mode",
     "mempool": "Mempool",
-    "txs": "Transactions"
+    "txs": "Transactions",
+    "superUserBadge": "Super User"
   },
   "footer": {
     "about": "About",
