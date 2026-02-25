@@ -134,6 +134,8 @@ export class AIService {
         "Content-Type": "application/json",
         "x-api-key": this.apiKey,
         "anthropic-version": "2023-06-01",
+        // Required for direct browser-to-API calls (bypasses CORS restriction).
+        // Safe here because users provide their own API keys via Settings.
         "anthropic-dangerous-direct-browser-access": "true",
       },
       body: JSON.stringify(body),
