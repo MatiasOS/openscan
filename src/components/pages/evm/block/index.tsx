@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { useDataService } from "../../../../hooks/useDataService";
+import { usePersistentCache } from "../../../../hooks/usePersistentCache";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import { useSelectedData } from "../../../../hooks/useSelectedData";
 import type { Block, DataWithMetadata } from "../../../../types";
@@ -19,6 +20,9 @@ export default function BlockPage() {
   const numericNetworkId = Number(networkId) || 1;
 
   const dataService = useDataService(numericNetworkId);
+  const { getCached, setCached } = usePersistentCache();
+  const cacheNetworkId = `eip155:${numericNetworkId}`;
+
   const [blockResult, setBlockResult] = useState<DataWithMetadata<Block> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +41,16 @@ export default function BlockPage() {
       return;
     }
 
+    // Check persistent cache for non-latest blocks
+    if (blockNumber !== "latest") {
+      const cached = getCached<Block>(cacheNetworkId, "block", String(blockNumber));
+      if (cached) {
+        setBlockResult({ data: cached });
+        setLoading(false);
+        return;
+      }
+    }
+
     setLoading(true);
     setError(null);
 
@@ -44,12 +58,14 @@ export default function BlockPage() {
       .getBlock(blockNumber)
       .then((result) => {
         setBlockResult(result);
+        // Cache using the resolved block number
+        setCached(cacheNetworkId, "block", String(Number(result.data.number)), result.data);
       })
       .catch((err) => {
         setError(err.message || t("errors.failedToFetchBlock"));
       })
       .finally(() => setLoading(false));
-  }, [dataService, blockNumber, t]);
+  }, [dataService, blockNumber, t, getCached, setCached, cacheNetworkId]);
 
   if (loading) {
     return (

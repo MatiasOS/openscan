@@ -1,9 +1,12 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
+import { getAllNetworks } from "../../../config/networks";
 import { AppContext } from "../../../context/AppContext";
 import { useDataService } from "../../../hooks/useDataService";
+import { usePersistentCache } from "../../../hooks/usePersistentCache";
 import { getBTCPrice } from "../../../services/PriceService";
 import type { BitcoinTransaction, DataWithMetadata } from "../../../types";
+import { resolveNetwork } from "../../../utils/networkResolver";
 import Loader from "../../common/Loader";
 import BitcoinTransactionDisplay from "./BitcoinTransactionDisplay";
 
@@ -15,6 +18,11 @@ export default function BitcoinTransactionPage() {
   // Extract network slug from path (e.g., "/tbtc/tx/..." → "tbtc")
   const networkSlug = location.pathname.split("/")[1] || "btc";
   const dataService = useDataService(networkSlug);
+  const { getCached, setCached } = usePersistentCache();
+  const cacheNetworkId = useMemo(
+    () => resolveNetwork(networkSlug, getAllNetworks())?.networkId ?? networkSlug,
+    [networkSlug],
+  );
 
   const [txResult, setTxResult] = useState<DataWithMetadata<BitcoinTransaction> | null>(null);
   const [btcPrice, setBtcPrice] = useState<number | null>(null);
@@ -26,6 +34,20 @@ export default function BitcoinTransactionPage() {
 
   useEffect(() => {
     if (!dataService || !dataService.isBitcoin() || !txid) {
+      setLoading(false);
+      return;
+    }
+
+    // Check persistent cache for the transaction
+    const cached = getCached<BitcoinTransaction>(cacheNetworkId, "transaction", txid);
+    if (cached) {
+      setTxResult({ data: cached });
+      // Still fetch BTC price (live market data)
+      if (mainnetRpcUrl) {
+        getBTCPrice(mainnetRpcUrl)
+          .then((price) => setBtcPrice(price))
+          .catch(() => {});
+      }
       setLoading(false);
       return;
     }
@@ -43,10 +65,14 @@ export default function BitcoinTransactionPage() {
       .then(([txData, price]) => {
         setTxResult(txData);
         setBtcPrice(price);
+        // Only cache confirmed transactions
+        if (txData.data.confirmations) {
+          setCached(cacheNetworkId, "transaction", txid, txData.data);
+        }
       })
       .catch((err) => setError(err instanceof Error ? err.message : "Failed to fetch transaction"))
       .finally(() => setLoading(false));
-  }, [dataService, txid, mainnetRpcUrl]);
+  }, [dataService, txid, mainnetRpcUrl, getCached, setCached, cacheNetworkId]);
 
   if (loading) {
     return (

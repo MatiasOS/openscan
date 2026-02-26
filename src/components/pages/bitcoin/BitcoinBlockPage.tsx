@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
+import { getAllNetworks } from "../../../config/networks";
 import { useDataService } from "../../../hooks/useDataService";
+import { usePersistentCache } from "../../../hooks/usePersistentCache";
 import type { BitcoinBlock, DataWithMetadata } from "../../../types";
+import { resolveNetwork } from "../../../utils/networkResolver";
 import Loader from "../../common/Loader";
 import BitcoinBlockDisplay from "./BitcoinBlockDisplay";
 
@@ -12,6 +15,11 @@ export default function BitcoinBlockPage() {
   // Extract network slug from path (e.g., "/tbtc/block/123" → "tbtc")
   const networkSlug = location.pathname.split("/")[1] || "btc";
   const dataService = useDataService(networkSlug);
+  const { getCached, setCached } = usePersistentCache();
+  const cacheNetworkId = useMemo(
+    () => resolveNetwork(networkSlug, getAllNetworks())?.networkId ?? networkSlug,
+    [networkSlug],
+  );
 
   const [blockResult, setBlockResult] = useState<DataWithMetadata<BitcoinBlock> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -36,12 +44,19 @@ export default function BitcoinBlockPage() {
         if (filter === "latest") {
           blockId = await adapter.getLatestBlockNumber();
         } else if (/^\d+$/.test(filter)) {
-          // Numeric height
+          // Check persistent cache for numeric block heights
+          const cached = getCached<BitcoinBlock>(cacheNetworkId, "block", filter);
+          if (cached) {
+            setBlockResult({ data: cached });
+            return;
+          }
           blockId = Number(filter);
         }
 
         const result = await adapter.getBlock(blockId);
         setBlockResult(result);
+        // Cache using the resolved block height
+        setCached(cacheNetworkId, "block", String(result.data.height), result.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to fetch block");
       } finally {
@@ -50,7 +65,7 @@ export default function BitcoinBlockPage() {
     };
 
     fetchBlock();
-  }, [dataService, filter]);
+  }, [dataService, filter, getCached, setCached, cacheNetworkId]);
 
   if (loading) {
     return (
