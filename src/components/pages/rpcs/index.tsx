@@ -231,14 +231,13 @@ const RPCs: React.FC = () => {
     [setSearchParams, clearResults],
   );
 
-  // Auto-test when network selection changes (endpoints and testAll derive from it)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: only re-run on network change
+  // Auto-test when selected network/endpoints change
   useEffect(() => {
     if (endpoints.length > 0) {
       const urls = endpoints.map((e) => e.url);
       testAll(urls, networkType);
     }
-  }, [selectedNetworkId]);
+  }, [endpoints, testAll, networkType]);
 
   // Handle test all
   const handleTestAll = useCallback(() => {

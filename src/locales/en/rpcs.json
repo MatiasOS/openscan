@@ -1,6 +1,6 @@
 {
   "pageTitle": "RPC Endpoints",
-  "description": "Test and compare RPC endpoint performance across networks. Add fast endpoints to your configuration with one click.",
+  "description": "Test and compare RPC endpoint performance across networks. Re-test providers and copy endpoint URLs for your configuration.",
   "networkSelector": {
     "label": "Select Network",
     "placeholder": "Choose a network..."

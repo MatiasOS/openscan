@@ -1,6 +1,6 @@
 {
   "pageTitle": "Endpoints RPC",
-  "description": "Probá y compará el rendimiento de los endpoints RPC en distintas redes. Agregá endpoints rápidos a tu configuración con un click.",
+  "description": "Probá y compará el rendimiento de los endpoints RPC en distintas redes. Re-probá proveedores y copiá URLs para tu configuración.",
   "networkSelector": {
     "label": "Seleccionar Red",
     "placeholder": "Elegí una red..."
