@@ -1,6 +1,7 @@
 import type React from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
+import { useSettings } from "../../context/SettingsContext";
 import { ENVIRONMENT } from "../../utils/constants";
 
 interface FooterProps {
@@ -10,6 +11,7 @@ interface FooterProps {
 const Footer: React.FC<FooterProps> = ({ className = "" }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { isSuperUser } = useSettings();
 
   // Get commit hash from environment variable, fallback to 'development'
   const commitHash = process.env.REACT_APP_COMMIT_HASH || "development";
@@ -39,7 +41,7 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
     navigate("/supporters");
   };
   return (
-    <footer className={`app-footer ${className}`}>
+    <footer className={`app-footer ${isSuperUser ? "super-user-active" : ""} ${className}`}>
       <div className="footer-content">
         <div className="footer-left">
           <button

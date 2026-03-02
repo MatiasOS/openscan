@@ -44,7 +44,6 @@ export default function NavbarLogo() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
-
   // Get current subdomain info
   const subdomain = getSubdomain();
   const subdomainRedirect = getSubdomainRedirect();

@@ -108,16 +108,37 @@
     "settingsSaved": "Settings saved successfully!",
     "cacheCleared": "Cache cleared!"
   },
+  "superUser": {
+    "title": "Super User",
+    "description": "Advanced settings for super user mode.",
+    "persistentCache": {
+      "label": "Persistent Cache",
+      "description": "Cache blockchain data in local storage for faster access across sessions.",
+      "sizeLimit": {
+        "label": "Cache Size Limit",
+        "description": "Maximum storage space for persistent cache."
+      },
+      "usage": "Using {{used}} of {{limit}}",
+      "clear": {
+        "label": "Clear Persistent Cache",
+        "description": "Remove all cached blockchain data from local storage.",
+        "button": "Clear Cache"
+      }
+    }
+  },
   "rpcEndpoints": {
     "title": "RPC Endpoints",
     "description": "Configure RPC URLs for each network. Click on a network to expand and configure its endpoints.",
     "legendOpensource": "Open source & no tracking",
     "legendPrivate": "Closed source & no tracking",
     "legendTracking": "Tracking enabled",
+    "testEndpoints": "Test RPCs",
     "currentRPCs": "Current RPCs:",
     "removeRpc": "Remove RPC",
     "localhostHelp": "Need to access your local network remotely?",
     "localhostHelpLink": "Learn how to set up a tunnel with ngrok",
+    "syncRpcs": "Sync RPCs",
+    "syncing": "Syncing...",
     "metamask": {
       "notSupported": "Not supported for this chain",
       "configured": "OpenScan configured!",

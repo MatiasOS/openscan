@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { useDataService } from "../../../../hooks/useDataService";
+import { usePersistentCache } from "../../../../hooks/usePersistentCache";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import { useSelectedData } from "../../../../hooks/useSelectedData";
 import type { DataWithMetadata, Transaction } from "../../../../types";
@@ -20,6 +21,9 @@ export default function Tx() {
   const numericNetworkId = Number(networkId) || 1;
 
   const dataService = useDataService(numericNetworkId);
+  const { getCached, setCached } = usePersistentCache();
+  const cacheNetworkId = `eip155:${numericNetworkId}`;
+
   const [transactionResult, setTransactionResult] = useState<DataWithMetadata<Transaction> | null>(
     null,
   );
@@ -41,6 +45,19 @@ export default function Tx() {
       return;
     }
 
+    // Check persistent cache for the transaction
+    const cached = getCached<Transaction>(cacheNetworkId, "transaction", txHash);
+    if (cached) {
+      setTransactionResult({ data: cached });
+      // Still fetch latest block number for confirmation count
+      dataService.networkAdapter
+        .getLatestBlockNumber()
+        .then((latestBlock) => setCurrentBlockNumber(latestBlock))
+        .catch(() => {});
+      setLoading(false);
+      return;
+    }
+
     logger.debug("Fetching transaction:", txHash, "for chain:", numericNetworkId);
     setLoading(true);
     setError(null);
@@ -54,13 +71,17 @@ export default function Tx() {
         logger.debug("Latest block number:", latestBlock);
         setTransactionResult(result);
         setCurrentBlockNumber(latestBlock);
+        // Only cache confirmed transactions (those with a receipt)
+        if (result.data.receipt) {
+          setCached(cacheNetworkId, "transaction", txHash, result.data);
+        }
       })
       .catch((err) => {
         logger.error("Error fetching transaction:", err);
         setError(err.message || "Failed to fetch transaction");
       })
       .finally(() => setLoading(false));
-  }, [dataService, txHash, numericNetworkId]);
+  }, [dataService, txHash, numericNetworkId, getCached, setCached, cacheNetworkId]);
 
   if (loading) {
     return (

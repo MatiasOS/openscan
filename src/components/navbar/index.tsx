@@ -54,7 +54,7 @@ const Navbar = () => {
   return (
     <>
       <nav className="navbar">
-        <div className="navbar-inner">
+        <div className={`navbar-inner ${isSuperUser ? "super-user-active" : ""}`}>
           {/* Left side - Logo and Search */}
           <div className="navbar-left">
             <NavbarLogo />
@@ -108,6 +108,11 @@ const Navbar = () => {
 
             {/* Desktop icons - hidden on mobile */}
             <ul className="hide-mobile">
+              {isSuperUser && (
+                <li>
+                  <span className="navbar-super-user-badge">{t("nav.superUserBadge")}</span>
+                </li>
+              )}
               <li>
                 <button
                   type="button"

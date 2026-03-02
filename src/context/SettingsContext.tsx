@@ -1,6 +1,7 @@
 import React, { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import { DEFAULT_SETTINGS, type UserSettings } from "../types";
 import { logger } from "../utils/logger";
+import { getSubdomain } from "../utils/subdomainUtils";
 
 interface SettingsContextType {
   settings: UserSettings;
@@ -25,17 +26,24 @@ interface SettingsProviderProps {
 export const SettingsProvider = React.memo<SettingsProviderProps>(({ children }) => {
   const [settings, setSettings] = useState<UserSettings>(() => {
     // Load settings from localStorage on initialization
+    let loaded = DEFAULT_SETTINGS;
     try {
       const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
         // Merge with defaults to ensure all fields are present
-        return { ...DEFAULT_SETTINGS, ...parsed };
+        loaded = { ...DEFAULT_SETTINGS, ...parsed };
       }
     } catch (error) {
       logger.warn("Failed to load settings from localStorage:", error);
     }
-    return DEFAULT_SETTINGS;
+
+    // Auto-activate super user mode when accessed via "super" subdomain
+    if (getSubdomain() === "super") {
+      loaded = { ...loaded, isSuperUser: true };
+    }
+
+    return loaded;
   });
 
   // Determine if dark mode should be active based on settings and system preference

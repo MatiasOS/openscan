@@ -458,7 +458,14 @@ export interface AIAnalysisResult {
 /**
  * Analysis types for the AI analyzer
  */
-export type AIAnalysisType = "transaction" | "account" | "contract" | "block";
+export type AIAnalysisType =
+  | "transaction"
+  | "account"
+  | "contract"
+  | "block"
+  | "bitcoin_transaction"
+  | "bitcoin_block"
+  | "bitcoin_address";
 
 /**
  * Prompt version for AI analysis
@@ -476,6 +483,7 @@ export interface UserSettings {
   apiKeys?: ApiKeys;
   isSuperUser?: boolean;
   promptVersion?: PromptVersion;
+  persistentCacheSizeMB?: number;
 }
 
 /**
@@ -489,6 +497,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   apiKeys: {},
   isSuperUser: false,
   promptVersion: "stable",
+  persistentCacheSizeMB: 10,
 };
 
 /**

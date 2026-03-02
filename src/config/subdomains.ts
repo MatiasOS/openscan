@@ -21,6 +21,9 @@ export const subdomainConfig: SubdomainConfig[] = [
   { subdomain: "ethereum", redirect: "/1", enabled: true },
   { subdomain: "localhost", redirect: "/31337", enabled: isDevelopment },
 
+  // Super user mode subdomain
+  { subdomain: "super", redirect: "/", enabled: true },
+
   // Profile subdomains
   { subdomain: "openscan-app", redirect: "/profile/app/openscan", enabled: true },
   { subdomain: "openscan-org", redirect: "/profile/organization/openscan", enabled: true },
