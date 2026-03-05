@@ -27,7 +27,7 @@ const LoaderWithTimeout: React.FC<LoaderWithTimeoutProps> = ({
 
   if (timedOut) {
     return (
-      <div className="loader-timeout-container">
+      <div className="loader-timeout-container" role="alert">
         <svg
           width="40"
           height="40"
@@ -56,7 +56,7 @@ const LoaderWithTimeout: React.FC<LoaderWithTimeoutProps> = ({
   }
 
   return (
-    <div className="loader-container">
+    <div className="loader-container" aria-live="polite" aria-busy="true">
       <OpenScanCubeLoader size={size} />
       {text && <p className="loader-text">{text}</p>}
     </div>
