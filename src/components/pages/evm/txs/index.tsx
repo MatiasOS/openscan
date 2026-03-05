@@ -7,7 +7,7 @@ import { useDataService } from "../../../../hooks/useDataService";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import type { Block, DataWithMetadata, Transaction } from "../../../../types";
 import { logger } from "../../../../utils/logger";
-import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
+import { SkeletonTable } from "../../../common/SkeletonLoader";
 
 export default function Txs() {
   const { networkId } = useParams<{ networkId?: string }>();
@@ -135,7 +135,7 @@ export default function Txs() {
             <span className="block-label">{t("txs.latests", { network: networkName })}</span>
           </div>
           <div className="card-content-loading">
-            <LoaderWithTimeout text={t("txs.loading")} onRetry={() => window.location.reload()} />
+            <SkeletonTable rows={10} columns={7} />
           </div>
         </div>
       </div>

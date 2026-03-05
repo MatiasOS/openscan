@@ -4,7 +4,7 @@ import { useNetwork } from "../../../../context/AppContext";
 import { useNetworkDashboard } from "../../../../hooks/useNetworkDashboard";
 import { resolveNetwork, getChainIdFromNetwork } from "../../../../utils/networkResolver";
 import { getAllNetworks } from "../../../../config/networks";
-import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
+import { SkeletonDashboard } from "../../../common/SkeletonLoader";
 import SearchBox from "../../../common/SearchBox";
 import DashboardStats from "./DashboardStats";
 import LatestBlocksTable from "./LatestBlocksTable";
@@ -56,7 +56,7 @@ export default function Network() {
         <SearchBox />
 
         {dashboard.loading && dashboard.latestBlocks.length === 0 && (
-          <LoaderWithTimeout text={t("loadingNetworkData")} onRetry={() => window.location.reload()} />
+          <SkeletonDashboard />
         )}
 
         {dashboard.error && (

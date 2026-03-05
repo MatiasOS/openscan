@@ -7,7 +7,7 @@ import { useDataService } from "../../../../hooks/useDataService";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import type { Block, DataWithMetadata } from "../../../../types";
 import { logger } from "../../../../utils/logger";
-import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
+import { SkeletonTable } from "../../../common/SkeletonLoader";
 
 const BLOCKS_PER_PAGE = 10;
 
@@ -168,7 +168,7 @@ export default function Blocks() {
             <span className="block-label">{t("latestBlocks", { network: networkName })}</span>
           </div>
           <div className="card-content-loading">
-            <LoaderWithTimeout text={t("loadingBlocks")} onRetry={() => window.location.reload()} />
+            <SkeletonTable rows={10} columns={6} />
           </div>
         </div>
       </div>
