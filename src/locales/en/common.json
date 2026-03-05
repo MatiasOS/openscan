@@ -250,7 +250,10 @@
     "invalidType": "Invalid profile type: {{type}}. Must be one of: network, app, organization.",
     "notFoundMessage": "Profile not found: {{type}}/{{id}}",
     "fetchError": "Failed to fetch profile",
-    "unknownType": "Unknown profile type"
+    "unknownType": "Unknown profile type",
+    "notFoundFriendly": "This profile doesn't exist or isn't available yet. Profiles are available for networks, apps, and organizations.",
+    "goHome": "Go to Homepage",
+    "browseSupporters": "Browse Supporters"
   },
   "extraData": {
     "showDecoded": "Show decoded",
