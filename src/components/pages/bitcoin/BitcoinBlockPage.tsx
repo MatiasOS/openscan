@@ -5,6 +5,7 @@ import { useDataService } from "../../../hooks/useDataService";
 import { usePersistentCache } from "../../../hooks/usePersistentCache";
 import type { BitcoinBlock, DataWithMetadata } from "../../../types";
 import { resolveNetwork } from "../../../utils/networkResolver";
+import Breadcrumb from "../../common/Breadcrumb";
 import LoaderWithTimeout from "../../common/LoaderWithTimeout";
 import BitcoinBlockDisplay from "./BitcoinBlockDisplay";
 
@@ -100,6 +101,12 @@ export default function BitcoinBlockPage() {
 
   return (
     <div className="container-wide page-container-padded">
+      <Breadcrumb items={[
+        { label: "Home", to: "/" },
+        { label: networkSlug === "tbtc" ? "Bitcoin Testnet" : "Bitcoin", to: `/${networkSlug}` },
+        { label: "Blocks", to: `/${networkSlug}/blocks` },
+        { label: `Block #${filter}` },
+      ]} />
       {blockResult?.data ? (
         <BitcoinBlockDisplay block={blockResult.data} networkId={networkSlug} />
       ) : (

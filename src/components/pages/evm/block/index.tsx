@@ -6,6 +6,7 @@ import { usePersistentCache } from "../../../../hooks/usePersistentCache";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import { useSelectedData } from "../../../../hooks/useSelectedData";
 import type { Block, DataWithMetadata } from "../../../../types";
+import Breadcrumb from "../../../common/Breadcrumb";
 import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
 import BlockDisplay from "./BlockDisplay";
 
@@ -101,6 +102,12 @@ export default function BlockPage() {
 
   return (
     <div className="container-wide">
+      <Breadcrumb items={[
+        { label: "Home", to: "/" },
+        { label: `Chain ${networkId}`, to: `/${networkId}` },
+        { label: "Blocks", to: `/${networkId}/blocks` },
+        { label: `Block #${filter}` },
+      ]} />
       {block ? (
         <BlockDisplay
           block={block}

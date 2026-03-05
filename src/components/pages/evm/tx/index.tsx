@@ -7,6 +7,7 @@ import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import { useSelectedData } from "../../../../hooks/useSelectedData";
 import type { DataWithMetadata, Transaction } from "../../../../types";
 import { logger } from "../../../../utils/logger";
+import Breadcrumb from "../../../common/Breadcrumb";
 import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
 import TransactionDisplay from "./TransactionDisplay";
 
@@ -115,8 +116,16 @@ export default function Tx() {
     );
   }
 
+  const truncatedHash = filter ? `${filter.slice(0, 10)}...${filter.slice(-6)}` : "";
+
   return (
     <div className="container-wide">
+      <Breadcrumb items={[
+        { label: "Home", to: "/" },
+        { label: `Chain ${networkId}`, to: `/${networkId}` },
+        { label: "Transactions", to: `/${networkId}/txs` },
+        { label: truncatedHash },
+      ]} />
       {transaction ? (
         <TransactionDisplay
           transaction={transaction}

@@ -7,6 +7,7 @@ import { usePersistentCache } from "../../../hooks/usePersistentCache";
 import { getBTCPrice } from "../../../services/PriceService";
 import type { BitcoinTransaction, DataWithMetadata } from "../../../types";
 import { resolveNetwork } from "../../../utils/networkResolver";
+import Breadcrumb from "../../common/Breadcrumb";
 import LoaderWithTimeout from "../../common/LoaderWithTimeout";
 import BitcoinTransactionDisplay from "./BitcoinTransactionDisplay";
 
@@ -101,8 +102,16 @@ export default function BitcoinTransactionPage() {
     );
   }
 
+  const truncatedTxid = txid ? `${txid.slice(0, 10)}...${txid.slice(-6)}` : "";
+
   return (
     <div className="container-wide page-container-padded">
+      <Breadcrumb items={[
+        { label: "Home", to: "/" },
+        { label: networkSlug === "tbtc" ? "Bitcoin Testnet" : "Bitcoin", to: `/${networkSlug}` },
+        { label: "Transactions", to: `/${networkSlug}/txs` },
+        { label: truncatedTxid },
+      ]} />
       {txResult?.data ? (
         <BitcoinTransactionDisplay
           transaction={txResult.data}

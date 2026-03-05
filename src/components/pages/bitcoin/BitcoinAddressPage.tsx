@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { useDataService } from "../../../hooks/useDataService";
 import type { BitcoinAddress, DataWithMetadata } from "../../../types";
+import Breadcrumb from "../../common/Breadcrumb";
 import LoaderWithTimeout from "../../common/LoaderWithTimeout";
 import BitcoinAddressDisplay from "./BitcoinAddressDisplay";
 
@@ -62,8 +63,15 @@ export default function BitcoinAddressPage() {
     );
   }
 
+  const truncatedAddr = address ? `${address.slice(0, 10)}...${address.slice(-6)}` : "";
+
   return (
     <div className="container-wide page-container-padded">
+      <Breadcrumb items={[
+        { label: "Home", to: "/" },
+        { label: networkSlug === "tbtc" ? "Bitcoin Testnet" : "Bitcoin", to: `/${networkSlug}` },
+        { label: truncatedAddr },
+      ]} />
       {addressResult?.data ? (
         <BitcoinAddressDisplay address={addressResult.data} networkId={networkSlug} />
       ) : (

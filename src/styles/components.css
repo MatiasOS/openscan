@@ -7483,6 +7483,49 @@ button.tx-section-header-toggle {
 }
 
 /* Copy Button */
+/* Breadcrumb */
+.breadcrumb {
+	padding: 8px 0;
+	margin-bottom: 8px;
+}
+
+.breadcrumb-list {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	gap: 0;
+}
+
+.breadcrumb-item {
+	display: flex;
+	align-items: center;
+	font-size: 0.85rem;
+}
+
+.breadcrumb-separator {
+	margin: 0 8px;
+	color: var(--text-muted, #888);
+	font-size: 0.9rem;
+}
+
+.breadcrumb-link {
+	color: var(--color-primary, #3ecfa0);
+	text-decoration: none;
+	transition: opacity 0.2s;
+}
+
+.breadcrumb-link:hover {
+	opacity: 0.8;
+	text-decoration: underline;
+}
+
+.breadcrumb-current {
+	color: var(--text-muted, #888);
+}
+
 /* Skeleton Loaders */
 @keyframes skeleton-shimmer {
 	0% { background-position: -200% 0; }

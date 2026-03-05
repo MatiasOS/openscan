@@ -8,6 +8,7 @@ import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import { ENSService } from "../../../../services/ENS/ENSService";
 import type { Address as AddressData, AddressType, DataWithMetadata } from "../../../../types";
 import { fetchAddressWithType } from "../../../../utils/addressTypeDetection";
+import Breadcrumb from "../../../common/Breadcrumb";
 import LoaderWithTimeout from "../../../common/LoaderWithTimeout";
 import {
   AccountDisplay,
@@ -253,8 +254,15 @@ export default function Address() {
   };
 
   // Render appropriate display component based on detected type
+  const truncatedAddr = address ? `${address.slice(0, 10)}...${address.slice(-6)}` : "";
+
   return (
     <div className="container-wide">
+      <Breadcrumb items={[
+        { label: "Home", to: "/" },
+        { label: `Chain ${networkId}`, to: `/${networkId}` },
+        { label: truncatedAddr },
+      ]} />
       {addressType === "account" && <AccountDisplay {...displayProps} />}
       {addressType === "contract" && <ContractDisplay {...displayProps} />}
       {addressType === "erc20" && <ERC20Display {...displayProps} />}
