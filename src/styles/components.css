@@ -4563,6 +4563,30 @@ button.tx-section-header-toggle {
 	border-radius: 4px;
 }
 
+.kleros-verified-tag {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: #6b3fa0;
+	padding: 2px 8px;
+	background: rgba(107, 63, 160, 0.1);
+	border: 1px solid rgba(107, 63, 160, 0.3);
+	border-radius: 4px;
+	text-decoration: none;
+}
+
+.kleros-verified-tag:hover {
+	background: rgba(107, 63, 160, 0.2);
+}
+
+.kleros-logo {
+	width: 14px;
+	height: 14px;
+	object-fit: contain;
+}
+
 /* Token Info Row */
 .token-info-row {
 	display: flex;

@@ -5,6 +5,7 @@ import { getNetworkById } from "../../../../config/networks";
 import { AppContext } from "../../../../context";
 import { useDataService } from "../../../../hooks/useDataService";
 import { useENS } from "../../../../hooks/useENS";
+import { useKlerosTag } from "../../../../hooks/useKlerosTag";
 import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import { ENSService } from "../../../../services/ENS/ENSService";
 import type { Address as AddressData, AddressType, DataWithMetadata } from "../../../../types";
@@ -64,6 +65,8 @@ export default function Address() {
   const [selectedProvider, setSelectedProvider] = useProviderSelection(
     `address_${numericNetworkId}_${address}`,
   );
+
+  const klerosTag = useKlerosTag(address, numericNetworkId);
 
   // Resolve ENS name to address
   useEffect(() => {
@@ -263,6 +266,7 @@ export default function Address() {
     metadata: addressDataResult?.metadata,
     selectedProvider,
     onProviderSelect: setSelectedProvider,
+    klerosTag,
   };
 
   // Render appropriate display component based on detected type

@@ -1,4 +1,5 @@
 {
+  "klerosVerifiedTooltip": "Verified by Kleros curated registry",
   "balance": "Balance",
   "contractName": "Contract Name",
   "compiler": "Compiler",
