@@ -5532,6 +5532,7 @@ button.tx-section-header-toggle {
 	background: var(--overlay-light-2);
 	border-radius: 8px;
 	transition: background 0.2s;
+	min-height: 48px;
 }
 
 .dashboard-table-row:hover {
