@@ -185,10 +185,7 @@
         ]
       },
       "networks": {
-        "backer": [
-          "Markdown profile on the network page",
-          "Priority placement on the home page"
-        ],
+        "backer": ["Markdown profile on the network page", "Priority placement on the home page"],
         "partner": [
           "Dedicated subdomain network explorer",
           "Direct communication line with the technical team"
@@ -204,14 +201,8 @@
           "Important contracts verified and tagged",
           "Contract events listing"
         ],
-        "partner": [
-          "OpenScan subdomain",
-          "Complete profile page with markdown description"
-        ],
-        "ally": [
-          "Roadmap voting power",
-          "Direct communication line with the technical team"
-        ]
+        "partner": ["OpenScan subdomain", "Complete profile page with markdown description"],
+        "ally": ["Roadmap voting power", "Direct communication line with the technical team"]
       },
       "companies": {
         "backer": [
@@ -219,14 +210,8 @@
           "Important contracts verified and tagged",
           "Contract events listing"
         ],
-        "partner": [
-          "Complete profile page with markdown description",
-          "OpenScan subdomain"
-        ],
-        "ally": [
-          "Direct communication line with the technical team",
-          "Roadmap voting power"
-        ]
+        "partner": ["Complete profile page with markdown description", "OpenScan subdomain"],
+        "ally": ["Direct communication line with the technical team", "Roadmap voting power"]
       }
     }
   },

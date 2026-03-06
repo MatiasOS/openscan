@@ -29,20 +29,32 @@ const BitcoinBlocksTable: React.FC<BitcoinBlocksTableProps> = ({ blocks, loading
             <div key={i} className="dashboard-table-row">
               <div className="dashboard-block-info">
                 <span className="dashboard-block-number" style={{ pointerEvents: "none" }}>
-                  <span className="skeleton-pulse" style={{ width: "70px", height: 14, display: "inline-block" }} />
+                  <span
+                    className="skeleton-pulse"
+                    style={{ width: "70px", height: 14, display: "inline-block" }}
+                  />
                 </span>
                 <span className="dashboard-block-time">
-                  <span className="skeleton-pulse" style={{ width: "40px", height: 12, display: "inline-block" }} />
+                  <span
+                    className="skeleton-pulse"
+                    style={{ width: "40px", height: 12, display: "inline-block" }}
+                  />
                 </span>
               </div>
               <div className="dashboard-block-details">
                 <span className="dashboard-block-txns">
-                  <span className="skeleton-pulse" style={{ width: "50px", height: 12, display: "inline-block" }} />
+                  <span
+                    className="skeleton-pulse"
+                    style={{ width: "50px", height: 12, display: "inline-block" }}
+                  />
                 </span>
               </div>
               <div className="dashboard-block-meta">
                 <span className="dashboard-block-miner" style={{ pointerEvents: "none" }}>
-                  <span className="skeleton-pulse" style={{ width: "80px", height: 12, display: "inline-block" }} />
+                  <span
+                    className="skeleton-pulse"
+                    style={{ width: "80px", height: 12, display: "inline-block" }}
+                  />
                 </span>
               </div>
             </div>

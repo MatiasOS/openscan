@@ -8,7 +8,6 @@ import { useProviderSelection } from "../../../../hooks/useProviderSelection";
 import type { Block, DataWithMetadata } from "../../../../types";
 import { logger } from "../../../../utils/logger";
 
-
 const BLOCKS_PER_PAGE = 10;
 
 export default function Blocks() {
@@ -184,13 +183,27 @@ export default function Blocks() {
                 {Array.from({ length: BLOCKS_PER_PAGE }).map((_, i) => (
                   // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
                   <tr key={i}>
-                    <td><span className="skeleton-pulse" style={{ width: "80px", height: 14 }} /></td>
-                    <td><span className="skeleton-pulse" style={{ width: "140px", height: 14 }} /></td>
-                    <td><span className="skeleton-pulse" style={{ width: "40px", height: 14 }} /></td>
-                    <td className="hide-mobile"><span className="skeleton-pulse" style={{ width: "120px", height: 14 }} /></td>
-                    <td><span className="skeleton-pulse" style={{ width: "80px", height: 14 }} /></td>
-                    <td className="hide-mobile"><span className="skeleton-pulse" style={{ width: "80px", height: 14 }} /></td>
-                    <td className="hide-mobile"><span className="skeleton-pulse" style={{ width: "60px", height: 14 }} /></td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "80px", height: 14 }} />
+                    </td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "140px", height: 14 }} />
+                    </td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "40px", height: 14 }} />
+                    </td>
+                    <td className="hide-mobile">
+                      <span className="skeleton-pulse" style={{ width: "120px", height: 14 }} />
+                    </td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "80px", height: 14 }} />
+                    </td>
+                    <td className="hide-mobile">
+                      <span className="skeleton-pulse" style={{ width: "80px", height: 14 }} />
+                    </td>
+                    <td className="hide-mobile">
+                      <span className="skeleton-pulse" style={{ width: "60px", height: 14 }} />
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -28,9 +28,7 @@ const LongString: React.FC<LongStringProps> = ({
   const shouldTruncate = value && value.length > start + end;
 
   return (
-    <span
-      style={{ display: "inline-flex", alignItems: "center", gap: 0 }}
-    >
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 0 }}>
       {/* biome-ignore lint/a11y/noStaticElementInteractions: hover expand for long strings */}
       <span
         onMouseEnter={() => setIsHovered(true)}

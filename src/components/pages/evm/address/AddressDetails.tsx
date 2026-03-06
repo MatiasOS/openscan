@@ -358,7 +358,13 @@ const AddressDisplay: React.FC<AddressDisplayProps> = React.memo(
             {(ensName || reverseResult?.ensName) && (
               <span className="address-ens-name">{ensName || reverseResult?.ensName}</span>
             )}
-            <span className="tx-mono header-subtitle" style={{ display: "inline-flex", alignItems: "center" }}>{addressHash}<CopyButton value={addressHash} size={14} /></span>
+            <span
+              className="tx-mono header-subtitle"
+              style={{ display: "inline-flex", alignItems: "center" }}
+            >
+              {addressHash}
+              <CopyButton value={addressHash} size={14} />
+            </span>
           </div>
           {metadata && selectedProvider !== undefined && onProviderSelect && (
             <RPCIndicator

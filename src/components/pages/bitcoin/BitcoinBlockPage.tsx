@@ -77,7 +77,10 @@ export default function BitcoinBlockPage() {
             <span className="tx-mono header-subtitle">{filter}</span>
           </div>
           <div className="card-content-loading">
-            <LoaderWithTimeout text="Loading block data..." onRetry={() => window.location.reload()} />
+            <LoaderWithTimeout
+              text="Loading block data..."
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>
@@ -101,12 +104,14 @@ export default function BitcoinBlockPage() {
 
   return (
     <div className="container-wide page-container-padded">
-      <Breadcrumb items={[
-        { label: "Home", to: "/" },
-        { label: networkSlug === "tbtc" ? "Bitcoin Testnet" : "Bitcoin", to: `/${networkSlug}` },
-        { label: "Blocks", to: `/${networkSlug}/blocks` },
-        { label: `Block #${filter}` },
-      ]} />
+      <Breadcrumb
+        items={[
+          { label: "Home", to: "/" },
+          { label: networkSlug === "tbtc" ? "Bitcoin Testnet" : "Bitcoin", to: `/${networkSlug}` },
+          { label: "Blocks", to: `/${networkSlug}/blocks` },
+          { label: `Block #${filter}` },
+        ]}
+      />
       {blockResult?.data ? (
         <BitcoinBlockDisplay block={blockResult.data} networkId={networkSlug} />
       ) : (

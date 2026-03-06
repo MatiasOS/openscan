@@ -119,7 +119,10 @@ const ERC1155TokenDetails: React.FC = () => {
             </span>
           </div>
           <div className="card-content-loading">
-            <LoaderWithTimeout text="Loading token metadata..." onRetry={() => window.location.reload()} />
+            <LoaderWithTimeout
+              text="Loading token metadata..."
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>

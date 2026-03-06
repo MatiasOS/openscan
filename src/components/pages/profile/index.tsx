@@ -91,13 +91,28 @@ const Profile: React.FC = () => {
             >
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
               <path d="M12 8v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              <circle cx="12" cy="16" r="0.5" fill="currentColor" stroke="currentColor" strokeWidth="1" />
+              <circle
+                cx="12"
+                cy="16"
+                r="0.5"
+                fill="currentColor"
+                stroke="currentColor"
+                strokeWidth="1"
+              />
             </svg>
-            <h1 className="page-heading" style={{ color: "var(--text-color, #fff)" }}>{t("profile.notFound")}</h1>
-            <p className="text-muted" style={{ marginBottom: 24 }} role="alert">{t("profile.notFoundFriendly")}</p>
+            <h1 className="page-heading" style={{ color: "var(--text-color, #fff)" }}>
+              {t("profile.notFound")}
+            </h1>
+            <p className="text-muted" style={{ marginBottom: 24 }} role="alert">
+              {t("profile.notFoundFriendly")}
+            </p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-              <Link to="/" className="button-primary-inline">{t("profile.goHome")}</Link>
-              <Link to="/supporters" className="button-secondary-inline">{t("profile.browseSupporters")}</Link>
+              <Link to="/" className="button-primary-inline">
+                {t("profile.goHome")}
+              </Link>
+              <Link to="/supporters" className="button-secondary-inline">
+                {t("profile.browseSupporters")}
+              </Link>
             </div>
           </div>
         )}

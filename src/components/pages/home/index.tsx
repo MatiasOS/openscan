@@ -89,11 +89,7 @@ export default function Home() {
         {featuredNetworks.length > 0 && (
           <div className="network-grid network-grid-featured">
             {featuredNetworks.map((network) => (
-              <NetworkCard
-                key={network.networkId}
-                network={network}
-                showChainId={isSuperUser}
-              />
+              <NetworkCard key={network.networkId} network={network} showChainId={isSuperUser} />
             ))}
           </div>
         )}
@@ -103,11 +99,7 @@ export default function Home() {
             <p className="loading-text">{t("loading")}</p>
           ) : (
             productionNetworks.map((network) => (
-              <NetworkCard
-                key={network.networkId}
-                network={network}
-                showChainId={isSuperUser}
-              />
+              <NetworkCard key={network.networkId} network={network} showChainId={isSuperUser} />
             ))
           )}
         </div>
@@ -117,7 +109,11 @@ export default function Home() {
             {showTestnets && (
               <div className="network-grid testnet-grid">
                 {testnetNetworks.map((network) => (
-                  <NetworkCard key={network.networkId} network={network} showChainId={isSuperUser} />
+                  <NetworkCard
+                    key={network.networkId}
+                    network={network}
+                    showChainId={isSuperUser}
+                  />
                 ))}
               </div>
             )}

@@ -80,7 +80,10 @@ export default function BlockPage() {
             <span className="tx-mono header-subtitle">#{filter}</span>
           </div>
           <div className="card-content-loading">
-            <LoaderWithTimeout text={t("loadingBlockData")} onRetry={() => window.location.reload()} />
+            <LoaderWithTimeout
+              text={t("loadingBlockData")}
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>
@@ -105,12 +108,14 @@ export default function BlockPage() {
 
   return (
     <div className="container-wide">
-      <Breadcrumb items={[
-        { label: "Home", to: "/" },
-        { label: networkLabel, to: `/${networkId}` },
-        { label: "Blocks", to: `/${networkId}/blocks` },
-        { label: `Block #${filter}` },
-      ]} />
+      <Breadcrumb
+        items={[
+          { label: "Home", to: "/" },
+          { label: networkLabel, to: `/${networkId}` },
+          { label: "Blocks", to: `/${networkId}/blocks` },
+          { label: `Block #${filter}` },
+        ]}
+      />
       {block ? (
         <BlockDisplay
           block={block}

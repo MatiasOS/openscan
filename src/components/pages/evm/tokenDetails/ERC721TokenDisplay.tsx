@@ -90,7 +90,10 @@ const ERC721TokenDisplay: React.FC = () => {
             <span className="tx-mono header-subtitle">: {tokenId}</span>
           </div>
           <div className="card-content-loading">
-            <LoaderWithTimeout text="Loading NFT metadata..." onRetry={() => window.location.reload()} />
+            <LoaderWithTimeout
+              text="Loading NFT metadata..."
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>

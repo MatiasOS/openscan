@@ -125,7 +125,10 @@ const NFTTokenDetails: React.FC = () => {
             <span className="block-label">NFT Token</span>
           </div>
           <div className="card-content-loading">
-            <LoaderWithTimeout text={t("detectingTokenType")} onRetry={() => window.location.reload()} />
+            <LoaderWithTimeout
+              text={t("detectingTokenType")}
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>

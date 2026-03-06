@@ -90,7 +90,10 @@ export default function BitcoinMempoolPage() {
             <span className="block-label">Bitcoin Mempool</span>
           </div>
           <div className="card-content-loading">
-            <LoaderWithTimeout text="Loading mempool data..." onRetry={() => window.location.reload()} />
+            <LoaderWithTimeout
+              text="Loading mempool data..."
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>

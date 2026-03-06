@@ -151,7 +151,10 @@ export default function Search() {
     return (
       <div className="container-wide search-page-wrapper">
         <div className="block-display-card search-results-card">
-          <div className="search-results-container" style={{ textAlign: "center", padding: "40px 20px" }}>
+          <div
+            className="search-results-container"
+            style={{ textAlign: "center", padding: "40px 20px" }}
+          >
             <svg
               width="48"
               height="48"
@@ -162,8 +165,18 @@ export default function Search() {
               aria-hidden="true"
             >
               <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="1.5" />
-              <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              <path d="M11 8v6M8 11h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <path
+                d="M21 21l-4.35-4.35"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+              <path
+                d="M11 8v6M8 11h6"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
             </svg>
             <h1 className="search-results-title">{t("search.title")}</h1>
             <p className="text-muted" style={{ marginBottom: 24 }}>

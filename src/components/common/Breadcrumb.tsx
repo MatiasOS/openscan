@@ -21,7 +21,11 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
           return (
             // biome-ignore lint/suspicious/noArrayIndexKey: breadcrumb items are positional
             <li key={index} className="breadcrumb-item">
-              {index > 0 && <span className="breadcrumb-separator" aria-hidden="true">›</span>}
+              {index > 0 && (
+                <span className="breadcrumb-separator" aria-hidden="true">
+                  ›
+                </span>
+              )}
               {isLast || !item.to ? (
                 <span className="breadcrumb-current" aria-current={isLast ? "page" : undefined}>
                   {item.label}

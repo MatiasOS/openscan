@@ -96,7 +96,10 @@ export default function Tx() {
             <span className="tx-mono header-subtitle">{txHash}</span>
           </div>
           <div className="card-content-loading">
-            <LoaderWithTimeout text={t("loadingTransaction")} onRetry={() => window.location.reload()} />
+            <LoaderWithTimeout
+              text={t("loadingTransaction")}
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>
@@ -123,12 +126,14 @@ export default function Tx() {
 
   return (
     <div className="container-wide">
-      <Breadcrumb items={[
-        { label: "Home", to: "/" },
-        { label: networkLabel, to: `/${networkId}` },
-        { label: "Transactions", to: `/${networkId}/txs` },
-        { label: truncatedHash },
-      ]} />
+      <Breadcrumb
+        items={[
+          { label: "Home", to: "/" },
+          { label: networkLabel, to: `/${networkId}` },
+          { label: "Transactions", to: `/${networkId}/txs` },
+          { label: truncatedHash },
+        ]}
+      />
       {transaction ? (
         <TransactionDisplay
           transaction={transaction}

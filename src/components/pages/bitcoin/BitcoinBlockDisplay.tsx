@@ -94,7 +94,13 @@ const BitcoinBlockDisplay: React.FC<BitcoinBlockDisplayProps> = React.memo(
             {/* Block Hash */}
             <div className="tx-row">
               <span className="tx-label">Block Hash:</span>
-              <span className="tx-value tx-mono" style={{ display: "inline-flex", alignItems: "center" }}>{block.hash}<CopyButton value={block.hash} /></span>
+              <span
+                className="tx-value tx-mono"
+                style={{ display: "inline-flex", alignItems: "center" }}
+              >
+                {block.hash}
+                <CopyButton value={block.hash} />
+              </span>
             </div>
 
             {/* Miner */}

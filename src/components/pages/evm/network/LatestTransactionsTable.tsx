@@ -60,20 +60,32 @@ const LatestTransactionsTable: React.FC<LatestTransactionsTableProps> = ({
             <div key={i} className="dashboard-table-row">
               <div className="dashboard-tx-info">
                 <span className="dashboard-tx-hash" style={{ pointerEvents: "none" }}>
-                  <span className="skeleton-pulse" style={{ width: "90px", height: 14, display: "inline-block" }} />
+                  <span
+                    className="skeleton-pulse"
+                    style={{ width: "90px", height: 14, display: "inline-block" }}
+                  />
                 </span>
               </div>
               <div className="dashboard-tx-addresses">
                 <span className="dashboard-tx-from" style={{ pointerEvents: "none" }}>
-                  <span className="skeleton-pulse" style={{ width: "70px", height: 12, display: "inline-block" }} />
+                  <span
+                    className="skeleton-pulse"
+                    style={{ width: "70px", height: 12, display: "inline-block" }}
+                  />
                 </span>
                 <span className="dashboard-tx-arrow">→</span>
                 <span className="dashboard-tx-to" style={{ pointerEvents: "none" }}>
-                  <span className="skeleton-pulse" style={{ width: "70px", height: 12, display: "inline-block" }} />
+                  <span
+                    className="skeleton-pulse"
+                    style={{ width: "70px", height: 12, display: "inline-block" }}
+                  />
                 </span>
               </div>
               <div className="dashboard-tx-value">
-                <span className="skeleton-pulse" style={{ width: "60px", height: 12, display: "inline-block" }} />
+                <span
+                  className="skeleton-pulse"
+                  style={{ width: "60px", height: 12, display: "inline-block" }}
+                />
               </div>
             </div>
           ))}

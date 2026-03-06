@@ -21,30 +21,64 @@ const BitcoinDashboardStats: React.FC<BitcoinDashboardStatsProps> = ({
       <div className="dashboard-stat-card">
         <div className="dashboard-stat-label">BTC Price</div>
         <div className="dashboard-stat-value">
-          {loading && !btcPrice ? <span className="skeleton-pulse" style={{ width: "80px", height: 20, display: "inline-block" }} /> : formatPrice(btcPrice)}
+          {loading && !btcPrice ? (
+            <span
+              className="skeleton-pulse"
+              style={{ width: "80px", height: 20, display: "inline-block" }}
+            />
+          ) : (
+            formatPrice(btcPrice)
+          )}
         </div>
       </div>
 
       <div className="dashboard-stat-card">
         <div className="dashboard-stat-label">Mempool</div>
         <div className="dashboard-stat-value">
-          {loading && !stats ? <span className="skeleton-pulse" style={{ width: "90px", height: 20, display: "inline-block" }} /> : <>{formatNumber(stats?.mempoolSize)} txs</>}
+          {loading && !stats ? (
+            <span
+              className="skeleton-pulse"
+              style={{ width: "90px", height: 20, display: "inline-block" }}
+            />
+          ) : (
+            <>{formatNumber(stats?.mempoolSize)} txs</>
+          )}
         </div>
         <div className="dashboard-stat-subvalue">
-          {loading && !stats ? <span className="skeleton-pulse" style={{ width: "60px", height: 12, display: "inline-block" }} /> : formatSize(stats?.mempoolBytes ?? 0)}
+          {loading && !stats ? (
+            <span
+              className="skeleton-pulse"
+              style={{ width: "60px", height: 12, display: "inline-block" }}
+            />
+          ) : (
+            formatSize(stats?.mempoolBytes ?? 0)
+          )}
         </div>
       </div>
 
       <div className="dashboard-stat-card">
         <div className="dashboard-stat-label">Fee Estimates</div>
         <div className="dashboard-stat-value">
-          {loading && !feeEstimates ? <span className="skeleton-pulse" style={{ width: "80px", height: 20, display: "inline-block" }} /> : formatFeeRate(feeEstimates?.fast ?? null)}
+          {loading && !feeEstimates ? (
+            <span
+              className="skeleton-pulse"
+              style={{ width: "80px", height: 20, display: "inline-block" }}
+            />
+          ) : (
+            formatFeeRate(feeEstimates?.fast ?? null)
+          )}
         </div>
         <div className="dashboard-stat-subvalue btc-fee-rates">
           {loading && !feeEstimates ? (
             <>
-              <span className="skeleton-pulse" style={{ width: "50px", height: 12, display: "inline-block" }} />
-              <span className="skeleton-pulse" style={{ width: "50px", height: 12, display: "inline-block" }} />
+              <span
+                className="skeleton-pulse"
+                style={{ width: "50px", height: 12, display: "inline-block" }}
+              />
+              <span
+                className="skeleton-pulse"
+                style={{ width: "50px", height: 12, display: "inline-block" }}
+              />
             </>
           ) : (
             <>

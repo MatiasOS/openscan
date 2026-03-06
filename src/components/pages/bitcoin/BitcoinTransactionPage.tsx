@@ -83,7 +83,10 @@ export default function BitcoinTransactionPage() {
             <span className="block-label">Bitcoin Transaction</span>
           </div>
           <div className="card-content-loading">
-            <LoaderWithTimeout text="Loading transaction..." onRetry={() => window.location.reload()} />
+            <LoaderWithTimeout
+              text="Loading transaction..."
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>
@@ -106,12 +109,14 @@ export default function BitcoinTransactionPage() {
 
   return (
     <div className="container-wide page-container-padded">
-      <Breadcrumb items={[
-        { label: "Home", to: "/" },
-        { label: networkSlug === "tbtc" ? "Bitcoin Testnet" : "Bitcoin", to: `/${networkSlug}` },
-        { label: "Transactions", to: `/${networkSlug}/txs` },
-        { label: truncatedTxid },
-      ]} />
+      <Breadcrumb
+        items={[
+          { label: "Home", to: "/" },
+          { label: networkSlug === "tbtc" ? "Bitcoin Testnet" : "Bitcoin", to: `/${networkSlug}` },
+          { label: "Transactions", to: `/${networkSlug}/txs` },
+          { label: truncatedTxid },
+        ]}
+      />
       {txResult?.data ? (
         <BitcoinTransactionDisplay
           transaction={txResult.data}

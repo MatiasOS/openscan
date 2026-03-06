@@ -162,7 +162,12 @@ export default function GasTracker() {
           <h1 className="page-title-small">{t("gasTracker.title")}</h1>
         </div>
 
-        {loading && !gasPrices && <LoaderWithTimeout text={t("gasTracker.loadingGasPrices")} onRetry={() => window.location.reload()} />}
+        {loading && !gasPrices && (
+          <LoaderWithTimeout
+            text={t("gasTracker.loadingGasPrices")}
+            onRetry={() => window.location.reload()}
+          />
+        )}
 
         {error && <p className="error-text-center">{t("gasTracker.errorLoadingGas", { error })}</p>}
 

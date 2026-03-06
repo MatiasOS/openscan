@@ -28,7 +28,8 @@ export default function Address() {
   const location = useLocation();
   const numericNetworkId = Number(networkId) || 1;
   const networkConfigData = getNetworkById(networkId ?? numericNetworkId);
-  const networkLabel = networkConfigData?.shortName || networkConfigData?.name || `Chain ${networkId}`;
+  const networkLabel =
+    networkConfigData?.shortName || networkConfigData?.name || `Chain ${networkId}`;
   const { rpcUrls } = useContext(AppContext);
   const [addressData, setAddressData] = useState<AddressData | null>(null);
   const [addressType, setAddressType] = useState<AddressType>("account");
@@ -176,7 +177,10 @@ export default function Address() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="card-content-loading">
-            <LoaderWithTimeout text={t("resolvingEns", { name: addressParam })} onRetry={() => window.location.reload()} />
+            <LoaderWithTimeout
+              text={t("resolvingEns", { name: addressParam })}
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>
@@ -203,7 +207,10 @@ export default function Address() {
       <div className="container-wide">
         <div className="block-display-card">
           <div className="card-content-loading">
-            <LoaderWithTimeout text={loading ? t("loadingAddressData") : t("detectingAddressType")} onRetry={() => window.location.reload()} />
+            <LoaderWithTimeout
+              text={loading ? t("loadingAddressData") : t("detectingAddressType")}
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>
@@ -263,11 +270,13 @@ export default function Address() {
 
   return (
     <div className="container-wide">
-      <Breadcrumb items={[
-        { label: "Home", to: "/" },
-        { label: networkLabel, to: `/${networkId}` },
-        { label: truncatedAddr },
-      ]} />
+      <Breadcrumb
+        items={[
+          { label: "Home", to: "/" },
+          { label: networkLabel, to: `/${networkId}` },
+          { label: truncatedAddr },
+        ]}
+      />
       {addressType === "account" && <AccountDisplay {...displayProps} />}
       {addressType === "contract" && <ContractDisplay {...displayProps} />}
       {addressType === "erc20" && <ERC20Display {...displayProps} />}

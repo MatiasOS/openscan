@@ -43,7 +43,14 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
       <div className="dashboard-stat-card">
         <div className="dashboard-stat-label">{t("currencyPrice", { currency })}</div>
         <div className="dashboard-stat-value">
-          {loading ? <span className="skeleton-pulse" style={{ width: "80px", height: 20, display: "inline-block" }} /> : formatPrice(price)}
+          {loading ? (
+            <span
+              className="skeleton-pulse"
+              style={{ width: "80px", height: 20, display: "inline-block" }}
+            />
+          ) : (
+            formatPrice(price)
+          )}
         </div>
       </div>
 
@@ -70,15 +77,42 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
           <div className="dashboard-gas-tiers">
             <div className="gas-tier gas-tier-low">
               <span className="gas-tier-label">{t("low")}</span>
-              <span className="gas-tier-value">{loading ? <span className="skeleton-pulse" style={{ width: "50px", height: 14, display: "inline-block" }} /> : formatGasPriceWithUnit(gasPrice)}</span>
+              <span className="gas-tier-value">
+                {loading ? (
+                  <span
+                    className="skeleton-pulse"
+                    style={{ width: "50px", height: 14, display: "inline-block" }}
+                  />
+                ) : (
+                  formatGasPriceWithUnit(gasPrice)
+                )}
+              </span>
             </div>
             <div className="gas-tier gas-tier-avg">
               <span className="gas-tier-label">{t("avg")}</span>
-              <span className="gas-tier-value">{loading ? <span className="skeleton-pulse" style={{ width: "50px", height: 14, display: "inline-block" }} /> : "—"}</span>
+              <span className="gas-tier-value">
+                {loading ? (
+                  <span
+                    className="skeleton-pulse"
+                    style={{ width: "50px", height: 14, display: "inline-block" }}
+                  />
+                ) : (
+                  "—"
+                )}
+              </span>
             </div>
             <div className="gas-tier gas-tier-high">
               <span className="gas-tier-label">{t("high")}</span>
-              <span className="gas-tier-value">{loading ? <span className="skeleton-pulse" style={{ width: "50px", height: 14, display: "inline-block" }} /> : "—"}</span>
+              <span className="gas-tier-value">
+                {loading ? (
+                  <span
+                    className="skeleton-pulse"
+                    style={{ width: "50px", height: 14, display: "inline-block" }}
+                  />
+                ) : (
+                  "—"
+                )}
+              </span>
             </div>
           </div>
         )}
@@ -87,7 +121,14 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
       <div className="dashboard-stat-card">
         <div className="dashboard-stat-label">{t("latestBlock")}</div>
         <div className="dashboard-stat-value">
-          {loading ? <span className="skeleton-pulse" style={{ width: "100px", height: 20, display: "inline-block" }} /> : formatBlockNumber(blockNumber)}
+          {loading ? (
+            <span
+              className="skeleton-pulse"
+              style={{ width: "100px", height: 20, display: "inline-block" }}
+            />
+          ) : (
+            formatBlockNumber(blockNumber)
+          )}
         </div>
       </div>
     </div>

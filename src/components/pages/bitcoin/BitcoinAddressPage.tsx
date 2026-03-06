@@ -44,7 +44,10 @@ export default function BitcoinAddressPage() {
             <span className="block-label">Bitcoin Address</span>
           </div>
           <div className="card-content-loading">
-            <LoaderWithTimeout text="Loading address data..." onRetry={() => window.location.reload()} />
+            <LoaderWithTimeout
+              text="Loading address data..."
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
       </div>
@@ -67,11 +70,13 @@ export default function BitcoinAddressPage() {
 
   return (
     <div className="container-wide page-container-padded">
-      <Breadcrumb items={[
-        { label: "Home", to: "/" },
-        { label: networkSlug === "tbtc" ? "Bitcoin Testnet" : "Bitcoin", to: `/${networkSlug}` },
-        { label: truncatedAddr },
-      ]} />
+      <Breadcrumb
+        items={[
+          { label: "Home", to: "/" },
+          { label: networkSlug === "tbtc" ? "Bitcoin Testnet" : "Bitcoin", to: `/${networkSlug}` },
+          { label: truncatedAddr },
+        ]}
+      />
       {addressResult?.data ? (
         <BitcoinAddressDisplay address={addressResult.data} networkId={networkSlug} />
       ) : (

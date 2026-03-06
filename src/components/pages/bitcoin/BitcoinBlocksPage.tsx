@@ -12,7 +12,6 @@ import {
 } from "../../../utils/bitcoinFormatters";
 import { logger } from "../../../utils/logger";
 
-
 export default function BitcoinBlocksPage() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -137,12 +136,24 @@ export default function BitcoinBlocksPage() {
                 {Array.from({ length: BLOCKS_PER_PAGE }).map((_, i) => (
                   // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
                   <tr key={i}>
-                    <td><span className="skeleton-pulse" style={{ width: "70px", height: 14 }} /></td>
-                    <td><span className="skeleton-pulse" style={{ width: "120px", height: 14 }} /></td>
-                    <td><span className="skeleton-pulse" style={{ width: "60px", height: 14 }} /></td>
-                    <td><span className="skeleton-pulse" style={{ width: "40px", height: 14 }} /></td>
-                    <td className="hide-mobile"><span className="skeleton-pulse" style={{ width: "80px", height: 14 }} /></td>
-                    <td className="hide-mobile"><span className="skeleton-pulse" style={{ width: "80px", height: 14 }} /></td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "70px", height: 14 }} />
+                    </td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "120px", height: 14 }} />
+                    </td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "60px", height: 14 }} />
+                    </td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "40px", height: 14 }} />
+                    </td>
+                    <td className="hide-mobile">
+                      <span className="skeleton-pulse" style={{ width: "80px", height: 14 }} />
+                    </td>
+                    <td className="hide-mobile">
+                      <span className="skeleton-pulse" style={{ width: "80px", height: 14 }} />
+                    </td>
                   </tr>
                 ))}
               </tbody>

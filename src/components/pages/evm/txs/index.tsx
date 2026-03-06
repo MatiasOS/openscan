@@ -190,13 +190,27 @@ export default function Txs() {
                 {Array.from({ length: 10 }).map((_, i) => (
                   // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
                   <tr key={i}>
-                    <td><span className="skeleton-pulse" style={{ width: "120px", height: 14 }} /></td>
-                    <td><span className="skeleton-pulse" style={{ width: "70px", height: 14 }} /></td>
-                    <td><span className="skeleton-pulse" style={{ width: "120px", height: 14 }} /></td>
-                    <td><span className="skeleton-pulse" style={{ width: "120px", height: 14 }} /></td>
-                    <td><span className="skeleton-pulse" style={{ width: "80px", height: 14 }} /></td>
-                    <td className="hide-mobile"><span className="skeleton-pulse" style={{ width: "70px", height: 14 }} /></td>
-                    <td className="hide-mobile"><span className="skeleton-pulse" style={{ width: "60px", height: 14 }} /></td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "120px", height: 14 }} />
+                    </td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "70px", height: 14 }} />
+                    </td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "120px", height: 14 }} />
+                    </td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "120px", height: 14 }} />
+                    </td>
+                    <td>
+                      <span className="skeleton-pulse" style={{ width: "80px", height: 14 }} />
+                    </td>
+                    <td className="hide-mobile">
+                      <span className="skeleton-pulse" style={{ width: "70px", height: 14 }} />
+                    </td>
+                    <td className="hide-mobile">
+                      <span className="skeleton-pulse" style={{ width: "60px", height: 14 }} />
+                    </td>
                   </tr>
                 ))}
               </tbody>
