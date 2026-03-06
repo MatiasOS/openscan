@@ -126,6 +126,45 @@ export default function Txs() {
   const canGoOlder = currentBlock !== null && currentBlock > 0;
   const isAtLatest = requestedBlock === null;
 
+  const Pagination = () => {
+    return (
+      <div className="pagination-container no-margin-top">
+        {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
+        <button
+          onClick={goToLatest}
+          disabled={isAtLatest || loading}
+          className="pagination-btn"
+          title={t("txs.pagination.latestTitle")}
+          aria-label={t("txs.pagination.latestTitle")}
+        >
+          {t("txs.pagination.latest")}
+        </button>
+
+        {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
+        <button
+          onClick={goToNewerBlock}
+          disabled={!canGoNewer || loading}
+          className="pagination-btn"
+          title={t("txs.pagination.newerTitle")}
+          aria-label={t("txs.pagination.newerTitle")}
+        >
+          {t("txs.pagination.newer")}
+        </button>
+
+        {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
+        <button
+          onClick={goToOlderBlock}
+          disabled={!canGoOlder || loading}
+          className="pagination-btn"
+          title={t("txs.pagination.olderTitle")}
+          aria-label={t("txs.pagination.olderTitle")}
+        >
+          {t("txs.pagination.older")}
+        </button>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="container-wide">
@@ -133,6 +172,7 @@ export default function Txs() {
           <div className="blocks-header">
             <span className="block-label">{t("txs.latests", { network: networkName })}</span>
           </div>
+          <Pagination />
           <div className="table-wrapper">
             <table className="dash-table">
               <thead>
@@ -162,6 +202,7 @@ export default function Txs() {
               </tbody>
             </table>
           </div>
+          <Pagination />
         </div>
       </div>
     );
@@ -181,45 +222,6 @@ export default function Txs() {
       </div>
     );
   }
-
-  const Pagination = () => {
-    return (
-      <div className="pagination-container no-margin-top">
-        {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-        <button
-          onClick={goToLatest}
-          disabled={isAtLatest}
-          className="pagination-btn"
-          title={t("txs.pagination.latestTitle")}
-          aria-label={t("txs.pagination.latestTitle")}
-        >
-          {t("txs.pagination.latest")}
-        </button>
-
-        {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-        <button
-          onClick={goToNewerBlock}
-          disabled={!canGoNewer}
-          className="pagination-btn"
-          title={t("txs.pagination.newerTitle")}
-          aria-label={t("txs.pagination.newerTitle")}
-        >
-          {t("txs.pagination.newer")}
-        </button>
-
-        {/** biome-ignore lint/a11y/useButtonType: <TODO> */}
-        <button
-          onClick={goToOlderBlock}
-          disabled={!canGoOlder}
-          className="pagination-btn"
-          title={t("txs.pagination.olderTitle")}
-          aria-label={t("txs.pagination.olderTitle")}
-        >
-          {t("txs.pagination.older")}
-        </button>
-      </div>
-    );
-  };
 
   // Get metadata from block result if available
   const metadata = blockResult?.metadata;
