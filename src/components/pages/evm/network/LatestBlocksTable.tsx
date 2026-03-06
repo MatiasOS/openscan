@@ -112,15 +112,28 @@ const LatestBlocksTable: React.FC<LatestBlocksTableProps> = ({
             // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
             <div key={i} className="dashboard-table-row">
               <div className="dashboard-block-info">
-                <span className="skeleton-pulse" style={{ width: "70px", height: 14 }} />
-                <span className="skeleton-pulse" style={{ width: "40px", height: 12, marginTop: 4 }} />
+                <span className="dashboard-block-number" style={{ pointerEvents: "none" }}>
+                  <span className="skeleton-pulse" style={{ width: "70px", height: 14, display: "inline-block" }} />
+                </span>
+                <span className="dashboard-block-time">
+                  <span className="skeleton-pulse" style={{ width: "40px", height: 12, display: "inline-block" }} />
+                </span>
               </div>
               <div className="dashboard-block-details">
-                <span className="skeleton-pulse" style={{ width: "50px", height: 12 }} />
-                <span className="skeleton-pulse" style={{ width: "40px", height: 12 }} />
+                <span className="dashboard-block-txns">
+                  <span className="skeleton-pulse" style={{ width: "50px", height: 12, display: "inline-block" }} />
+                </span>
+                <span className="dashboard-block-gas">
+                  <span className="skeleton-pulse" style={{ width: "40px", height: 12, display: "inline-block" }} />
+                </span>
+                <span className="dashboard-block-reward">
+                  <span className="skeleton-pulse" style={{ width: "60px", height: 12, display: "inline-block" }} />
+                </span>
               </div>
               <div className="dashboard-block-meta">
-                <span className="skeleton-pulse" style={{ width: "80px", height: 12 }} />
+                <span className="dashboard-block-miner" style={{ pointerEvents: "none" }}>
+                  <span className="skeleton-pulse" style={{ width: "80px", height: 12, display: "inline-block" }} />
+                </span>
               </div>
             </div>
           ))}
