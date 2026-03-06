@@ -7495,8 +7495,11 @@ button.tx-section-header-toggle {
 /* Copy Button */
 /* Breadcrumb */
 .breadcrumb {
-	padding: 8px 0;
-	margin-bottom: 8px;
+	padding: 6px 14px;
+	margin: 0 0 12px 4px;
+	background: var(--overlay-light-3);
+	border-radius: 8px;
+	display: inline-flex;
 }
 
 .breadcrumb-list {
