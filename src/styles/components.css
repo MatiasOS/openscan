@@ -5308,6 +5308,7 @@ button.tx-section-header-toggle {
 	border-radius: 12px;
 	padding: 20px;
 	text-align: center;
+	min-height: 100px;
 }
 
 .dashboard-stat-label {
@@ -5324,6 +5325,10 @@ button.tx-section-header-toggle {
 	font-size: 1.5rem;
 	font-weight: 700;
 	color: var(--color-primary-muted);
+	min-height: 36px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .dashboard-stat-loading {
@@ -5392,6 +5397,9 @@ button.tx-section-header-toggle {
 	font-family: "Outfit", sans-serif;
 	font-size: 0.95rem;
 	font-weight: 600;
+	min-height: 20px;
+	display: flex;
+	align-items: center;
 }
 
 .gas-tier-low .gas-tier-label {
@@ -5501,6 +5509,7 @@ button.tx-section-header-toggle {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
+	min-height: 290px;
 }
 
 /* Transactions table scrollable to match blocks height */
