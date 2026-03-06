@@ -228,9 +228,7 @@
           "Poder de voto en el roadmap"
         ]
       }
-    },
-    "getStarted": "Comenzar",
-    "mostPopular": "Más Popular"
+    }
   },
   "buildWarning": {
     "notProductionBuild": "Esta no es una versión verificada de producción"

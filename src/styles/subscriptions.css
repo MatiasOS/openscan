@@ -85,7 +85,6 @@
 	transition: all 0.3s ease;
 	display: flex;
 	flex-direction: column;
-	position: relative;
 }
 
 .subscriptions-tier-card:hover {
@@ -702,46 +701,4 @@
 		padding: 12px 8px;
 		font-size: 0.85rem;
 	}
-}
-
-/* Tier CTA Button */
-.subscriptions-tier-cta {
-	margin-top: auto;
-	padding-top: 16px;
-	text-align: center;
-}
-
-.subscriptions-tier-cta .button-primary-inline {
-	width: 100%;
-	display: inline-block;
-	text-align: center;
-}
-
-/* Recommended Tier */
-.subscriptions-tier-recommended {
-	border-color: var(--color-primary, #3ecfa0);
-	box-shadow: 0 0 0 1px var(--color-primary-alpha-20, rgba(62, 207, 160, 0.2));
-	position: relative;
-}
-
-.subscriptions-tier-recommended-badge {
-	position: absolute;
-	top: -12px;
-	left: 50%;
-	transform: translateX(-50%);
-	background: var(--color-primary, #3ecfa0);
-	color: var(--bg-primary, #1a1d2e);
-	font-size: 0.75rem;
-	font-weight: 700;
-	padding: 3px 14px;
-	border-radius: 12px;
-	text-transform: uppercase;
-	letter-spacing: 0.5px;
-	white-space: nowrap;
-}
-
-.subscriptions-tier-cta-recommended {
-	background: var(--color-primary, #3ecfa0);
-	color: var(--bg-primary, #1a1d2e);
-	font-weight: 600;
 }

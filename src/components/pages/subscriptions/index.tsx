@@ -235,12 +235,7 @@ const Subscriptions: React.FC = () => {
               const multiplier = tierMultipliers[tier.tier] ?? 1;
               const price = selectedSubscription.basePrice * multiplier;
               return (
-                <div key={tier.tierKey} className={`subscriptions-tier-card ${tier.tierKey === "partner" ? "subscriptions-tier-recommended" : ""}`}>
-                  {tier.tierKey === "partner" && (
-                    <div className="subscriptions-tier-recommended-badge">
-                      {t("subscriptions.mostPopular")}
-                    </div>
-                  )}
+                <div key={tier.tierKey} className="subscriptions-tier-card">
                   <div className="subscriptions-tier-header">
                     <h3 className="subscriptions-tier-name">
                       {t("subscriptions.tierLabel", {
@@ -284,16 +279,6 @@ const Subscriptions: React.FC = () => {
                       })}
                     </div>
                   )}
-                  <div className="subscriptions-tier-cta">
-                    <a
-                      href="https://github.com/openscan-explorer/explorer-metadata"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`button-primary-inline ${tier.tierKey === "partner" ? "subscriptions-tier-cta-recommended" : ""}`}
-                    >
-                      {t("subscriptions.getStarted")}
-                    </a>
-                  </div>
                 </div>
               );
             })}
