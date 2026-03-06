@@ -11,7 +11,7 @@ import {
   truncateBlockHash,
 } from "../../../utils/bitcoinFormatters";
 import { logger } from "../../../utils/logger";
-import LoaderWithTimeout from "../../common/LoaderWithTimeout";
+
 
 export default function BitcoinBlocksPage() {
   const location = useLocation();
@@ -121,8 +121,32 @@ export default function BitcoinBlocksPage() {
           <div className="blocks-header">
             <span className="block-label">{t("latestBlocks", { network: networkName })}</span>
           </div>
-          <div className="card-content-loading">
-            <LoaderWithTimeout text="Loading blocks..." onRetry={() => window.location.reload()} />
+          <div className="table-wrapper">
+            <table className="dash-table">
+              <thead>
+                <tr>
+                  <th>Height</th>
+                  <th>Hash</th>
+                  <th>Time</th>
+                  <th>Txns</th>
+                  <th className="hide-mobile">Size</th>
+                  <th className="hide-mobile">Weight</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: BLOCKS_PER_PAGE }).map((_, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+                  <tr key={i}>
+                    <td><span className="skeleton-pulse" style={{ width: "70px", height: 14 }} /></td>
+                    <td><span className="skeleton-pulse" style={{ width: "120px", height: 14 }} /></td>
+                    <td><span className="skeleton-pulse" style={{ width: "60px", height: 14 }} /></td>
+                    <td><span className="skeleton-pulse" style={{ width: "40px", height: 14 }} /></td>
+                    <td className="hide-mobile"><span className="skeleton-pulse" style={{ width: "80px", height: 14 }} /></td>
+                    <td className="hide-mobile"><span className="skeleton-pulse" style={{ width: "80px", height: 14 }} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

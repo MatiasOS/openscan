@@ -7,9 +7,8 @@ import type { BitcoinTransaction } from "../../../types";
 import { formatBTC, formatTimeAgo, truncateHash } from "../../../utils/bitcoinFormatters";
 import { calculateTotalOutput } from "../../../utils/bitcoinUtils";
 import { logger } from "../../../utils/logger";
-import LoaderWithTimeout from "../../common/LoaderWithTimeout";
-
 const TXS_PER_PAGE = 100;
+const SKELETON_ROWS = 10;
 
 export default function BitcoinTransactionsPage() {
   const location = useLocation();
@@ -135,8 +134,34 @@ export default function BitcoinTransactionsPage() {
           <div className="blocks-header">
             <span className="block-label">{t("btcTxs.title", { network: networkName })}</span>
           </div>
-          <div className="card-content-loading">
-            <LoaderWithTimeout text={t("btcTxs.loading")} onRetry={() => window.location.reload()} />
+          <div className="table-wrapper">
+            <table className="dash-table">
+              <thead>
+                <tr>
+                  <th>{t("btcTxs.txId")}</th>
+                  <th>{t("btcTxs.block")}</th>
+                  <th className="hide-mobile">{t("btcTxs.time")}</th>
+                  <th>{t("btcTxs.inputs")}</th>
+                  <th>{t("btcTxs.outputs")}</th>
+                  <th>{t("btcTxs.value")}</th>
+                  <th className="hide-mobile">{t("btcTxs.size")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: SKELETON_ROWS }).map((_, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
+                  <tr key={i}>
+                    <td><span className="skeleton-pulse" style={{ width: "120px", height: 14 }} /></td>
+                    <td><span className="skeleton-pulse" style={{ width: "70px", height: 14 }} /></td>
+                    <td className="hide-mobile"><span className="skeleton-pulse" style={{ width: "60px", height: 14 }} /></td>
+                    <td><span className="skeleton-pulse" style={{ width: "40px", height: 14 }} /></td>
+                    <td><span className="skeleton-pulse" style={{ width: "40px", height: 14 }} /></td>
+                    <td><span className="skeleton-pulse" style={{ width: "80px", height: 14 }} /></td>
+                    <td className="hide-mobile"><span className="skeleton-pulse" style={{ width: "60px", height: 14 }} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

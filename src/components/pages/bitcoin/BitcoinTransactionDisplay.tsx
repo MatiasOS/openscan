@@ -313,18 +313,21 @@ const BitcoinTransactionDisplay: React.FC<BitcoinTransactionDisplayProps> = Reac
                         <>
                           <div className="btc-io-address">
                             {input.prevout?.scriptPubKey.address ? (
-                              networkId ? (
-                                <Link
-                                  to={`/${networkId}/address/${input.prevout.scriptPubKey.address}`}
-                                  className="link-accent tx-mono"
-                                >
-                                  {input.prevout.scriptPubKey.address}
-                                </Link>
-                              ) : (
-                                <span className="tx-mono">
-                                  {input.prevout.scriptPubKey.address}
-                                </span>
-                              )
+                              <>
+                                {networkId ? (
+                                  <Link
+                                    to={`/${networkId}/address/${input.prevout.scriptPubKey.address}`}
+                                    className="link-accent tx-mono"
+                                  >
+                                    {input.prevout.scriptPubKey.address}
+                                  </Link>
+                                ) : (
+                                  <span className="tx-mono">
+                                    {input.prevout.scriptPubKey.address}
+                                  </span>
+                                )}
+                                <CopyButton value={input.prevout.scriptPubKey.address} />
+                              </>
                             ) : (
                               <span className="tx-mono text-muted">Unknown</span>
                             )}
@@ -394,16 +397,19 @@ const BitcoinTransactionDisplay: React.FC<BitcoinTransactionDisplayProps> = Reac
                     <div className="btc-io-content">
                       <div className="btc-io-address">
                         {output.scriptPubKey.address ? (
-                          networkId ? (
-                            <Link
-                              to={`/${networkId}/address/${output.scriptPubKey.address}`}
-                              className="link-accent tx-mono"
-                            >
-                              {output.scriptPubKey.address}
-                            </Link>
-                          ) : (
-                            <span className="tx-mono">{output.scriptPubKey.address}</span>
-                          )
+                          <>
+                            {networkId ? (
+                              <Link
+                                to={`/${networkId}/address/${output.scriptPubKey.address}`}
+                                className="link-accent tx-mono"
+                              >
+                                {output.scriptPubKey.address}
+                              </Link>
+                            ) : (
+                              <span className="tx-mono">{output.scriptPubKey.address}</span>
+                            )}
+                            <CopyButton value={output.scriptPubKey.address} />
+                          </>
                         ) : (
                           <span className="tx-mono text-muted">
                             {output.scriptPubKey.type === "nulldata"

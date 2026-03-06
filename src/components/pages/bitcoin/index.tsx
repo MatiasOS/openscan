@@ -3,7 +3,6 @@ import { useBitcoinDashboard } from "../../../hooks/useBitcoinDashboard";
 import { resolveNetwork } from "../../../utils/networkResolver";
 import { getAllNetworks } from "../../../config/networks";
 import type { NetworkConfig } from "../../../types";
-import LoaderWithTimeout from "../../common/LoaderWithTimeout";
 import SearchBox from "../../common/SearchBox";
 import BitcoinDashboardStats from "./BitcoinDashboardStats";
 import BitcoinBlocksTable from "./BitcoinBlocksTable";
@@ -44,10 +43,6 @@ export default function BitcoinNetwork() {
         </h1>
         {network.description && <p className="network-description">{network.description}</p>}
         <SearchBox />
-
-        {dashboard.loading && dashboard.latestBlocks.length === 0 && (
-          <LoaderWithTimeout text="Loading Bitcoin network data..." onRetry={() => window.location.reload()} />
-        )}
 
         {dashboard.error && <p className="error-text-center">Error: {dashboard.error}</p>}
 
