@@ -3,9 +3,10 @@ import { AppContext } from "../context/AppContext";
 import { useSettings } from "../context/SettingsContext";
 import { logger } from "../utils/logger";
 import { autoSyncRpcs } from "../utils/rpcAutoSync";
+import { saveRpcUrlsToStorage } from "../utils/rpcStorage";
 
 export function useRpcAutoSync(): void {
-  const { rpcUrls, setRpcUrls, networksLoading, networks } = useContext(AppContext);
+  const { rpcUrls, networksLoading, networks } = useContext(AppContext);
   const { settings, updateSettings } = useSettings();
   const syncedRef = useRef(false); // prevent double-run in React StrictMode
 
@@ -18,12 +19,15 @@ export function useRpcAutoSync(): void {
 
     autoSyncRpcs(rpcUrls, networks)
       .then((sorted) => {
-        setRpcUrls(sorted);
+        // Write to storage only — do not update React state to avoid triggering
+        // data refetches on pages that are already loaded.
+        // The sorted order will be picked up on the next page load.
+        saveRpcUrlsToStorage(sorted);
         updateSettings({ rpcsSynced: true });
       })
       .catch(() => {
         // Don't set rpcsSynced on failure — retry on next load
         logger.warn("Auto-sync RPCs failed");
       });
-  }, [networksLoading, settings.rpcsSynced, rpcUrls, networks, setRpcUrls, updateSettings]);
+  }, [networksLoading, settings.rpcsSynced, rpcUrls, networks, updateSettings]);
 }
