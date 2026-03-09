@@ -173,7 +173,7 @@ export default function Address() {
               // Type detection failed — use the code we already have to distinguish
               // contract from EOA rather than blindly defaulting to "account".
               setAddressType(hasContractCode(addressData.code) ? "contract" : "account");
-            })
+            });
         } else {
           // No RPC URL configured for type detection — derive type from pre-fetched code.
           setAddressType(hasContractCode(addressData.code) ? "contract" : "account");

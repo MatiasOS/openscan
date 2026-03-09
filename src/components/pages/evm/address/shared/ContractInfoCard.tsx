@@ -116,14 +116,13 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
   // - tab switcher active + proxy tab → proxy source files
   // - no tab switcher, proxy with verified impl → implementation source files
   // - otherwise → proxy (contractData) source files
-  const activeSourceData =
-    showAbiTabSwitcher
-      ? abiView === "implementation"
-        ? implementationContractData
-        : contractData
-      : proxyInfo && hasImplAbi
-        ? implementationContractData
-        : contractData;
+  const activeSourceData = showAbiTabSwitcher
+    ? abiView === "implementation"
+      ? implementationContractData
+      : contractData
+    : proxyInfo && hasImplAbi
+      ? implementationContractData
+      : contractData;
 
   const sourceFiles =
     activeSourceData?.files && activeSourceData.files.length > 0
@@ -383,23 +382,26 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
       ) : null}
 
       {/* Bytecode for unverified contracts — hidden when contract-details-section already shows it */}
-      {!hasVerifiedContract && !(proxyInfo && hasImplAbi) && address.code && address.code !== "0x" && (
-        <div className="contract-bytecode-section">
-          <button
-            type="button"
-            className="contract-bytecode-toggle"
-            onClick={() => setShowBytecode(!showBytecode)}
-          >
-            <span className="account-card-label">{t("contractBytecode")}</span>
-            <span className="contract-toggle-icon">{showBytecode ? "−" : "+"}</span>
-          </button>
-          {showBytecode && (
-            <div className="contract-bytecode-content">
-              <code>{address.code}</code>
-            </div>
-          )}
-        </div>
-      )}
+      {!hasVerifiedContract &&
+        !(proxyInfo && hasImplAbi) &&
+        address.code &&
+        address.code !== "0x" && (
+          <div className="contract-bytecode-section">
+            <button
+              type="button"
+              className="contract-bytecode-toggle"
+              onClick={() => setShowBytecode(!showBytecode)}
+            >
+              <span className="account-card-label">{t("contractBytecode")}</span>
+              <span className="contract-toggle-icon">{showBytecode ? "−" : "+"}</span>
+            </button>
+            {showBytecode && (
+              <div className="contract-bytecode-content">
+                <code>{address.code}</code>
+              </div>
+            )}
+          </div>
+        )}
     </div>
   );
 };
