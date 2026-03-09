@@ -57,7 +57,7 @@ export async function autoSyncRpcs(
         const network = networks.find((n) => n.networkId === networkId);
         if (!network) return;
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10_000);
+        const timeout = setTimeout(() => controller.abort(), 5_000);
         try {
           const results = await Promise.all(
             urls.map((url) => testRpcEndpoint(url, controller.signal, network.type)),
