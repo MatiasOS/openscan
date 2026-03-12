@@ -313,18 +313,21 @@ const Settings: React.FC = () => {
 
     localStorage.setItem(SETTINGS_ACTIVE_TAB_KEY, nextTab);
 
-    if (tabFromQuery !== nextTab) {
+    const hasHashFragment = Boolean(location.hash);
+
+    if (tabFromQuery !== nextTab || hasHashFragment) {
       const updatedParams = new URLSearchParams(location.search);
       updatedParams.set("tab", nextTab);
       navigate(
         {
           pathname: location.pathname,
           search: `?${updatedParams.toString()}`,
+          hash: "",
         },
         { replace: true },
       );
     }
-  }, [activeTab, location.pathname, location.search, navigate]);
+  }, [activeTab, location.hash, location.pathname, location.search, navigate]);
 
   const currentDraft = useMemo(
     () => serializeDraft(localRpc, localApiKeys),
@@ -355,6 +358,7 @@ const Settings: React.FC = () => {
         {
           pathname: location.pathname,
           search: `?${updatedParams.toString()}`,
+          hash: "",
         },
         { replace: true },
       );
@@ -868,10 +872,8 @@ const Settings: React.FC = () => {
 
                 <div className="settings-grid settings-tab-grid">
                   <div className="settings-section no-margin">
-                    <h2 className="settings-section-title">🔑 {t("apiKeys.title")}</h2>
+                    <h2 className="settings-section-title">🔑 RPC API Keys</h2>
                     <p className="settings-section-description">{t("apiKeys.description")}</p>
-
-                    <h3 className="settings-api-key-group-title">RPC API Keys</h3>
 
                     <div className="settings-api-key-item">
                       <div className="settings-api-key-header">
@@ -946,8 +948,13 @@ const Settings: React.FC = () => {
                         </button>
                       </div>
                     </div>
+                  </div>
 
-                    <h3 className="settings-api-key-group-title">Verifications API Keys</h3>
+                  <div className="settings-section no-margin">
+                    <h2 className="settings-section-title">🧾 Verifications API Keys</h2>
+                    <p className="settings-section-description">
+                      API keys used for source-code verification services.
+                    </p>
 
                     <div className="settings-api-key-item">
                       <div className="settings-api-key-header">
