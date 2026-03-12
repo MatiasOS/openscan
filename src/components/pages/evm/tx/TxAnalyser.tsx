@@ -965,7 +965,7 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
         {hasEvents && (
           <button
             type="button"
-            className={`tx-analyser-tab${activeTab === "events" ? " tx-analyser-tab--active" : ""}`}
+            className={`tx-analyser-tab${activeTab === "events" ? " tx-analyser-tab--active-base" : ""}`}
             onClick={() => setActiveTab("events")}
           >
             {t("analyser.events")} ({logs.length})
@@ -974,7 +974,7 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
         {hasInputData && (
           <button
             type="button"
-            className={`tx-analyser-tab${activeTab === "inputData" ? " tx-analyser-tab--active" : ""}`}
+            className={`tx-analyser-tab${activeTab === "inputData" ? " tx-analyser-tab--active-base" : ""}`}
             onClick={() => setActiveTab("inputData")}
           >
             {t("analyser.inputDataTab")}

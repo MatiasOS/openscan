@@ -1867,6 +1867,11 @@ button.tx-section-header-toggle {
 	border-bottom-color: var(--color-accent);
 }
 
+.tx-analyser-tab--active-base {
+	color: var(--text-primary);
+	border-bottom-color: var(--text-primary);
+}
+
 .tx-analyser-body {
 	padding: 16px;
 	min-height: 80px;
