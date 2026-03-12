@@ -155,6 +155,12 @@
     "nonceChange": "Nonce",
     "storageChange": "Storage",
     "codeDeployed": "Código",
-    "enriching": "Cargando info de contratos..."
+    "enriching": "Cargando info de contratos...",
+    "gasProfiler": "Perfil de Gas",
+    "gasProfilerEntries": "{{count}} operaciones",
+    "gasColType": "Tipo",
+    "gasColTarget": "Contrato",
+    "gasColFunction": "Función",
+    "gasColGas": "Gas Usado"
   }
 }

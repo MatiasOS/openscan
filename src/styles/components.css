@@ -2142,6 +2142,108 @@ button.tx-section-header-toggle {
 	font-style: italic;
 }
 
+/* Gas Profiler */
+.gas-profiler {
+	border: 1px solid var(--border-primary);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.gas-profiler-header {
+	display: grid;
+	grid-template-columns: 120px 1fr 1fr 140px 120px;
+	gap: 8px;
+	padding: 8px 12px;
+	background: var(--bg-tertiary);
+	border-bottom: 1px solid var(--border-primary);
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: var(--text-tertiary);
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+
+.gas-profiler-row {
+	display: grid;
+	grid-template-columns: 120px 1fr 1fr 140px 120px;
+	gap: 8px;
+	padding: 6px 12px;
+	align-items: center;
+	font-size: 0.82rem;
+	border-bottom: 1px solid var(--border-secondary);
+}
+
+.gas-profiler-row:last-child {
+	border-bottom: none;
+}
+
+.gas-profiler-row:hover {
+	background: var(--overlay-light-5);
+}
+
+.gas-profiler-row--error {
+	background: rgba(239, 68, 68, 0.05);
+}
+
+.gas-profiler-col-gas {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 1px;
+}
+
+.gas-profiler-gas-value {
+	font-family: monospace;
+	font-weight: 500;
+	color: var(--text-primary);
+}
+
+.gas-profiler-gas-pct {
+	font-size: 0.72rem;
+	color: var(--text-tertiary);
+}
+
+.gas-profiler-col-bar {
+	position: relative;
+	height: 16px;
+	background: var(--overlay-light-5);
+	border-radius: 3px;
+	overflow: hidden;
+}
+
+.gas-profiler-bar {
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	border-radius: 3px;
+	opacity: 0.7;
+	min-width: 1px;
+}
+
+.gas-profiler-col-function .call-tree-decoded {
+	font-family: monospace;
+	font-size: 0.8rem;
+}
+
+.gas-profiler-selector {
+	font-family: monospace;
+	font-size: 0.78rem;
+	color: var(--text-tertiary);
+}
+
+.gas-profiler-col-target {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.gas-profiler-col-function {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 /* Input Data Display */
 .input-data-display {
 	background: var(--bg-tertiary);

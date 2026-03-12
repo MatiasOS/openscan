@@ -155,6 +155,12 @@
     "nonceChange": "Nonce",
     "storageChange": "存储",
     "codeDeployed": "代码",
-    "enriching": "正在加载合约信息..."
+    "enriching": "正在加载合约信息...",
+    "gasProfiler": "Gas 分析",
+    "gasProfilerEntries": "{{count}} 个操作",
+    "gasColType": "类型",
+    "gasColTarget": "合约",
+    "gasColFunction": "函数",
+    "gasColGas": "Gas 消耗"
   }
 }

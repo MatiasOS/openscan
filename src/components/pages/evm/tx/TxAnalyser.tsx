@@ -23,7 +23,7 @@ interface TxAnalyserProps {
   dataService: DataService;
 }
 
-type AnalyserTab = "callTree" | "stateChanges";
+type AnalyserTab = "callTree" | "gasProfiler" | "stateChanges";
 
 // ─── Call type color mapping ───────────────────────────────────────────────
 
@@ -386,6 +386,131 @@ const StateChangesTab: React.FC<{
   );
 };
 
+// ─── Gas Profiler Tab ─────────────────────────────────────────────────────
+
+interface GasProfileEntry {
+  type: string;
+  from: string;
+  to?: string;
+  gasUsed: number;
+  percentage: number;
+  input?: string;
+  error?: string;
+  depth: number;
+}
+
+function flattenGasEntries(node: CallNode, depth = 0): GasProfileEntry[] {
+  const entries: GasProfileEntry[] = [];
+  const gasUsed = hexToGas(node.gasUsed) ?? 0;
+  entries.push({
+    type: node.type,
+    from: node.from,
+    to: node.to,
+    gasUsed,
+    percentage: 0, // computed after
+    input: node.input,
+    error: node.error,
+    depth,
+  });
+  if (node.calls) {
+    for (const child of node.calls) {
+      entries.push(...flattenGasEntries(child, depth + 1));
+    }
+  }
+  return entries;
+}
+
+const GasProfilerTab: React.FC<{
+  root: CallNode;
+  networkId: string;
+  contracts: Record<string, ContractInfo>;
+}> = ({ root, networkId, contracts }) => {
+  const { t } = useTranslation("transaction");
+  const totalGas = hexToGas(root.gasUsed) ?? 1;
+
+  const entries = flattenGasEntries(root)
+    .map((e) => ({ ...e, percentage: (e.gasUsed / totalGas) * 100 }))
+    .sort((a, b) => b.gasUsed - a.gasUsed);
+
+  return (
+    <div className="analyser-tab-content">
+      <div className="analyser-summary">
+        <span>{t("analyser.summaryGas", { gas: totalGas.toLocaleString() })}</span>
+        <span>{t("analyser.gasProfilerEntries", { count: entries.length })}</span>
+      </div>
+      <div className="gas-profiler">
+        {/* Header */}
+        <div className="gas-profiler-header">
+          <span className="gas-profiler-col-type">{t("analyser.gasColType")}</span>
+          <span className="gas-profiler-col-target">{t("analyser.gasColTarget")}</span>
+          <span className="gas-profiler-col-function">{t("analyser.gasColFunction")}</span>
+          <span className="gas-profiler-col-gas">{t("analyser.gasColGas")}</span>
+          <span className="gas-profiler-col-bar" />
+        </div>
+        {/* Rows */}
+        {entries.map((entry, i) => {
+          const contractInfo = entry.to ? contracts[entry.to.toLowerCase()] : undefined;
+          const decoded =
+            entry.input && entry.input !== "0x" && contractInfo?.abi
+              ? decodeFunctionCall(entry.input, contractInfo.abi)
+              : null;
+          const color = getCallTypeColor(entry.type);
+
+          return (
+            <div
+              key={`${i}-${entry.type}-${entry.to ?? ""}`}
+              className={`gas-profiler-row${entry.error ? " gas-profiler-row--error" : ""}`}
+            >
+              <span className="gas-profiler-col-type">
+                <span
+                  className="call-tree-type-badge"
+                  style={{ background: `${color}22`, color, borderColor: `${color}66` }}
+                >
+                  {entry.type}
+                </span>
+              </span>
+              <span className="gas-profiler-col-target">
+                {entry.to ? (
+                  <Link
+                    to={`/address/${entry.to}?network=${networkId}`}
+                    className="call-tree-address"
+                  >
+                    {contractInfo?.name ?? <LongString value={entry.to} start={6} end={4} />}
+                  </Link>
+                ) : (
+                  "—"
+                )}
+              </span>
+              <span className="gas-profiler-col-function">
+                {decoded ? (
+                  <span className="call-tree-decoded">{decoded.functionName}</span>
+                ) : entry.input && entry.input !== "0x" ? (
+                  <span className="gas-profiler-selector">{entry.input.slice(0, 10)}</span>
+                ) : (
+                  "—"
+                )}
+              </span>
+              <span className="gas-profiler-col-gas">
+                <span className="gas-profiler-gas-value">{entry.gasUsed.toLocaleString()}</span>
+                <span className="gas-profiler-gas-pct">{entry.percentage.toFixed(1)}%</span>
+              </span>
+              <span className="gas-profiler-col-bar">
+                <span
+                  className="gas-profiler-bar"
+                  style={{
+                    width: `${Math.max(entry.percentage, 0.5)}%`,
+                    backgroundColor: color,
+                  }}
+                />
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 // ─── Main TxAnalyser ───────────────────────────────────────────────────────
 
 const TxAnalyser: React.FC<TxAnalyserProps> = ({
@@ -480,6 +605,13 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
         </button>
         <button
           type="button"
+          className={`tx-analyser-tab${activeTab === "gasProfiler" ? " tx-analyser-tab--active" : ""}`}
+          onClick={() => setActiveTab("gasProfiler")}
+        >
+          {t("analyser.gasProfiler")}
+        </button>
+        <button
+          type="button"
           className={`tx-analyser-tab${activeTab === "stateChanges" ? " tx-analyser-tab--active" : ""}`}
           onClick={() => setActiveTab("stateChanges")}
         >
@@ -508,6 +640,23 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
                 contracts={contracts}
                 enrichmentLoading={enrichmentLoading}
               />
+            )}
+          </>
+        )}
+
+        {activeTab === "gasProfiler" && (
+          <>
+            {loadingCallTree && <div className="analyser-loading">{t("analyser.loading")}</div>}
+            {callTreeError && (
+              <div className="analyser-error">
+                <div>{callTreeError}</div>
+                {callTreeError === t("analyser.notSupported") && (
+                  <div className="analyser-hint">{t("analyser.traceHint")}</div>
+                )}
+              </div>
+            )}
+            {callTree && (
+              <GasProfilerTab root={callTree} networkId={networkId} contracts={contracts} />
             )}
           </>
         )}
