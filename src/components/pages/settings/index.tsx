@@ -340,10 +340,23 @@ const Settings: React.FC = () => {
     }
   }, [activeTab, location.hash, location.pathname, location.search, navigate]);
 
+  const currentDraft = useMemo(
+    () => serializeDraft(localRpc, localApiKeys),
+    [localApiKeys, localRpc, serializeDraft],
+  );
+
   const handleTabChange = useCallback(
     (tab: SettingsTab) => {
       if (tab === activeTab) {
         return;
+      }
+
+      if (
+        activeTab !== "providers" &&
+        tab === "providers" &&
+        currentDraft !== lastSavedDraftRef.current
+      ) {
+        persistConfiguration(localRpc, localApiKeys, { silent: true });
       }
 
       setActiveTab(tab);
@@ -361,12 +374,19 @@ const Settings: React.FC = () => {
         { replace: true },
       );
     },
-    [activeTab, location.pathname, location.search, navigate],
+    [
+      activeTab,
+      currentDraft,
+      localApiKeys,
+      localRpc,
+      location.pathname,
+      location.search,
+      navigate,
+      persistConfiguration,
+    ],
   );
 
   useEffect(() => {
-    const currentDraft = serializeDraft(localRpc, localApiKeys);
-
     if (initialRenderRef.current) {
       initialRenderRef.current = false;
       lastSavedDraftRef.current = currentDraft;
@@ -374,6 +394,15 @@ const Settings: React.FC = () => {
     }
 
     if (currentDraft === lastSavedDraftRef.current) {
+      return;
+    }
+
+    // Providers tab uses explicit save action to avoid auto-save loops while typing API keys.
+    if (activeTab === "providers") {
+      if (saveTimerRef.current) {
+        window.clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = null;
+      }
       return;
     }
 
@@ -393,14 +422,14 @@ const Settings: React.FC = () => {
         window.clearTimeout(saveTimerRef.current);
       }
     };
-  }, [localApiKeys, localRpc, persistConfiguration, serializeDraft]);
+  }, [activeTab, currentDraft, localApiKeys, localRpc, persistConfiguration]);
 
   useEffect(() => {
     return () => {
       if (saveTimerRef.current) {
         window.clearTimeout(saveTimerRef.current);
-        const currentDraft = serializeDraft(localRpc, localApiKeys);
-        if (currentDraft !== lastSavedDraftRef.current) {
+
+        if (activeTab !== "providers" && currentDraft !== lastSavedDraftRef.current) {
           persistConfiguration(localRpc, localApiKeys, { silent: true });
         }
       }
@@ -409,7 +438,7 @@ const Settings: React.FC = () => {
         window.clearTimeout(savedHintTimerRef.current);
       }
     };
-  }, [localApiKeys, localRpc, persistConfiguration, serializeDraft]);
+  }, [activeTab, currentDraft, localApiKeys, localRpc, persistConfiguration]);
 
   const updateField = useCallback((networkId: string, value: string) => {
     setLocalRpc((prev) => ({ ...prev, [networkId]: value }));
@@ -707,6 +736,19 @@ const Settings: React.FC = () => {
         ? "Saved"
         : "Auto-save enabled";
 
+  const hasUnsavedChanges = currentDraft !== lastSavedDraftRef.current;
+  const providersSaveMessage =
+    autoSaveState === "saving"
+      ? "Saving…"
+      : hasUnsavedChanges
+        ? "Unsaved changes"
+        : "All changes saved";
+
+  const handleSaveProviders = useCallback(() => {
+    setAutoSaveState("saving");
+    persistConfiguration(localRpc, localApiKeys);
+  }, [localApiKeys, localRpc, persistConfiguration]);
+
   return (
     <>
       {cacheCleared && (
@@ -831,9 +873,22 @@ const Settings: React.FC = () => {
                 aria-labelledby="settings-tab-providers"
               >
                 <div className="settings-autosave-row">
-                  <span className={`settings-autosave-pill ${autoSaveState}`}>
-                    {autoSaveMessage}
+                  <span
+                    className={`settings-autosave-pill ${!hasUnsavedChanges ? "saved" : autoSaveState}`}
+                  >
+                    {providersSaveMessage}
                   </span>
+                </div>
+
+                <div className="settings-save-section">
+                  <button
+                    type="button"
+                    className="settings-save-button"
+                    onClick={handleSaveProviders}
+                    disabled={!hasUnsavedChanges || autoSaveState === "saving"}
+                  >
+                    {t("saveConfiguration")}
+                  </button>
                 </div>
 
                 <div className="settings-grid settings-tab-grid">
