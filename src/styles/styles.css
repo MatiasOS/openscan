@@ -5283,6 +5283,15 @@ code {
   margin-top: 0;
 }
 
+.settings-api-key-group-title {
+  margin: 16px 0 4px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
 .settings-api-key-header {
   display: flex;
   justify-content: space-between;

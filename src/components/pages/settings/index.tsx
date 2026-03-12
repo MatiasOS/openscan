@@ -286,18 +286,16 @@ const Settings: React.FC = () => {
     });
   }, [settings.apiKeys]);
 
-  // Hydrate active tab from URL (query/hash) or previous session.
+  // Hydrate active tab from URL query or previous session.
+  // We intentionally use a single source of truth (query param) to avoid duplicate `#...#...` URLs.
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tabFromQuery = params.get("tab");
-    const tabFromHash = location.hash ? location.hash.replace(/^#/, "") : null;
 
     let nextTab: SettingsTab | null = null;
 
     if (isValidSettingsTab(tabFromQuery)) {
       nextTab = tabFromQuery;
-    } else if (isValidSettingsTab(tabFromHash)) {
-      nextTab = tabFromHash;
     } else {
       const stored = localStorage.getItem(SETTINGS_ACTIVE_TAB_KEY);
       if (isValidSettingsTab(stored)) {
@@ -315,19 +313,18 @@ const Settings: React.FC = () => {
 
     localStorage.setItem(SETTINGS_ACTIVE_TAB_KEY, nextTab);
 
-    if (!isValidSettingsTab(tabFromQuery) || tabFromQuery !== nextTab) {
+    if (tabFromQuery !== nextTab) {
       const updatedParams = new URLSearchParams(location.search);
       updatedParams.set("tab", nextTab);
       navigate(
         {
           pathname: location.pathname,
           search: `?${updatedParams.toString()}`,
-          hash: `#${nextTab}`,
         },
         { replace: true },
       );
     }
-  }, [activeTab, location.hash, location.pathname, location.search, navigate]);
+  }, [activeTab, location.pathname, location.search, navigate]);
 
   const currentDraft = useMemo(
     () => serializeDraft(localRpc, localApiKeys),
@@ -358,7 +355,6 @@ const Settings: React.FC = () => {
         {
           pathname: location.pathname,
           search: `?${updatedParams.toString()}`,
-          hash: `#${tab}`,
         },
         { replace: true },
       );
@@ -875,6 +871,8 @@ const Settings: React.FC = () => {
                     <h2 className="settings-section-title">🔑 {t("apiKeys.title")}</h2>
                     <p className="settings-section-description">{t("apiKeys.description")}</p>
 
+                    <h3 className="settings-api-key-group-title">RPC API Keys</h3>
+
                     <div className="settings-api-key-item">
                       <div className="settings-api-key-header">
                         <span className="settings-api-key-name">{t("apiKeys.infura.name")}</span>
@@ -948,6 +946,8 @@ const Settings: React.FC = () => {
                         </button>
                       </div>
                     </div>
+
+                    <h3 className="settings-api-key-group-title">Verifications API Keys</h3>
 
                     <div className="settings-api-key-item">
                       <div className="settings-api-key-header">
