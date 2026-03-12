@@ -19,7 +19,11 @@ export function useCallTreeEnrichment(
   const { settings } = useSettings();
   const [contracts, setContracts] = useState<Record<string, ContractInfo>>({});
   const [enrichmentLoading, setEnrichmentLoading] = useState(false);
+  const enrichedTreeRef = useRef<CallNode | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  // Track whether enrichment is needed but hasn't started yet
+  const pendingEnrichment = !!tree && tree !== enrichedTreeRef.current && !enrichmentLoading;
 
   useEffect(() => {
     if (!tree || !networkId) return;
@@ -33,6 +37,7 @@ export function useCallTreeEnrichment(
     const controller = new AbortController();
     abortRef.current = controller;
 
+    enrichedTreeRef.current = tree;
     setEnrichmentLoading(true);
     setContracts({});
 
@@ -47,5 +52,5 @@ export function useCallTreeEnrichment(
     return () => controller.abort();
   }, [tree, networkId, settings.apiKeys?.etherscan]);
 
-  return { contracts, enrichmentLoading };
+  return { contracts, enrichmentLoading: enrichmentLoading || pendingEnrichment };
 }
