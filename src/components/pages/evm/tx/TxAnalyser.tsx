@@ -38,6 +38,7 @@ interface TxAnalyserProps {
   contractAbi?: any[];
   inputData?: string;
   decodedInputData?: DecodedInput | null;
+  isSuperUser?: boolean;
 }
 
 type AnalyserTab = "callTree" | "gasProfiler" | "stateChanges" | "events" | "inputData";
@@ -704,11 +705,6 @@ const EventLogsTab: React.FC<{
 
   return (
     <div className="analyser-tab-content">
-      <div className="analyser-summary">
-        <span>
-          {t("analyser.events")} ({logs.length})
-        </span>
-      </div>
       <div className="tx-logs">
         {logs.map((log, index) => {
           let decoded: DecodedEvent | null = null;
@@ -872,9 +868,13 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
   contractAbi,
   inputData,
   decodedInputData,
+  isSuperUser,
 }) => {
   const { t } = useTranslation("transaction");
-  const [activeTab, setActiveTab] = useState<AnalyserTab>("callTree");
+  const hasEvents = logs && logs.length > 0;
+  const hasInputData = inputData && inputData !== "0x";
+  const defaultTab: AnalyserTab = hasEvents ? "events" : hasInputData ? "inputData" : "callTree";
+  const [activeTab, setActiveTab] = useState<AnalyserTab>(defaultTab);
 
   const [callTree, setCallTree] = useState<CallNode | null>(null);
   const [prestateTrace, setPrestateTrace] = useState<PrestateTrace | null>(null);
@@ -890,8 +890,9 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
     return /method not found|not supported|unsupported|does not exist/i.test(msg);
   }, []);
 
-  // Load call tree on first render
+  // Load call tree on first render (super user only)
   useEffect(() => {
+    if (!isSuperUser) return;
     if (callTree || callTreeError || loadingCallTree) return;
     setLoadingCallTree(true);
     dataService.networkAdapter
@@ -911,10 +912,20 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
         );
       })
       .finally(() => setLoadingCallTree(false));
-  }, [txHash, dataService, callTree, callTreeError, loadingCallTree, t, isUnsupported]);
+  }, [
+    isSuperUser,
+    txHash,
+    dataService,
+    callTree,
+    callTreeError,
+    loadingCallTree,
+    t,
+    isUnsupported,
+  ]);
 
-  // Load prestate when switching to that tab
+  // Load prestate when switching to that tab (super user only)
   useEffect(() => {
+    if (!isSuperUser) return;
     if (activeTab !== "stateChanges") return;
     if (prestateTrace || prestateError || loadingPrestate) return;
     setLoadingPrestate(true);
@@ -936,6 +947,7 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
       })
       .finally(() => setLoadingPrestate(false));
   }, [
+    isSuperUser,
     activeTab,
     txHash,
     dataService,
@@ -950,28 +962,7 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
     <div className="tx-analyser">
       {/* Tab bar */}
       <div className="tx-analyser-tabs">
-        <button
-          type="button"
-          className={`tx-analyser-tab${activeTab === "callTree" ? " tx-analyser-tab--active" : ""}`}
-          onClick={() => setActiveTab("callTree")}
-        >
-          {t("analyser.callTree")}
-        </button>
-        <button
-          type="button"
-          className={`tx-analyser-tab${activeTab === "gasProfiler" ? " tx-analyser-tab--active" : ""}`}
-          onClick={() => setActiveTab("gasProfiler")}
-        >
-          {t("analyser.gasProfiler")}
-        </button>
-        <button
-          type="button"
-          className={`tx-analyser-tab${activeTab === "stateChanges" ? " tx-analyser-tab--active" : ""}`}
-          onClick={() => setActiveTab("stateChanges")}
-        >
-          {t("analyser.stateChanges")}
-        </button>
-        {logs && logs.length > 0 && (
+        {hasEvents && (
           <button
             type="button"
             className={`tx-analyser-tab${activeTab === "events" ? " tx-analyser-tab--active" : ""}`}
@@ -980,7 +971,7 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
             {t("analyser.events")} ({logs.length})
           </button>
         )}
-        {inputData && inputData !== "0x" && (
+        {hasInputData && (
           <button
             type="button"
             className={`tx-analyser-tab${activeTab === "inputData" ? " tx-analyser-tab--active" : ""}`}
@@ -988,6 +979,31 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
           >
             {t("analyser.inputDataTab")}
           </button>
+        )}
+        {isSuperUser && (
+          <>
+            <button
+              type="button"
+              className={`tx-analyser-tab${activeTab === "callTree" ? " tx-analyser-tab--active" : ""}`}
+              onClick={() => setActiveTab("callTree")}
+            >
+              {t("analyser.callTree")}
+            </button>
+            <button
+              type="button"
+              className={`tx-analyser-tab${activeTab === "gasProfiler" ? " tx-analyser-tab--active" : ""}`}
+              onClick={() => setActiveTab("gasProfiler")}
+            >
+              {t("analyser.gasProfiler")}
+            </button>
+            <button
+              type="button"
+              className={`tx-analyser-tab${activeTab === "stateChanges" ? " tx-analyser-tab--active" : ""}`}
+              onClick={() => setActiveTab("stateChanges")}
+            >
+              {t("analyser.stateChanges")}
+            </button>
+          </>
         )}
       </div>
 
