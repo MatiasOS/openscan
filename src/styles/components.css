@@ -513,9 +513,8 @@ button.tx-section-header-toggle {
 
 .tx-log {
 	display: flex;
+	flex-direction: column;
 	border-bottom: 1px solid var(--color-primary-alpha-10);
-	padding: 16px;
-	gap: 16px;
 }
 
 .tx-log:last-child {
@@ -523,8 +522,8 @@ button.tx-section-header-toggle {
 }
 
 .tx-log-index {
-	flex: 0 0 32px;
-	height: 32px;
+	flex: 0 0 24px;
+	height: 24px;
 	background: var(--color-primary-alpha-15);
 	border-radius: 50%;
 	display: flex;
@@ -532,16 +531,16 @@ button.tx-section-header-toggle {
 	justify-content: center;
 	font-family: "Outfit", sans-serif;
 	font-weight: 600;
-	font-size: 0.85rem;
+	font-size: 0.75rem;
 	color: var(--color-primary);
 }
 
 .tx-log-content {
-	flex: 1;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
 	min-width: 0;
+	padding: 8px 16px 8px 16px;
 }
 
 .tx-log-row {
@@ -613,7 +612,6 @@ button.tx-section-header-toggle {
 	display: flex;
 	align-items: center;
 	gap: 10px;
-	margin-bottom: 12px;
 	flex-wrap: wrap;
 }
 
@@ -633,6 +631,7 @@ button.tx-section-header-toggle {
 	font-size: 0.75rem;
 	color: var(--text-secondary);
 	cursor: help;
+	margin-left: 8px;
 }
 
 .tx-log-params {
@@ -2044,6 +2043,56 @@ button.tx-section-header-toggle {
 	font-size: 0.85rem;
 	font-family: "monospace";
 	font-weight: 600;
+}
+
+.state-change-address--toggle {
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.state-change-address--toggle:hover {
+	background: var(--overlay-light-2);
+}
+
+.analyser-expand-controls {
+	margin-left: auto;
+	display: flex;
+	gap: 8px;
+}
+
+.analyser-expand-btn {
+	background: none;
+	border: 1px solid var(--border-primary);
+	border-radius: 4px;
+	padding: 2px 8px;
+	font-size: 0.75rem;
+	color: var(--text-secondary);
+	cursor: pointer;
+}
+
+.analyser-expand-btn:hover {
+	color: var(--text-primary);
+	border-color: var(--text-tertiary);
+}
+
+.tx-log-header--toggle {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 12px;
+	cursor: pointer;
+	font-size: 0.85rem;
+}
+
+.tx-log-header--toggle:hover {
+	background: var(--overlay-light-2);
+}
+
+.tx-log-header-address {
+	font-size: 0.8rem;
+	margin-left: auto;
 }
 
 .state-change-rows {

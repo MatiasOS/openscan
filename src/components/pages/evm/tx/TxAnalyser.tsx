@@ -100,15 +100,11 @@ const CallTreeNode: React.FC<{
     if (!addr) return null;
     return (
       <Link
-        to={`/address/${addr}?network=${networkId}`}
+        to={`/${networkId}/address/${addr}`}
         className="call-tree-address"
         onClick={(e) => e.stopPropagation()}
       >
-        {name ? (
-          <span className="call-tree-contract-name">{name}</span>
-        ) : (
-          <LongString value={addr} start={6} end={4} />
-        )}
+        {name ? <span className="call-tree-contract-name">{name}</span> : addr}
       </Link>
     );
   };
@@ -293,10 +289,25 @@ const StateChangesTab: React.FC<{
   contracts: Record<string, ContractInfo>;
 }> = ({ trace, networkId, networkCurrency, contracts }) => {
   const { t } = useTranslation("transaction");
+  const [expandedSet, setExpandedSet] = useState<Set<string>>(new Set());
 
   const allAddresses = Array.from(new Set([...Object.keys(trace.pre), ...Object.keys(trace.post)]));
 
-  if (allAddresses.length === 0) {
+  // Filter to only addresses with actual changes
+  const changedAddresses = allAddresses.filter((address) => {
+    const pre: PrestateAccountState = trace.pre[address] ?? {};
+    const post: PrestateAccountState = trace.post[address] ?? {};
+    const balDiff = balanceDiff(pre.balance, post.balance);
+    const nonceDiff =
+      pre.nonce !== post.nonce && (pre.nonce !== undefined || post.nonce !== undefined);
+    const storageKeys = Array.from(
+      new Set([...Object.keys(pre.storage ?? {}), ...Object.keys(post.storage ?? {})]),
+    ).filter((k) => pre.storage?.[k] !== post.storage?.[k]);
+    const codeChanged = pre.code !== post.code;
+    return !!(balDiff || nonceDiff || storageKeys.length > 0 || codeChanged);
+  });
+
+  if (changedAddresses.length === 0) {
     return (
       <div className="analyser-tab-content">
         <div className="analyser-empty">{t("analyser.noChanges")}</div>
@@ -304,12 +315,36 @@ const StateChangesTab: React.FC<{
     );
   }
 
+  const toggleAddress = (addr: string) => {
+    setExpandedSet((prev) => {
+      const next = new Set(prev);
+      if (next.has(addr)) next.delete(addr);
+      else next.add(addr);
+      return next;
+    });
+  };
+
+  const expandAll = () => setExpandedSet(new Set(changedAddresses));
+  const collapseAll = () => setExpandedSet(new Set());
+
   return (
     <div className="analyser-tab-content">
-      {allAddresses.map((address) => {
+      <div className="analyser-summary">
+        <span>
+          {changedAddresses.length} {t("analyser.stateChanges").toLowerCase()}
+        </span>
+        <span className="analyser-expand-controls">
+          <button type="button" className="analyser-expand-btn" onClick={expandAll}>
+            {t("analyser.expandAll")}
+          </button>
+          <button type="button" className="analyser-expand-btn" onClick={collapseAll}>
+            {t("analyser.collapseAll")}
+          </button>
+        </span>
+      </div>
+      {changedAddresses.map((address) => {
         const pre: PrestateAccountState = trace.pre[address] ?? {};
         const post: PrestateAccountState = trace.post[address] ?? {};
-
         const balDiff = balanceDiff(pre.balance, post.balance);
         const nonceDiff =
           pre.nonce !== post.nonce && (pre.nonce !== undefined || post.nonce !== undefined);
@@ -317,86 +352,90 @@ const StateChangesTab: React.FC<{
           new Set([...Object.keys(pre.storage ?? {}), ...Object.keys(post.storage ?? {})]),
         ).filter((k) => pre.storage?.[k] !== post.storage?.[k]);
         const codeChanged = pre.code !== post.code;
-
-        if (!balDiff && !nonceDiff && storageKeys.length === 0 && !codeChanged) return null;
-
         const contractName = contracts[address.toLowerCase()]?.name;
+        const isExpanded = expandedSet.has(address);
 
         return (
           <div key={address} className="state-change-block">
-            <div className="state-change-address">
-              <Link to={`/address/${address}?network=${networkId}`} className="call-tree-address">
+            {/* biome-ignore lint/a11y/noStaticElementInteractions: collapsible header */}
+            {/* biome-ignore lint/a11y/useKeyWithClickEvents: collapsible header */}
+            <div
+              className="state-change-address state-change-address--toggle"
+              onClick={() => toggleAddress(address)}
+            >
+              <span className="call-tree-toggle">{isExpanded ? "▾" : "▸"}</span>
+              <Link
+                to={`/${networkId}/address/${address}`}
+                className="call-tree-address"
+                onClick={(e) => e.stopPropagation()}
+              >
                 {contractName ? (
                   <>
                     <span className="call-tree-contract-name">{contractName}</span>
-                    <span className="state-change-addr-sub">
-                      <LongString value={address} start={6} end={4} />
-                    </span>
+                    <span className="state-change-addr-sub">({address})</span>
                   </>
                 ) : (
-                  <LongString value={address} start={10} end={8} />
+                  address
                 )}
               </Link>
             </div>
 
-            <div className="state-change-rows">
-              {/* Balance */}
-              {balDiff && (
-                <div className="state-change-row">
-                  <span className="state-change-label">
-                    {t("analyser.balanceChange")} ({networkCurrency})
-                  </span>
-                  <span className="state-change-before">{formatHexBalance(pre.balance)}</span>
-                  <span className="state-change-arrow">→</span>
-                  <span className="state-change-after">{formatHexBalance(post.balance)}</span>
-                  <span
-                    className={`state-change-diff ${balDiff.startsWith("+") ? "state-change-diff--positive" : "state-change-diff--negative"}`}
-                  >
-                    {balDiff}
-                  </span>
-                </div>
-              )}
+            {isExpanded && (
+              <div className="state-change-rows">
+                {balDiff && (
+                  <div className="state-change-row">
+                    <span className="state-change-label">
+                      {t("analyser.balanceChange")} ({networkCurrency})
+                    </span>
+                    <span className="state-change-before">{formatHexBalance(pre.balance)}</span>
+                    <span className="state-change-arrow">→</span>
+                    <span className="state-change-after">{formatHexBalance(post.balance)}</span>
+                    <span
+                      className={`state-change-diff ${balDiff.startsWith("+") ? "state-change-diff--positive" : "state-change-diff--negative"}`}
+                    >
+                      {balDiff}
+                    </span>
+                  </div>
+                )}
 
-              {/* Nonce */}
-              {nonceDiff && (
-                <div className="state-change-row">
-                  <span className="state-change-label">{t("analyser.nonceChange")}</span>
-                  <span className="state-change-before">{pre.nonce ?? "—"}</span>
-                  <span className="state-change-arrow">→</span>
-                  <span className="state-change-after">{post.nonce ?? "—"}</span>
-                  <span className="state-change-diff state-change-diff--positive">
-                    +{(post.nonce ?? 0) - (pre.nonce ?? 0)}
-                  </span>
-                </div>
-              )}
+                {nonceDiff && (
+                  <div className="state-change-row">
+                    <span className="state-change-label">{t("analyser.nonceChange")}</span>
+                    <span className="state-change-before">{pre.nonce ?? "—"}</span>
+                    <span className="state-change-arrow">→</span>
+                    <span className="state-change-after">{post.nonce ?? "—"}</span>
+                    <span className="state-change-diff state-change-diff--positive">
+                      +{(post.nonce ?? 0) - (pre.nonce ?? 0)}
+                    </span>
+                  </div>
+                )}
 
-              {/* Code */}
-              {codeChanged && (
-                <div className="state-change-row">
-                  <span className="state-change-label">{t("analyser.codeDeployed")}</span>
-                  <span className="state-change-after state-change-code">
-                    {post.code ? `${post.code.slice(0, 20)}…` : "—"}
-                  </span>
-                </div>
-              )}
+                {codeChanged && (
+                  <div className="state-change-row">
+                    <span className="state-change-label">{t("analyser.codeDeployed")}</span>
+                    <span className="state-change-after state-change-code">
+                      {post.code ? `${post.code.slice(0, 20)}…` : "—"}
+                    </span>
+                  </div>
+                )}
 
-              {/* Storage */}
-              {storageKeys.map((slot) => (
-                <div key={slot} className="state-change-row state-change-row--storage">
-                  <span className="state-change-label">{t("analyser.storageChange")}</span>
-                  <span className="state-change-slot">
-                    <LongString value={slot} start={8} end={6} />
-                  </span>
-                  <span className="state-change-before">
-                    <LongString value={pre.storage?.[slot] ?? "0x0"} start={8} end={6} />
-                  </span>
-                  <span className="state-change-arrow">→</span>
-                  <span className="state-change-after">
-                    <LongString value={post.storage?.[slot] ?? "0x0"} start={8} end={6} />
-                  </span>
-                </div>
-              ))}
-            </div>
+                {storageKeys.map((slot) => (
+                  <div key={slot} className="state-change-row state-change-row--storage">
+                    <span className="state-change-label">{t("analyser.storageChange")}</span>
+                    <span className="state-change-slot">
+                      <LongString value={slot} start={8} end={6} />
+                    </span>
+                    <span className="state-change-before">
+                      <LongString value={pre.storage?.[slot] ?? "0x0"} start={8} end={6} />
+                    </span>
+                    <span className="state-change-arrow">→</span>
+                    <span className="state-change-after">
+                      <LongString value={post.storage?.[slot] ?? "0x0"} start={8} end={6} />
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         );
       })}
@@ -593,10 +632,7 @@ const GasProfilerTab: React.FC<{
                 />
                 <span className="gas-profiler-breakdown-label">
                   {entry.to ? (
-                    <Link
-                      to={`/address/${entry.to}?network=${networkId}`}
-                      className="call-tree-address"
-                    >
+                    <Link to={`/${networkId}/address/${entry.to}`} className="call-tree-address">
                       {entry.label}
                     </Link>
                   ) : (
@@ -653,7 +689,6 @@ const InputDataTab: React.FC<{
           </div>
           <div className="tx-decoded-input">
             <div className="tx-decoded-function">
-              <span className="tx-function-badge">{resolved.functionName}</span>
               <span className="tx-function-signature">{resolved.signature}</span>
             </div>
             {resolved.params.length > 0 && (
@@ -702,9 +737,35 @@ const EventLogsTab: React.FC<{
   contracts: Record<string, ContractInfo>;
 }> = ({ logs, networkId, txToAddress, contractAbi, contracts }) => {
   const { t } = useTranslation("transaction");
+  const [expandedSet, setExpandedSet] = useState<Set<number>>(new Set());
+
+  const expandAll = () => setExpandedSet(new Set(logs.map((_, i) => i)));
+  const collapseAll = () => setExpandedSet(new Set());
+
+  const toggleLog = (idx: number) => {
+    setExpandedSet((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
+  };
 
   return (
     <div className="analyser-tab-content">
+      <div className="analyser-summary">
+        <span>
+          {logs.length} {t("analyser.events").toLowerCase()}
+        </span>
+        <span className="analyser-expand-controls">
+          <button type="button" className="analyser-expand-btn" onClick={expandAll}>
+            {t("analyser.expandAll")}
+          </button>
+          <button type="button" className="analyser-expand-btn" onClick={collapseAll}>
+            {t("analyser.collapseAll")}
+          </button>
+        </span>
+      </div>
       <div className="tx-logs">
         {logs.map((log, index) => {
           let decoded: DecodedEvent | null = null;
@@ -738,13 +799,18 @@ const EventLogsTab: React.FC<{
           const displaySignature = abiDecoded?.signature || decoded?.fullSignature;
           const displayParams = abiDecoded?.params || decoded?.params || [];
 
+          const isExpanded = expandedSet.has(index);
+
           return (
             // biome-ignore lint/suspicious/noArrayIndexKey: log index is stable
             <div key={index} className="tx-log">
-              <div className="tx-log-index">{index}</div>
-              <div className="tx-log-content">
+              {/* biome-ignore lint/a11y/noStaticElementInteractions: collapsible header */}
+              {/* biome-ignore lint/a11y/useKeyWithClickEvents: collapsible header */}
+              <div className="tx-log-header tx-log-header--toggle" onClick={() => toggleLog(index)}>
+                <span className="call-tree-toggle">{isExpanded ? "▾" : "▸"}</span>
+                <span className="tx-log-index">{index}</span>
                 {hasDecoded && (
-                  <div className="tx-log-decoded">
+                  <div>
                     <span
                       className="tx-event-badge"
                       style={
@@ -763,91 +829,99 @@ const EventLogsTab: React.FC<{
                     >
                       {displaySignature}
                     </span>
-                    {abiDecoded && (
-                      <span className="tx-abi-badge" title="Decoded using contract ABI">
-                        {t("logsAbi")}
-                      </span>
-                    )}
                   </div>
                 )}
-
-                <div className="tx-log-row">
-                  <span className="tx-log-label">{t("logsAddress")}</span>
-                  <span className="tx-log-value tx-mono">
-                    <Link to={`/${networkId}/address/${log.address}`} className="link-accent">
-                      {enrichedContract?.name ? (
-                        <>
-                          {enrichedContract.name}{" "}
-                          <span className="tx-log-address-hex">
-                            (<LongString value={log.address} start={6} end={4} />)
-                          </span>
-                        </>
-                      ) : (
-                        log.address
-                      )}
-                    </Link>
-                  </span>
-                </div>
-
-                {displayParams.length > 0 && (
-                  <div className="tx-log-row tx-log-params">
-                    <span className="tx-log-label">{t("logsDecoded")}</span>
-                    <div className="tx-log-value">
-                      {displayParams.map((param, i) => (
-                        // biome-ignore lint/suspicious/noArrayIndexKey: param index is stable
-                        <div key={i} className="tx-decoded-param">
-                          <span className="tx-param-name">{param.name}</span>
-                          <span className="tx-param-type">({param.type})</span>
-                          <span
-                            className={`tx-param-value ${param.type === "address" ? "tx-mono" : ""}`}
-                          >
-                            {param.type === "address" ? (
-                              <Link
-                                to={`/${networkId}/address/${param.value}`}
-                                className="link-accent"
-                              >
-                                {param.value}
-                              </Link>
-                            ) : (
-                              formatDecodedValue(param.value, param.type)
-                            )}
-                          </span>
-                          {param.indexed && (
-                            <span className="tx-param-indexed">{t("logsIndexed")}</span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {log.topics && log.topics.length > 0 && (
-                  <div className="tx-log-row tx-log-topics">
-                    <span className="tx-log-label">
-                      {hasDecoded ? t("logsRawTopics") : t("logsTopics")}
-                    </span>
-                    <div className="tx-log-value">
-                      {log.topics.map((topic: string, i: number) => (
-                        <div key={topic} className="tx-topic">
-                          <span className="tx-topic-index">[{i}]</span>
-                          <code className="tx-topic-value">{topic}</code>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {log.data && log.data !== "0x" && (
-                  <div className="tx-log-row">
-                    <span className="tx-log-label">
-                      {hasDecoded ? t("logsRawData") : t("logsData")}
-                    </span>
-                    <div className="tx-log-value">
-                      <code className="tx-log-data">{log.data}</code>
-                    </div>
-                  </div>
-                )}
+                <span className="tx-log-header-address tx-mono">
+                  <Link
+                    to={`/${networkId}/address/${log.address}`}
+                    className="link-accent"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {enrichedContract?.name ?? log.address}
+                  </Link>
+                </span>
               </div>
+
+              {isExpanded && (
+                <div className="tx-log-content">
+                  <div className="tx-log-row">
+                    <span className="tx-log-label">{t("logsAddress")}</span>
+                    <span className="tx-log-value tx-mono">
+                      <Link to={`/${networkId}/address/${log.address}`} className="link-accent">
+                        {enrichedContract?.name ? (
+                          <>
+                            {enrichedContract.name}{" "}
+                            <span className="tx-log-address-hex">
+                              (<LongString value={log.address} start={6} end={4} />)
+                            </span>
+                          </>
+                        ) : (
+                          log.address
+                        )}
+                      </Link>
+                    </span>
+                  </div>
+
+                  {displayParams.length > 0 && (
+                    <div className="tx-log-row tx-log-params">
+                      <span className="tx-log-label">{t("logsDecoded")}</span>
+                      <div className="tx-log-value">
+                        {displayParams.map((param, i) => (
+                          // biome-ignore lint/suspicious/noArrayIndexKey: param index is stable
+                          <div key={i} className="tx-decoded-param">
+                            <span className="tx-param-name">{param.name}</span>
+                            <span className="tx-param-type">({param.type})</span>
+                            <span
+                              className={`tx-param-value ${param.type === "address" ? "tx-mono" : ""}`}
+                            >
+                              {param.type === "address" ? (
+                                <Link
+                                  to={`/${networkId}/address/${param.value}`}
+                                  className="link-accent"
+                                >
+                                  {param.value}
+                                </Link>
+                              ) : (
+                                formatDecodedValue(param.value, param.type)
+                              )}
+                            </span>
+                            {param.indexed && (
+                              <span className="tx-param-indexed">{t("logsIndexed")}</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {log.topics && log.topics.length > 0 && (
+                    <div className="tx-log-row tx-log-topics">
+                      <span className="tx-log-label">
+                        {hasDecoded ? t("logsRawTopics") : t("logsTopics")}
+                      </span>
+                      <div className="tx-log-value">
+                        {log.topics.map((topic: string, i: number) => (
+                          <div key={topic} className="tx-topic">
+                            <span className="tx-topic-index">[{i}]</span>
+                            <code className="tx-topic-value">{topic}</code>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {log.data && log.data !== "0x" && (
+                    <div className="tx-log-row">
+                      <span className="tx-log-label">
+                        {hasDecoded ? t("logsRawData") : t("logsData")}
+                      </span>
+                      <div className="tx-log-value">
+                        <code className="tx-log-data">{log.data}</code>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}

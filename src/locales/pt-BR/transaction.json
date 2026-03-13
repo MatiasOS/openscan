@@ -162,6 +162,8 @@
     "gasResetView": "Redefinir zoom",
     "events": "Eventos",
     "inputDataTab": "Dados de Entrada",
-    "rawInputData": "Dados de Entrada Brutos"
+    "rawInputData": "Dados de Entrada Brutos",
+    "expandAll": "Expandir Tudo",
+    "collapseAll": "Recolher Tudo"
   }
 }

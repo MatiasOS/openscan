@@ -162,6 +162,8 @@
     "gasResetView": "Reset zoom",
     "events": "Events",
     "inputDataTab": "Input Data",
-    "rawInputData": "Raw Input Data"
+    "rawInputData": "Raw Input Data",
+    "expandAll": "Expand All",
+    "collapseAll": "Collapse All"
   }
 }

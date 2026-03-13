@@ -162,6 +162,8 @@
     "gasResetView": "ズームをリセット",
     "events": "イベント",
     "inputDataTab": "入力データ",
-    "rawInputData": "生の入力データ"
+    "rawInputData": "生の入力データ",
+    "expandAll": "すべて展開",
+    "collapseAll": "すべて折りたたむ"
   }
 }
