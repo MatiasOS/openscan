@@ -164,6 +164,8 @@
     "inputDataTab": "Dados de Entrada",
     "rawInputData": "Dados de Entrada Brutos",
     "expandAll": "Expandir Tudo",
-    "collapseAll": "Recolher Tudo"
+    "collapseAll": "Recolher Tudo",
+    "expand": "Expandir",
+    "collapse": "Recolher"
   }
 }

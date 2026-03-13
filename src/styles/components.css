@@ -1840,8 +1840,23 @@ button.tx-section-header-toggle {
 
 .tx-analyser-tabs {
 	display: flex;
+	align-items: center;
 	border-bottom: 1px solid var(--border-primary);
 	background: var(--bg-tertiary);
+}
+
+.tx-analyser-collapse-btn {
+	margin-left: auto;
+	padding: 6px 12px;
+	background: none;
+	border: none;
+	color: var(--text-tertiary);
+	cursor: pointer;
+	font-size: 0.85rem;
+}
+
+.tx-analyser-collapse-btn:hover {
+	color: var(--text-primary);
 }
 
 .tx-analyser-tab {

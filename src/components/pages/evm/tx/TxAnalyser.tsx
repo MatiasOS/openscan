@@ -954,7 +954,9 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
   // Reset to a base tab when leaving super user mode
   // biome-ignore lint/correctness/useExhaustiveDependencies: only react to isSuperUser changes
   useEffect(() => {
-    if (!isSuperUser) {
+    if (isSuperUser) {
+      setCollapsed(false);
+    } else {
       const superTabs: AnalyserTab[] = ["callTree", "gasProfiler", "stateChanges"];
       setActiveTab((prev) => (superTabs.includes(prev) ? defaultTab : prev));
     }
@@ -1087,6 +1089,20 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
     isUnsupported,
   ]);
 
+  const [collapsed, setCollapsed] = useState(!isSuperUser);
+
+  const handleTabClick = useCallback(
+    (tab: AnalyserTab) => {
+      if (tab === activeTab) {
+        setCollapsed((c) => !c);
+      } else {
+        setActiveTab(tab);
+        setCollapsed(false);
+      }
+    },
+    [activeTab],
+  );
+
   return (
     <div className="tx-analyser">
       {/* Tab bar */}
@@ -1095,7 +1111,7 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
           <button
             type="button"
             className={`tx-analyser-tab${activeTab === "events" ? " tx-analyser-tab--active-base" : ""}`}
-            onClick={() => setActiveTab("events")}
+            onClick={() => handleTabClick("events")}
           >
             {t("analyser.events")} ({logs.length})
           </button>
@@ -1104,7 +1120,7 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
           <button
             type="button"
             className={`tx-analyser-tab${activeTab === "inputData" ? " tx-analyser-tab--active-base" : ""}`}
-            onClick={() => setActiveTab("inputData")}
+            onClick={() => handleTabClick("inputData")}
           >
             {t("analyser.inputDataTab")}
           </button>
@@ -1114,131 +1130,141 @@ const TxAnalyser: React.FC<TxAnalyserProps> = ({
             <button
               type="button"
               className={`tx-analyser-tab${activeTab === "callTree" ? " tx-analyser-tab--active" : ""}`}
-              onClick={() => setActiveTab("callTree")}
+              onClick={() => handleTabClick("callTree")}
             >
               {t("analyser.callTree")}
             </button>
             <button
               type="button"
               className={`tx-analyser-tab${activeTab === "gasProfiler" ? " tx-analyser-tab--active" : ""}`}
-              onClick={() => setActiveTab("gasProfiler")}
+              onClick={() => handleTabClick("gasProfiler")}
             >
               {t("analyser.gasProfiler")}
             </button>
             <button
               type="button"
               className={`tx-analyser-tab${activeTab === "stateChanges" ? " tx-analyser-tab--active" : ""}`}
-              onClick={() => setActiveTab("stateChanges")}
+              onClick={() => handleTabClick("stateChanges")}
             >
               {t("analyser.stateChanges")}
             </button>
           </>
         )}
+        <button
+          type="button"
+          className="tx-analyser-collapse-btn"
+          onClick={() => setCollapsed((c) => !c)}
+          aria-label={collapsed ? t("analyser.expand") : t("analyser.collapse")}
+        >
+          {collapsed ? `▸ ${t("analyser.expand")}` : `▾ ${t("analyser.collapse")}`}
+        </button>
       </div>
 
       {/* Tab content */}
-      <div className="tx-analyser-body">
-        {activeTab === "callTree" && (
-          <>
-            {(loadingCallTree || enrichmentLoading) && (
-              <div className="analyser-loading">
-                {loadingCallTree ? t("analyser.loading") : t("analyser.enriching")}
-              </div>
-            )}
-            {callTreeError && (
-              <div className="analyser-error">
-                <div>{callTreeError}</div>
-                {callTreeError === t("analyser.notSupported") && (
-                  <div className="analyser-hint">{t("analyser.traceHint")}</div>
-                )}
-              </div>
-            )}
-            {callTree && !enrichmentLoading && (
-              <CallTreeTab
-                root={callTree}
-                networkId={networkId}
-                networkCurrency={networkCurrency}
-                contracts={contracts}
-                enrichmentLoading={false}
-              />
-            )}
-          </>
-        )}
+      {!collapsed && (
+        <div className="tx-analyser-body">
+          {activeTab === "callTree" && (
+            <>
+              {(loadingCallTree || enrichmentLoading) && (
+                <div className="analyser-loading">
+                  {loadingCallTree ? t("analyser.loading") : t("analyser.enriching")}
+                </div>
+              )}
+              {callTreeError && (
+                <div className="analyser-error">
+                  <div>{callTreeError}</div>
+                  {callTreeError === t("analyser.notSupported") && (
+                    <div className="analyser-hint">{t("analyser.traceHint")}</div>
+                  )}
+                </div>
+              )}
+              {callTree && !enrichmentLoading && (
+                <CallTreeTab
+                  root={callTree}
+                  networkId={networkId}
+                  networkCurrency={networkCurrency}
+                  contracts={contracts}
+                  enrichmentLoading={false}
+                />
+              )}
+            </>
+          )}
 
-        {activeTab === "gasProfiler" && (
-          <>
-            {(loadingCallTree || enrichmentLoading) && (
-              <div className="analyser-loading">
-                {loadingCallTree ? t("analyser.loading") : t("analyser.enriching")}
-              </div>
-            )}
-            {callTreeError && (
-              <div className="analyser-error">
-                <div>{callTreeError}</div>
-                {callTreeError === t("analyser.notSupported") && (
-                  <div className="analyser-hint">{t("analyser.traceHint")}</div>
-                )}
-              </div>
-            )}
-            {callTree && !enrichmentLoading && (
-              <GasProfilerTab root={callTree} networkId={networkId} contracts={contracts} />
-            )}
-          </>
-        )}
+          {activeTab === "gasProfiler" && (
+            <>
+              {(loadingCallTree || enrichmentLoading) && (
+                <div className="analyser-loading">
+                  {loadingCallTree ? t("analyser.loading") : t("analyser.enriching")}
+                </div>
+              )}
+              {callTreeError && (
+                <div className="analyser-error">
+                  <div>{callTreeError}</div>
+                  {callTreeError === t("analyser.notSupported") && (
+                    <div className="analyser-hint">{t("analyser.traceHint")}</div>
+                  )}
+                </div>
+              )}
+              {callTree && !enrichmentLoading && (
+                <GasProfilerTab root={callTree} networkId={networkId} contracts={contracts} />
+              )}
+            </>
+          )}
 
-        {activeTab === "stateChanges" && (
-          <>
-            {(loadingPrestate || enrichmentLoading) && (
-              <div className="analyser-loading">
-                {loadingPrestate ? t("analyser.loading") : t("analyser.enriching")}
-              </div>
-            )}
-            {prestateError && (
-              <div className="analyser-error">
-                <div>{prestateError}</div>
-                {prestateError === t("analyser.notSupported") && (
-                  <div className="analyser-hint">{t("analyser.traceHint")}</div>
-                )}
-              </div>
-            )}
-            {prestateTrace && !enrichmentLoading && (
-              <StateChangesTab
-                trace={prestateTrace}
-                networkId={networkId}
-                networkCurrency={networkCurrency}
-                contracts={contracts}
-              />
-            )}
-          </>
-        )}
+          {activeTab === "stateChanges" && (
+            <>
+              {(loadingPrestate || enrichmentLoading) && (
+                <div className="analyser-loading">
+                  {loadingPrestate ? t("analyser.loading") : t("analyser.enriching")}
+                </div>
+              )}
+              {prestateError && (
+                <div className="analyser-error">
+                  <div>{prestateError}</div>
+                  {prestateError === t("analyser.notSupported") && (
+                    <div className="analyser-hint">{t("analyser.traceHint")}</div>
+                  )}
+                </div>
+              )}
+              {prestateTrace && !enrichmentLoading && (
+                <StateChangesTab
+                  trace={prestateTrace}
+                  networkId={networkId}
+                  networkCurrency={networkCurrency}
+                  contracts={contracts}
+                />
+              )}
+            </>
+          )}
 
-        {activeTab === "events" && logs && logs.length > 0 && (
-          <>
-            {logEnrichmentLoading && (
-              <div className="analyser-loading">{t("analyser.enriching")}</div>
-            )}
-            {!logEnrichmentLoading && (
-              <EventLogsTab
-                logs={logs}
-                networkId={networkId}
-                txToAddress={txToAddress}
-                contractAbi={contractAbi}
-                contracts={contracts}
-              />
-            )}
-          </>
-        )}
+          {activeTab === "events" && logs && logs.length > 0 && (
+            <>
+              {logEnrichmentLoading && (
+                <div className="analyser-loading">{t("analyser.enriching")}</div>
+              )}
+              {!logEnrichmentLoading && (
+                <EventLogsTab
+                  logs={logs}
+                  networkId={networkId}
+                  txToAddress={txToAddress}
+                  contractAbi={contractAbi}
+                  contracts={contracts}
+                />
+              )}
+            </>
+          )}
 
-        {activeTab === "inputData" && inputData && inputData !== "0x" && (
-          <InputDataTab
-            inputData={inputData}
-            decodedInput={decodedInputData ?? null}
-            networkId={networkId}
-            contracts={contracts}
-            txToAddress={txToAddress}
-          />
-        )}
-      </div>
+          {activeTab === "inputData" && inputData && inputData !== "0x" && (
+            <InputDataTab
+              inputData={inputData}
+              decodedInput={decodedInputData ?? null}
+              networkId={networkId}
+              contracts={contracts}
+              txToAddress={txToAddress}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 };

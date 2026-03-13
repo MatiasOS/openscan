@@ -164,6 +164,8 @@
     "inputDataTab": "输入数据",
     "rawInputData": "原始输入数据",
     "expandAll": "全部展开",
-    "collapseAll": "全部折叠"
+    "collapseAll": "全部折叠",
+    "expand": "展开",
+    "collapse": "折叠"
   }
 }

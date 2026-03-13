@@ -164,6 +164,8 @@
     "inputDataTab": "Input Data",
     "rawInputData": "Raw Input Data",
     "expandAll": "Expand All",
-    "collapseAll": "Collapse All"
+    "collapseAll": "Collapse All",
+    "expand": "Expand",
+    "collapse": "Collapse"
   }
 }

@@ -164,6 +164,8 @@
     "inputDataTab": "入力データ",
     "rawInputData": "生の入力データ",
     "expandAll": "すべて展開",
-    "collapseAll": "すべて折りたたむ"
+    "collapseAll": "すべて折りたたむ",
+    "expand": "展開",
+    "collapse": "折りたたむ"
   }
 }
