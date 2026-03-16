@@ -127,6 +127,28 @@
     "settingsSaved": "配置保存成功！",
     "cacheCleared": "缓存已清除！"
   },
+  "superUser": {
+    "title": "超级用户",
+    "description": "超级用户模式的高级设置。",
+    "enabled": {
+      "label": "超级用户模式",
+      "description": "启用高级功能，如交易分析器、调用树、Gas分析器和状态变更。"
+    },
+    "persistentCache": {
+      "label": "持久缓存",
+      "description": "将区块链数据缓存到本地存储中，以加快跨会话访问速度。",
+      "sizeLimit": {
+        "label": "缓存大小限制",
+        "description": "持久缓存的最大存储空间。"
+      },
+      "usage": "已使用 {{used}} / {{limit}}",
+      "clear": {
+        "label": "清除持久缓存",
+        "description": "从本地存储中删除所有缓存的区块链数据。",
+        "button": "清除缓存"
+      }
+    }
+  },
   "rpcEndpoints": {
     "title": "RPC 端点",
     "description": "为每个网络配置 RPC URL。点击网络展开并配置其端点。",

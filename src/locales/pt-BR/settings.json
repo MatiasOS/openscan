@@ -127,6 +127,28 @@
     "settingsSaved": "Configurações salvas com sucesso!",
     "cacheCleared": "Cache limpo!"
   },
+  "superUser": {
+    "title": "Super Usuário",
+    "description": "Configurações avançadas para o modo super usuário.",
+    "enabled": {
+      "label": "Modo Super Usuário",
+      "description": "Habilitar recursos avançados como Analisador de TX, árvore de chamadas, perfilador de gas e mudanças de estado."
+    },
+    "persistentCache": {
+      "label": "Cache Persistente",
+      "description": "Armazenar dados de blockchain no armazenamento local para acesso mais rápido entre sessões.",
+      "sizeLimit": {
+        "label": "Limite de Tamanho do Cache",
+        "description": "Espaço máximo de armazenamento para o cache persistente."
+      },
+      "usage": "Usando {{used}} de {{limit}}",
+      "clear": {
+        "label": "Limpar Cache Persistente",
+        "description": "Remover todos os dados de blockchain armazenados do armazenamento local.",
+        "button": "Limpar Cache"
+      }
+    }
+  },
   "rpcEndpoints": {
     "title": "Endpoints RPC",
     "description": "Configure URLs RPC para cada rede. Clique em uma rede para expandir e configurar seus endpoints.",

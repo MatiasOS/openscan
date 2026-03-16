@@ -90,7 +90,7 @@ const Settings: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { rpcUrls, setRpcUrls } = useContext(AppContext);
-  const { settings, updateSettings } = useSettings();
+  const { settings, updateSettings, isSuperUser, toggleSuperUserMode } = useSettings();
   const { enabledNetworks } = useNetworks();
   const { isMetaMaskAvailable, isSupported, setAsDefaultExplorer } = useMetaMaskExplorer();
   const [activeTab, setActiveTab] = useState<SettingsTab>("network");
@@ -1553,6 +1553,28 @@ const Settings: React.FC = () => {
                   <div className="settings-section no-margin">
                     <h2 className="settings-section-title">{t("superUser.title")}</h2>
                     <p className="settings-section-description">{t("superUser.description")}</p>
+
+                    <div className="settings-item">
+                      <div>
+                        <div className="settings-item-label">{t("superUser.enabled.label")}</div>
+                        <div className="settings-item-description">
+                          {t("superUser.enabled.description")}
+                        </div>
+                      </div>
+                      <label className="settings-toggle">
+                        <input
+                          type="checkbox"
+                          checked={isSuperUser}
+                          onChange={toggleSuperUserMode}
+                          className="settings-toggle-input"
+                        />
+                        <span className={`settings-toggle-slider ${isSuperUser ? "active" : ""}`}>
+                          <span className={`settings-toggle-knob ${isSuperUser ? "active" : ""}`} />
+                        </span>
+                      </label>
+                    </div>
+
+                    <br />
 
                     <div className="settings-item">
                       <div>

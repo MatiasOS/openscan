@@ -130,6 +130,10 @@
   "superUser": {
     "title": "Super User",
     "description": "Advanced settings for super user mode.",
+    "enabled": {
+      "label": "Super User Mode",
+      "description": "Enable advanced features like TX Analyser, call tree, gas profiler, and state changes."
+    },
     "persistentCache": {
       "label": "Persistent Cache",
       "description": "Cache blockchain data in local storage for faster access across sessions.",

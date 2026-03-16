@@ -130,6 +130,10 @@
   "superUser": {
     "title": "Super Usuario",
     "description": "Configuración avanzada para el modo super usuario.",
+    "enabled": {
+      "label": "Modo Super Usuario",
+      "description": "Habilitar funciones avanzadas como Analizador de TX, árbol de llamadas, perfilador de gas y cambios de estado."
+    },
     "persistentCache": {
       "label": "Cache Persistente",
       "description": "Cachear datos de blockchain en almacenamiento local para acceso más rápido entre sesiones.",
