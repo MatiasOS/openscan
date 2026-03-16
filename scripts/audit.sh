@@ -8,7 +8,7 @@ echo "Generating package-lock.json..."
 npm i --package-lock-only --silent
 
 echo "Running npm audit..."
-npm audit "$@" || true
+npm audit --audit-level=moderate "$@"
 
 echo "Cleaning up..."
 rm -f package-lock.json
