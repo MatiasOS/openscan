@@ -75,7 +75,7 @@ interface SourcifyV2Raw {
 
 function normalizeMatch(raw?: string): "perfect" | "partial" | null {
   if (!raw) return null;
-  if (raw === "exact_match" || raw === "perfect") return "perfect";
+  if (raw === "match" || raw === "exact_match" || raw === "perfect") return "perfect";
   if (raw.includes("partial")) return "partial";
   return null;
 }
