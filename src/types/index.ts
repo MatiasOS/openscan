@@ -74,6 +74,8 @@ export interface Transaction {
   gasPrice: string;
   maxFeePerGas?: string;
   maxPriorityFeePerGas?: string;
+  maxFeePerBlobGas?: string;
+  blobVersionedHashes?: string[];
   hash: string;
   nonce: string;
   to: string;
@@ -108,6 +110,8 @@ export interface TransactionReceipt {
   transactionHash: string;
   transactionIndex: string;
   type: string;
+  blobGasUsed?: string;
+  blobGasPrice?: string;
 }
 
 export interface TransactionReceiptArbitrum extends TransactionReceipt {
@@ -421,6 +425,7 @@ export type RpcUrlsContextType = Record<string, RPCUrls>;
 export interface ApiKeys {
   infura?: string;
   alchemy?: string;
+  etherscan?: string;
   groq?: string;
   openai?: string;
   anthropic?: string;
@@ -431,7 +436,13 @@ export interface ApiKeys {
 /**
  * Supported AI providers for blockchain analysis
  */
-export type AIProvider = "groq" | "openai" | "anthropic" | "perplexity" | "gemini";
+export type AIProvider =
+  | "openscan-groq"
+  | "groq"
+  | "openai"
+  | "anthropic"
+  | "perplexity"
+  | "gemini";
 
 /**
  * Configuration for an AI provider

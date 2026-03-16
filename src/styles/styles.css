@@ -634,37 +634,7 @@ a.navbar-logo-dropdown-item:hover {
 }
 
 /* Notifications */
-.notification-container {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  z-index: 1000;
-  width: clamp(240px, 90vw, 520px);
-}
-
-.notification {
-  padding: 14px 18px;
-}
-
-.notification__content {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.notification__message {
-  flex: 1;
-  line-height: 1.3;
-}
-
-.notification__close {
-  padding: 2px 6px;
-  cursor: pointer;
-}
+/* Base notification styles moved to notification section below */
 
 /* Loading */
 .loading-container {
@@ -2497,35 +2467,42 @@ a.navbar-logo-dropdown-item:hover {
 /* Notifications */
 .notification-container {
   position: fixed;
-  top: 20px;
+  top: 70px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 10px;
   z-index: 1000;
-  width: clamp(240px, 90vw, 520px);
 }
 
 .notification {
+  width: clamp(240px, 90vw, 520px);
   padding: 14px 18px;
-  border-radius: var(--radius-sm);
-  box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.5);
-  border-left: 5px solid var(--accent);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--overlay-light-10);
   background: var(--panel);
   backdrop-filter: blur(10px);
 }
 
 .notification--success {
-  border-left-color: var(--success);
+  border-color: var(--success);
 }
 
 .notification--warning {
-  border-left-color: var(--warning);
+  background: rgba(255, 193, 7, 0.12);
+  border-color: var(--warning);
+  color: var(--warning);
+}
+
+.notification--warning .notification__message {
+  color: var(--warning);
 }
 
 .notification--error {
-  border-left-color: var(--danger);
+  border-color: var(--danger);
 }
 
 .notification__content {
@@ -4678,6 +4655,147 @@ code {
   text-align: center;
 }
 
+.settings-tabs-shell {
+  margin-bottom: 20px;
+}
+
+.settings-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 4px;
+  background: var(--color-primary-alpha-6);
+  border-radius: 12px;
+  border: 1px solid var(--color-primary-alpha-10);
+  min-height: 52px;
+}
+
+.settings-tab {
+  flex: 1;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+}
+
+.settings-tab:hover {
+  background: var(--color-primary-alpha-10);
+  color: var(--color-primary);
+}
+
+.settings-tab.active {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-muted) 100%);
+  color: white;
+  box-shadow: 0 2px 8px var(--color-primary-alpha-30);
+}
+
+.settings-tabs-mobile {
+  display: none;
+  position: relative;
+}
+
+.settings-tabs-mobile-select {
+  width: 100%;
+  padding: 12px 40px 12px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: "Outfit", sans-serif;
+  color: white;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-muted) 100%);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  box-shadow: 0 2px 8px var(--color-primary-alpha-30);
+}
+
+.settings-tabs-mobile-arrow {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+
+.settings-tab-panel-wrap {
+  min-height: 280px;
+}
+
+.settings-tab-panel {
+  animation: settingsTabFade 0.18s ease;
+}
+
+@keyframes settingsTabFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.settings-tab-grid {
+  align-items: start;
+}
+
+.settings-autosave-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.settings-providers-save-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-areas: ". save status";
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.settings-providers-save-row .settings-save-button {
+  grid-area: save;
+  justify-self: center;
+}
+
+.settings-providers-save-row .settings-autosave-pill {
+  grid-area: status;
+  justify-self: end;
+}
+
+.settings-autosave-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--color-primary-alpha-20);
+  background: var(--color-primary-alpha-6);
+  color: var(--text-secondary);
+  min-width: 130px;
+  justify-content: center;
+}
+
+.settings-autosave-pill.saving {
+  color: var(--color-primary);
+  border-color: var(--color-primary-alpha-40);
+}
+
+.settings-autosave-pill.saved {
+  color: #16a34a;
+  border-color: rgba(34, 197, 94, 0.4);
+  background: rgba(34, 197, 94, 0.08);
+}
+
 .settings-top-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -4696,6 +4814,23 @@ code {
   .settings-top-row,
   .settings-grid {
     grid-template-columns: 1fr;
+  }
+
+  .settings-tabs-mobile {
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  .settings-tabs {
+    display: none;
+  }
+
+  .settings-autosave-row {
+    justify-content: flex-start;
+  }
+
+  .settings-autosave-pill {
+    min-width: auto;
   }
 }
 
@@ -5087,6 +5222,17 @@ code {
   box-shadow: 0 6px 16px var(--color-primary-alpha-40);
 }
 
+.settings-save-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+.settings-providers-save-row .settings-save-button {
+  margin: 0;
+}
+
 /* Sticky Save Button Container */
 /* Save Section */
 .settings-save-section {
@@ -5112,6 +5258,15 @@ code {
 
 .settings-api-key-item:first-child {
   margin-top: 0;
+}
+
+.settings-api-key-group-title {
+  margin: 16px 0 4px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .settings-api-key-header {
@@ -5188,6 +5343,10 @@ code {
 
 .settings-ai-other-providers {
   margin-top: 12px;
+}
+
+.settings-prompt-version-item {
+  margin-top: 20px;
 }
 
 /* Toast Notifications */

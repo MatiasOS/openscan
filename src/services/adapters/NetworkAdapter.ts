@@ -42,6 +42,32 @@ export interface TraceCallConfig {
     withLog?: boolean;
   };
 }
+
+export interface CallNode {
+  type: string;
+  from: string;
+  to?: string;
+  value?: string;
+  gas?: string;
+  gasUsed?: string;
+  input?: string;
+  output?: string;
+  error?: string;
+  revertReason?: string;
+  calls?: CallNode[];
+}
+
+export interface PrestateAccountState {
+  balance?: string;
+  nonce?: number;
+  code?: string;
+  storage?: Record<string, string>;
+}
+
+export interface PrestateTrace {
+  pre: Record<string, PrestateAccountState>;
+  post: Record<string, PrestateAccountState>;
+}
 /**
  * Base interface for blockchain-specific services
  * All chain implementations must conform to this unified API
@@ -214,6 +240,32 @@ export abstract class NetworkAdapter {
   abstract getNetworkStats(): Promise<DataWithMetadata<NetworkStats>>;
 
   /**
+   * Get storage value at a given slot for an address.
+   * Used for proxy detection (EIP-1967, EIP-1822, etc.)
+   */
+  async getStorageAt(address: string, slot: string): Promise<string> {
+    const result = await this.getClient().getStorageAt(address, slot, "latest");
+    return result.data ?? "0x";
+  }
+
+  /**
+   * Fetch the deployed bytecode (eth_getCode) for any address.
+   */
+  async getCode(address: string): Promise<string> {
+    const result = await this.getClient().getCode(address, "latest");
+    return result.data ?? "0x";
+  }
+
+  /**
+   * Execute a low-level eth_call.
+   * Used for beacon proxy implementation() calls during proxy detection.
+   */
+  async callContract(to: string, data: string): Promise<string> {
+    const result = await this.getClient().execute<string>("eth_call", [{ to, data }, "latest"]);
+    return result.data ?? "0x";
+  }
+
+  /**
    * Get gas prices with tiers (Low/Average/High) using eth_feeHistory
    * @returns Gas price tiers and base fee
    */
@@ -351,4 +403,20 @@ export abstract class NetworkAdapter {
    * @returns Array of trace results or null
    */
   abstract getBlockTrace(blockHash: string): Promise<TraceResult[] | null>;
+
+  /**
+   * Get call tree trace using debug_traceTransaction with callTracer.
+   * Available in Super User Mode — no localhost restriction.
+   * @param txHash - Transaction hash
+   * @returns Nested CallNode tree or null
+   */
+  abstract getAnalyserCallTrace(txHash: string): Promise<CallNode | null>;
+
+  /**
+   * Get prestate diff trace using debug_traceTransaction with prestateTracer.
+   * Available in Super User Mode — no localhost restriction.
+   * @param txHash - Transaction hash
+   * @returns PrestateTrace with pre/post state or null
+   */
+  abstract getAnalyserPrestateTrace(txHash: string): Promise<PrestateTrace | null>;
 }

@@ -35,7 +35,10 @@
 /* Note: No display property set here to preserve natural element display (e.g., table-cell for td/th) */
 
 /* Show only on mobile (hide on tablet+) */
-.show-mobile {
+.show-mobile,
+.show-mobile-flex,
+.show-mobile-inline,
+.show-mobile-inline-flex {
   display: none;
 }
 
@@ -1404,6 +1407,25 @@
   .settings-save-button {
     width: 100%;
     padding: 14px 24px;
+  }
+
+  .settings-providers-save-row {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "status"
+      "save";
+    gap: 10px;
+  }
+
+  .settings-providers-save-row .settings-save-button {
+    grid-area: save;
+    width: auto;
+    justify-self: center;
+  }
+
+  .settings-providers-save-row .settings-autosave-pill {
+    grid-area: status;
+    justify-self: end;
   }
 }
 
