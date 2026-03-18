@@ -8,6 +8,7 @@ import { ArbitrumAdapter } from "./ArbitrumAdapter/ArbitrumAdapter";
 import { BitcoinAdapter } from "./BitcoinAdapter/BitcoinAdapter";
 import type {
   ArbitrumClient,
+  AvalancheClient,
   AztecClient,
   BaseClient,
   BitcoinClient,
@@ -24,7 +25,7 @@ export class AdapterFactory {
    * Create an EVM network adapter
    */
   static createAdapter(
-    networkId: SupportedChainId | 11155111 | 97 | 31337,
+    networkId: SupportedChainId,
     client:
       | EthereumClient
       | OptimismClient
@@ -32,13 +33,15 @@ export class AdapterFactory {
       | PolygonClient
       | BaseClient
       | ArbitrumClient
+      | AvalancheClient
       | AztecClient,
   ): NetworkAdapter {
     switch (networkId) {
       case 1:
       case 11155111:
       case 31337:
-        return new EVMAdapter(networkId, client as EthereumClient);
+      case 43114:
+        return new EVMAdapter(networkId, client as unknown as EthereumClient);
       case 10:
         return new OptimismAdapter(networkId, client as OptimismClient);
       case 56:

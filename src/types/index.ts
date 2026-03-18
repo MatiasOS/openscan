@@ -1,4 +1,4 @@
-import type { EthLog } from "@openscan/network-connectors";
+import type { EthLog, SupportedChainId } from "@openscan/network-connectors";
 import type React from "react";
 
 // ==================== NETWORK TYPES ====================
@@ -7,6 +7,13 @@ import type React from "react";
  * Network type - EVM or Bitcoin
  */
 export type NetworkType = "evm" | "bitcoin";
+
+/**
+ * All EVM chain IDs supported by the app.
+ * Maps directly to the connector library's SupportedChainId.
+ * When adding a new EVM network, add its chain ID to network-connectors first.
+ */
+export type AppChainId = SupportedChainId;
 
 // ==================== CORE DOMAIN TYPES ====================
 
