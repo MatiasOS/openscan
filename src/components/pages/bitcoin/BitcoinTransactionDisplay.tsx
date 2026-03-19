@@ -180,16 +180,19 @@ const BitcoinTransactionDisplay: React.FC<BitcoinTransactionDisplayProps> = Reac
             {transaction.blockhash && (
               <div className="tx-row">
                 <FieldLabel label="Block:" tooltipKey="bitcoin.block" visibleFor={["beginner"]} />
-                <span className="tx-value tx-mono">
+                <span className="tx-value">
+                  {transaction.blockheight !== undefined && (
+                    <span>{transaction.blockheight.toLocaleString()} - </span>
+                  )}
                   {networkId ? (
                     <Link
                       to={`/${networkId}/block/${transaction.blockhash}`}
-                      className="link-accent"
+                      className="link-accent tx-mono"
                     >
                       {truncateBlockHash(transaction.blockhash)}
                     </Link>
                   ) : (
-                    truncateBlockHash(transaction.blockhash)
+                    <span className="tx-mono">{truncateBlockHash(transaction.blockhash)}</span>
                   )}
                 </span>
               </div>

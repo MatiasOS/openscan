@@ -228,6 +228,7 @@ export interface BitcoinTransaction {
   vin: BitcoinTransactionInput[];
   vout: BitcoinTransactionOutput[];
   blockhash?: string;
+  blockheight?: number;
   confirmations?: number;
   blocktime?: number;
   time?: number;
