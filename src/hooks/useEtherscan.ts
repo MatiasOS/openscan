@@ -35,6 +35,7 @@ interface StandardJsonSources {
 function parseSourceFiles(
   sourceCode: string,
   contractName: string,
+  compilerVersion?: string,
 ): { name: string; path: string; content: string }[] {
   if (!sourceCode) return [];
 
@@ -58,8 +59,9 @@ function parseSourceFiles(
     }
   }
 
-  // Plain Solidity source
-  const fileName = `${contractName || "Contract"}.sol`;
+  // Detect language from compiler version — Vyper compilers start with "vyper:"
+  const ext = compilerVersion?.toLowerCase().startsWith("vyper:") ? ".vy" : ".sol";
+  const fileName = `${contractName || "Contract"}${ext}`;
   return [{ name: fileName, path: fileName, content: sourceCode }];
 }
 
@@ -141,14 +143,20 @@ export function useEtherscan(
           abi = undefined;
         }
 
-        const files = parseSourceFiles(result.SourceCode, result.ContractName);
+        const files = parseSourceFiles(
+          result.SourceCode,
+          result.ContractName,
+          result.CompilerVersion,
+        );
         const evmVersion =
           result.EVMVersion && result.EVMVersion !== "Default" ? result.EVMVersion : undefined;
 
+        const isVyper = result.CompilerVersion?.toLowerCase().startsWith("vyper:");
         const contractDetails: SourcifyContractDetails = {
           name: result.ContractName || undefined,
           compilerVersion: result.CompilerVersion || undefined,
           evmVersion,
+          language: isVyper ? "Vyper" : "Solidity",
           abi,
           files,
           match: "perfect",

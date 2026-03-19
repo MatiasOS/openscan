@@ -1,0 +1,59 @@
+/* Prism.js syntax highlighting theme for OpenScan */
+.source-file-code code[class*="language-"] {
+  text-shadow: none;
+}
+
+.source-file-code .token.comment,
+.source-file-code .token.prolog,
+.source-file-code .token.doctype,
+.source-file-code .token.cdata {
+  color: #6a9955;
+}
+
+.source-file-code .token.punctuation {
+  color: #d4d4d4;
+}
+
+.source-file-code .token.property,
+.source-file-code .token.tag,
+.source-file-code .token.boolean,
+.source-file-code .token.number,
+.source-file-code .token.constant,
+.source-file-code .token.symbol {
+  color: #b5cea8;
+}
+
+.source-file-code .token.selector,
+.source-file-code .token.attr-name,
+.source-file-code .token.string,
+.source-file-code .token.char,
+.source-file-code .token.builtin {
+  color: #ce9178;
+}
+
+.source-file-code .token.operator,
+.source-file-code .token.entity,
+.source-file-code .token.url {
+  color: #d4d4d4;
+}
+
+.source-file-code .token.atrule,
+.source-file-code .token.attr-value,
+.source-file-code .token.keyword {
+  color: #569cd6;
+}
+
+.source-file-code .token.function,
+.source-file-code .token.class-name {
+  color: #dcdcaa;
+}
+
+.source-file-code .token.regex,
+.source-file-code .token.important,
+.source-file-code .token.variable {
+  color: #d16969;
+}
+
+.source-file-code .token.decorator {
+  color: #dcdcaa;
+}

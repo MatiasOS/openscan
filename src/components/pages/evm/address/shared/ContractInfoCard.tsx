@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { Address, ABI } from "../../../../../types";
 import { useTranslation } from "react-i18next";
+import CodeBlock from "../../../../common/CodeBlock";
 import ContractInteraction from "./ContractInteraction";
 import type { VerificationSource } from "../../../../../hooks/useContractVerification";
 import type { SourcifyContractDetails } from "../../../../../hooks/useSourcify";
@@ -341,7 +342,7 @@ const ContractInfoCard: React.FC<ContractInfoCardProps> = ({
                       {sourceFiles.map((file) => (
                         <div key={file.path} className="source-file-container">
                           <div className="source-file-header">📄 {file.name || file.path}</div>
-                          <pre className="source-file-code">{file.content}</pre>
+                          <CodeBlock code={file.content} fileName={file.name || file.path} />
                         </div>
                       ))}
                     </div>
