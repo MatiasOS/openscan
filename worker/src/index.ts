@@ -12,6 +12,7 @@ import { validateBtcMiddleware } from "./middleware/validateBtc";
 import { validateEtherscanMiddleware } from "./middleware/validateEtherscan";
 import { validateEvmMiddleware } from "./middleware/validateEvm";
 import { analyzeHandler } from "./routes/analyze";
+import { btcAnkrHandler, evmAnkrHandler } from "./routes/ankrRpc";
 import { beaconAlchemyHandler } from "./routes/beaconBlobSidecars";
 import { btcAlchemyHandler } from "./routes/btcRpc";
 import { etherscanVerifyHandler } from "./routes/etherscanVerify";
@@ -67,6 +68,12 @@ app.post("/evm/drpc/:networkId", rateLimitEvmMiddleware, validateEvmMiddleware, 
 
 // POST /btc/drpc — Bitcoin JSON-RPC proxy via dRPC
 app.post("/btc/drpc", rateLimitBtcMiddleware, validateBtcMiddleware, btcDrpcHandler);
+
+// POST /evm/ankr/:networkId — EVM JSON-RPC proxy via Ankr
+app.post("/evm/ankr/:networkId", rateLimitEvmMiddleware, validateEvmMiddleware, evmAnkrHandler);
+
+// POST /btc/ankr — Bitcoin JSON-RPC proxy via Ankr
+app.post("/btc/ankr", rateLimitBtcMiddleware, validateBtcMiddleware, btcAnkrHandler);
 
 // POST /btc/onfinality/:networkId — Bitcoin JSON-RPC proxy via OnFinality
 app.post(

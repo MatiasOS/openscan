@@ -13,4 +13,5 @@ GROQ_MODEL = "groq/compound"
 # INFURA_API_KEY    — Infura API key for /evm/infura/*
 # DRPC_API_KEY      — dRPC API key for /evm/drpc/*, /btc/drpc
 # ONFINALITY_BTC_API_KEY — OnFinality API key for /btc/onfinality/*
+# ANKR_API_KEY      — Ankr API key for /evm/ankr/*, /btc/ankr
 

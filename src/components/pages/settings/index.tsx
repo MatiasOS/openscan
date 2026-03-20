@@ -91,6 +91,8 @@ const isWorkerAlchemyUrl = (url: string): boolean =>
 const isWorkerInfuraUrl = (url: string): boolean => url.includes("/evm/infura/");
 const isWorkerDrpcUrl = (url: string): boolean =>
   url.includes("/evm/drpc/") || url.includes("/btc/drpc");
+const isWorkerAnkrUrl = (url: string): boolean =>
+  url.includes("/evm/ankr/") || url.includes("/btc/ankr");
 const isWorkerOnfinalityUrl = (url: string): boolean => url.includes("/btc/onfinality/");
 
 const Settings: React.FC = () => {
@@ -616,6 +618,7 @@ const Settings: React.FC = () => {
         isWorkerAlchemyUrl(url) ||
         isWorkerInfuraUrl(url) ||
         isWorkerDrpcUrl(url) ||
+        isWorkerAnkrUrl(url) ||
         isWorkerOnfinalityUrl(url)
       )
         return "rpc-opensource";
@@ -634,6 +637,7 @@ const Settings: React.FC = () => {
       if (isWorkerAlchemyUrl(url)) return "OpenScan Alchemy";
       if (isWorkerInfuraUrl(url)) return "OpenScan Infura";
       if (isWorkerDrpcUrl(url)) return "OpenScan dRPC";
+      if (isWorkerAnkrUrl(url)) return "OpenScan Ankr";
       if (isWorkerOnfinalityUrl(url)) return "OpenScan OnFinality";
       if (isInfuraUrl(url)) return "Infura Personal";
       if (isAlchemyUrl(url)) return "Alchemy Personal";

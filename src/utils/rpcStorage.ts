@@ -17,6 +17,7 @@ const BUILTIN_RPC_DEFAULTS: RpcUrlsContextType = {
   "bip122:000000000019d6689c085ae165831e93": [
     `${OPENSCAN_WORKER_URL}/btc/alchemy`,
     `${OPENSCAN_WORKER_URL}/btc/drpc`,
+    `${OPENSCAN_WORKER_URL}/btc/ankr`,
     `${OPENSCAN_WORKER_URL}/btc/onfinality/bip122:000000000019d6689c085ae165831e93`,
   ],
   "bip122:000000000933ea01ad0ee984209779ba": [
@@ -26,35 +27,42 @@ const BUILTIN_RPC_DEFAULTS: RpcUrlsContextType = {
     `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:1`,
     `${OPENSCAN_WORKER_URL}/evm/infura/eip155:1`,
     `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:1`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:1`,
   ],
   "eip155:42161": [
     `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:42161`,
     `${OPENSCAN_WORKER_URL}/evm/infura/eip155:42161`,
     `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:42161`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:42161`,
   ],
   "eip155:10": [
     `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:10`,
     `${OPENSCAN_WORKER_URL}/evm/infura/eip155:10`,
     `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:10`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:10`,
   ],
   "eip155:8453": [
     `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:8453`,
     `${OPENSCAN_WORKER_URL}/evm/infura/eip155:8453`,
     `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:8453`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:8453`,
   ],
   "eip155:137": [
     `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:137`,
     `${OPENSCAN_WORKER_URL}/evm/infura/eip155:137`,
     `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:137`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:137`,
   ],
   "eip155:56": [
     `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:56`,
     `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:56`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:56`,
   ],
   "eip155:43114": [
     `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:43114`,
     `${OPENSCAN_WORKER_URL}/evm/infura/eip155:43114`,
     `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:43114`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:43114`,
   ],
 };
 
