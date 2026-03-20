@@ -2,6 +2,7 @@ import type React from "react";
 import { useState } from "react";
 import type { ABI } from "../../../../../types";
 import { useTranslation } from "react-i18next";
+import CodeBlock from "../../../../common/CodeBlock";
 import FieldLabel from "../../../../common/FieldLabel";
 import ContractInteraction from "./ContractInteraction";
 
@@ -201,7 +202,7 @@ const ContractDetails: React.FC<ContractDetailsProps> = ({
                 {sourceFiles.map((file) => (
                   <div key={file.path} className="source-file-container">
                     <div className="source-file-header">📄 {file.name || file.path}</div>
-                    <pre className="source-file-code">{file.content}</pre>
+                    <CodeBlock code={file.content} fileName={file.name || file.path} />
                   </div>
                 ))}
               </div>
