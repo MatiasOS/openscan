@@ -167,6 +167,11 @@ test.describe("Blocks Page", () => {
 
     await expect(blocksPage.loader).toBeHidden({ timeout: DEFAULT_TIMEOUT * 3 });
 
+    // Wait for table data to fully render (not just skeleton)
+    await expect(blocksPage.blockTable.locator("tbody tr td a").first()).toBeVisible({
+      timeout: DEFAULT_TIMEOUT * 3,
+    });
+
     // Verify header has proper structure
     const header = blocksPage.blocksHeader;
     await expect(header).toBeVisible();
