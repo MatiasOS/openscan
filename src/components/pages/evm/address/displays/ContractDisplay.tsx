@@ -104,23 +104,6 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
   const dataService = useDataService(Number(networkId));
   const [implCode, setImplCode] = useState<string | undefined>(undefined);
   const [isDetectedX402, setIsDetectedX402] = useState(false);
-
-  const isKnownFacilitator = isKnownX402Facilitator(Number(networkId), addressHash);
-
-  const handleTransactionsChange = useCallback(
-    (txs: Transaction[]) => {
-      if (isKnownFacilitator || isDetectedX402) return;
-
-      if (txs.length > 0) {
-        const detected = detectX402Behavior(txs, Number(networkId), addressHash);
-        if (detected) {
-          setIsDetectedX402(true);
-        }
-      }
-    },
-    [isKnownFacilitator, isDetectedX402, networkId, addressHash],
-  );
-
   useEffect(() => {
     const implAddr = proxyInfo?.implementationAddress;
     if (!implAddr || !dataService?.networkAdapter) {
@@ -243,14 +226,6 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
             implIsVerified={implIsVerified}
             sourcifyImplName={sourcifyImplName}
             implCode={implCode}
-          />
-
-          {/* Transaction History - Added to enable x402 detection and history view for contracts */}
-          <TransactionHistory
-            networkId={networkId}
-            addressHash={addressHash}
-            txCount={Number(address.txCount)}
-            onTransactionsChange={handleTransactionsChange}
           />
         </div>
       </div>
