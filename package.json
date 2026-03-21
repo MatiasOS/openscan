@@ -1,85 +1,90 @@
 {
-	"name": "openscan",
-	"version": "1.2.4-alpha",
-	"private": true,
-	"type": "module",
-	"packageManager": "bun@1.1.0",
-	"engines": {
-		"bun": ">=1.1.0"
-	},
-	"overrides": {
-		"@noble/hashes": "^1.8.0",
-		"@noble/curves": "^1.8.0"
-	},
-	"dependencies": {
-		"@erc7730/sdk": "^0.1.3",
-		"@openscan/network-connectors": "1.6.0",
-		"@rainbow-me/rainbowkit": "^2.2.8",
-		"@react-native-async-storage/async-storage": "^1.24.0",
-		"@tanstack/react-query": "^5.90.21",
-		"ethers": "^6.14.4",
-		"i18next": "^25.8.0",
-		"i18next-browser-languagedetector": "^8.2.0",
-		"jszip": "^3.10.1",
-		"prismjs": "^1.30.0",
-		"react": "^19.1.0",
-		"react-dom": "^19.1.0",
-		"react-i18next": "^16.5.4",
-		"react-markdown": "^10.1.0",
-		"react-router-dom": "^7.4.1",
-		"wagmi": "^2.15.6",
-		"web-vitals": "^2.1.4"
-	},
-	"scripts": {
-		"start": "vite",
-		"build": "vite build",
-		"build:development": "vite build --mode development",
-		"build:production": "bash ./scripts/build-production.sh",
-		"build:staging": "bash ./scripts/build-staging.sh",
-		"preview": "vite preview",
-		"test": "vitest",
-		"test:run": "vitest run",
-		"test:e2e": "playwright test",
-		"test:e2e:eth-mainnet": "playwright test e2e/tests/eth-mainnet/",
-		"test:e2e:evm-networks": "playwright test e2e/tests/evm-networks/",
-		"test:e2e:ui": "playwright test --ui",
-		"test:e2e:debug": "playwright test --debug",
-		"dev": "bash scripts/run-test-env.sh",
-		"typecheck": "tsc --noEmit",
-		"format": "biome format",
-		"format:fix": "biome format --write",
-		"lint": "biome lint",
-		"lint:fix": "biome lint --write --max-diagnostics 1024",
-		"check": "biome check --max-diagnostics 1024",
-		"audit": "bash ./scripts/audit.sh",
-		"publish:dist": "cd dist && npm publish --tag alpha"
-	},
-	"browserslist": {
-		"production": [
-			">0.2%",
-			"not dead",
-			"not op_mini all"
-		],
-		"development": [
-			"last 1 chrome version",
-			"last 1 firefox version",
-			"last 1 safari version"
-		]
-	},
-	"devDependencies": {
-		"@biomejs/biome": "^2.3.11",
-		"@playwright/test": "^1.57.0",
-		"@testing-library/dom": "^10.4.0",
-		"@testing-library/jest-dom": "^6.6.3",
-		"@testing-library/react": "^16.2.0",
-		"@testing-library/user-event": "^13.5.0",
-		"@types/prismjs": "^1.26.6",
-		"@types/react": "^19.1.8",
-		"@types/react-dom": "^19.1.6",
-		"@vitejs/plugin-react": "^5.1.2",
-		"dotenv": "^17.2.3",
-		"happy-dom": "^20.1.0",
-		"vite": "^7.3.1",
-		"vitest": "^4.0.14"
-	}
+  "name": "openscan",
+  "version": "1.2.4-alpha",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.1.0",
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "overrides": {
+    "@noble/hashes": "^1.8.0",
+    "@noble/curves": "^1.8.0"
+  },
+  "dependencies": {
+    "@erc7730/sdk": "^0.1.3",
+    "@openscan/network-connectors": "1.6.0",
+    "@rainbow-me/rainbowkit": "^2.2.8",
+    "@react-native-async-storage/async-storage": "^1.24.0",
+    "@tanstack/react-query": "^5.90.21",
+    "ethers": "^6.14.4",
+    "i18next": "^25.8.0",
+    "i18next-browser-languagedetector": "^8.2.0",
+    "jszip": "^3.10.1",
+    "prismjs": "^1.30.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-i18next": "^16.5.4",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^7.4.1",
+    "wagmi": "^2.15.6",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "build:development": "vite build --mode development",
+    "build:production": "bash ./scripts/build-production.sh",
+    "build:staging": "bash ./scripts/build-staging.sh",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:eth-mainnet": "playwright test e2e/tests/eth-mainnet/",
+    "test:e2e:evm-networks": "playwright test e2e/tests/evm-networks/",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "dev": "bash scripts/run-test-env.sh",
+    "typecheck": "tsc --noEmit",
+    "format": "biome format",
+    "format:fix": "biome format --write",
+    "lint": "biome lint",
+    "lint:fix": "biome lint --write --max-diagnostics 1024",
+    "check": "biome check --max-diagnostics 1024",
+    "audit": "bash ./scripts/audit.sh",
+    "publish:dist": "cd dist && npm publish --tag alpha"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.11",
+    "@playwright/test": "^1.57.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/prismjs": "^1.26.6",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^5.1.2",
+    "dotenv": "^17.2.3",
+    "happy-dom": "^20.1.0",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.14",
+    "@types/bun": "latest"
+  },
+  "module": "src/index.tsx",
+  "peerDependencies": {
+    "typescript": "^5"
+  }
 }
