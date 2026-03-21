@@ -85,8 +85,8 @@ test.describe("Transaction Page", () => {
 
     const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
-      // Verify input data section exists for contract interactions
-      await expect(page.locator("text=Input Data:")).toBeVisible();
+      // Verify input data exists (shown as tab in TX Analyser)
+      await expect(page.locator("text=Input Data").first()).toBeVisible();
     }
   });
 

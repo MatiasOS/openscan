@@ -267,7 +267,7 @@ test.describe("Arbitrum One - Transaction Page", () => {
 
       // Verify gas information
       await expect(page.locator("text=Gas Limit")).toBeVisible();
-      await expect(page.getByText("Gas Price:", { exact: true })).toBeVisible();
+      await expect(page.locator(".tx-label", { hasText: "Gas Price:" })).toBeVisible();
     }
   });
 
@@ -331,12 +331,12 @@ test.describe("Arbitrum One - Transaction Page", () => {
 
     const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
-      // Contract interaction should have input data
-      await expect(page.locator("text=Input Data:")).toBeVisible();
+      // Contract interaction should have input data (shown as tab in TX Analyser)
+      await expect(page.locator("text=Input Data").first()).toBeVisible();
     }
   });
 
-  test("displays other attributes section with nonce", async ({ page }, testInfo) => {
+  test("displays nonce and position fields", async ({ page }, testInfo) => {
     const txPage = new TransactionPage(page);
     const tx = ARBITRUM.transactions[UNISWAP_SWAP];
 
@@ -344,9 +344,8 @@ test.describe("Arbitrum One - Transaction Page", () => {
 
     const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
-      await expect(page.locator("text=Other Attributes:")).toBeVisible();
-      await expect(page.locator("text=Nonce:")).toBeVisible();
-      await expect(page.locator("text=Position:")).toBeVisible();
+      await expect(page.locator(".tx-label", { hasText: "Nonce:" })).toBeVisible();
+      await expect(page.locator(".tx-label", { hasText: "Position:" })).toBeVisible();
     }
   });
 

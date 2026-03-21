@@ -1,3 +1,4 @@
+import { OPENSCAN_WORKER_URL } from "../config/workerConfig";
 import { logger } from "./logger";
 
 export interface ContractInfo {
@@ -8,11 +9,6 @@ export interface ContractInfo {
 
 // Session-level cache keyed by "chainId:address"
 const cache = new Map<string, ContractInfo | null>();
-
-const OPENSCAN_WORKER_URL =
-  // biome-ignore lint/complexity/useLiteralKeys: env var access
-  process.env["REACT_APP_OPENSCAN_WORKER_URL"] ??
-  "https://openscan-groq-ai-proxy.openscan.workers.dev";
 
 /**
  * Fetch contract verification from Etherscan V2 API.

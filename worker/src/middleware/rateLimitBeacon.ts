@@ -2,17 +2,14 @@ import type { Context, Next } from "hono";
 import type { Env } from "../types";
 
 const WINDOW_MS = 60_000; // 1 minute
-const MAX_REQUESTS = 10;
+const MAX_REQUESTS = 60;
 
 interface RateLimitEntry {
   timestamps: number[];
 }
 
-// In-memory store — resets on worker cold start, which is acceptable
-// for a lightweight rate limiter. For stricter limits, use Durable Objects.
 const store = new Map<string, RateLimitEntry>();
 
-// Periodic cleanup to prevent unbounded growth
 let lastCleanup = Date.now();
 const CLEANUP_INTERVAL_MS = 300_000; // 5 minutes
 
@@ -26,7 +23,7 @@ function cleanup(now: number) {
   }
 }
 
-export async function rateLimitMiddleware(c: Context<{ Bindings: Env }>, next: Next) {
+export async function rateLimitBeaconMiddleware(c: Context<{ Bindings: Env }>, next: Next) {
   const ip = c.req.header("CF-Connecting-IP") ?? c.req.header("X-Forwarded-For") ?? "unknown";
   const now = Date.now();
 
@@ -38,7 +35,6 @@ export async function rateLimitMiddleware(c: Context<{ Bindings: Env }>, next: N
     store.set(ip, entry);
   }
 
-  // Sliding window: keep only timestamps within the window
   entry.timestamps = entry.timestamps.filter((ts) => now - ts < WINDOW_MS);
 
   if (entry.timestamps.length >= MAX_REQUESTS) {

@@ -1,6 +1,6 @@
 {
   "files": {
-    "includes": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.json", "!**/*.css"]
+    "includes": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.json", "worker/src/**/*.ts", "!**/*.css"]
   },
   "linter": {
     "rules": {

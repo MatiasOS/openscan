@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
+import { OPENSCAN_WORKER_URL } from "../config/workerConfig";
 import { useSettings } from "../context/SettingsContext";
 import { logger } from "../utils/logger";
 import type { SourcifyContractDetails } from "./useSourcify";
 
 const ETHERSCAN_V2_API = "https://api.etherscan.io/v2/api";
-const OPENSCAN_WORKER_URL =
-  // biome-ignore lint/complexity/useLiteralKeys: env var access
-  process.env["REACT_APP_OPENSCAN_WORKER_URL"] ??
-  "https://openscan-groq-ai-proxy.openscan.workers.dev";
 
 interface EtherscanSourceResult {
   SourceCode: string;

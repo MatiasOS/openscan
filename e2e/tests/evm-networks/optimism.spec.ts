@@ -310,7 +310,7 @@ test.describe("Optimism - Transaction Page", () => {
 
       // Verify gas information
       await expect(page.locator("text=Gas Limit")).toBeVisible();
-      await expect(page.getByText("Gas Price:", { exact: true })).toBeVisible();
+      await expect(page.locator("text=Gas Price").first()).toBeVisible();
     }
   });
 
@@ -351,12 +351,13 @@ test.describe("Optimism - Transaction Page", () => {
 
     const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
-      await expect(page.locator("text=Other Attributes:")).toBeVisible();
-      await expect(page.locator("text=Nonce:")).toBeVisible();
-      await expect(page.locator("text=Position:")).toBeVisible();
+      // Nonce and Position are in the transaction details grid
+      await expect(page.locator(".tx-label", { hasText: "Nonce:" })).toBeVisible();
+      await expect(page.locator(".tx-label", { hasText: "Position:" })).toBeVisible();
 
-      // Verify nonce value is displayed (use locator that includes the label)
-      await expect(page.locator(`text=Nonce: ${tx.nonce}`)).toBeVisible();
+      // Verify nonce value
+      const nonceRow = page.locator(".tx-row", { hasText: "Nonce:" });
+      await expect(nonceRow.locator(".tx-value")).toContainText(String(tx.nonce));
     }
   });
 
@@ -406,11 +407,12 @@ test.describe("Optimism - Transaction Page", () => {
 
     const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
-      await expect(page.locator("text=Nonce:")).toBeVisible();
-      await expect(page.locator("text=Position:")).toBeVisible();
+      await expect(page.locator(".tx-label", { hasText: "Nonce:" })).toBeVisible();
+      await expect(page.locator(".tx-label", { hasText: "Position:" })).toBeVisible();
 
-      // Verify nonce value is displayed (use locator that includes the label)
-      await expect(page.locator(`text=Nonce: ${tx.nonce}`)).toBeVisible();
+      // Verify nonce value
+      const nonceRow = page.locator(".tx-row", { hasText: "Nonce:" });
+      await expect(nonceRow.locator(".tx-value")).toContainText(String(tx.nonce));
     }
   });
 
@@ -458,8 +460,8 @@ test.describe("Optimism - Transaction Page", () => {
 
     const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
-      // Contract interaction should have input data
-      await expect(page.locator("text=Input Data:")).toBeVisible();
+      // Contract interaction should have input data (shown as tab in TX Analyser)
+      await expect(page.locator("text=Input Data").first()).toBeVisible();
     }
   });
 

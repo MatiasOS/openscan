@@ -16,9 +16,7 @@ function isOriginAllowed(origin: string, allowed: string[]): boolean {
         if (hostname.endsWith(suffix)) {
           return true;
         }
-      } catch {
-        continue;
-      }
+      } catch {}
     } else if (origin === entry) {
       return true;
     }
@@ -38,7 +36,7 @@ export async function corsMiddleware(c: Context<{ Bindings: Env }>, next: Next) 
       status: 204,
       headers: {
         "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type",
         "Access-Control-Max-Age": "86400",
       },

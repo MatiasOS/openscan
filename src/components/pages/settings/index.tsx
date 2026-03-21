@@ -87,6 +87,15 @@ const getAlchemyBtcUrl = (networkId: string, apiKey: string): string | null => {
 const isInfuraUrl = (url: string): boolean => url.includes("infura.io");
 const isAlchemyUrl = (url: string): boolean => url.includes("alchemy.com");
 
+const isWorkerAlchemyUrl = (url: string): boolean =>
+  url.includes("/evm/alchemy/") || url.includes("/btc/alchemy") || url.includes("/beacon/alchemy/");
+const isWorkerInfuraUrl = (url: string): boolean => url.includes("/evm/infura/");
+const isWorkerDrpcUrl = (url: string): boolean =>
+  url.includes("/evm/drpc/") || url.includes("/btc/drpc");
+const isWorkerAnkrUrl = (url: string): boolean =>
+  url.includes("/evm/ankr/") || url.includes("/btc/ankr");
+const isWorkerOnfinalityUrl = (url: string): boolean => url.includes("/btc/onfinality/");
+
 const Settings: React.FC = () => {
   const { t, i18n } = useTranslation("settings");
   const { t: tTooltips } = useTranslation("tooltips");
@@ -606,6 +615,14 @@ const Settings: React.FC = () => {
 
   const getRpcTagClass = useCallback(
     (url: string): string => {
+      if (
+        isWorkerAlchemyUrl(url) ||
+        isWorkerInfuraUrl(url) ||
+        isWorkerDrpcUrl(url) ||
+        isWorkerAnkrUrl(url) ||
+        isWorkerOnfinalityUrl(url)
+      )
+        return "rpc-opensource";
       if (isInfuraUrl(url) || isAlchemyUrl(url)) return "rpc-tracking";
       const ep = metadataUrlMap.get(url);
       if (!ep) return "";
@@ -618,6 +635,11 @@ const Settings: React.FC = () => {
 
   const getRpcTagLabel = useCallback(
     (url: string): string => {
+      if (isWorkerAlchemyUrl(url)) return "OpenScan Alchemy";
+      if (isWorkerInfuraUrl(url)) return "OpenScan Infura";
+      if (isWorkerDrpcUrl(url)) return "OpenScan dRPC";
+      if (isWorkerAnkrUrl(url)) return "OpenScan Ankr";
+      if (isWorkerOnfinalityUrl(url)) return "OpenScan OnFinality";
       if (isInfuraUrl(url)) return "Infura Personal";
       if (isAlchemyUrl(url)) return "Alchemy Personal";
       const ep = metadataUrlMap.get(url);

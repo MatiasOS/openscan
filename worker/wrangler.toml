@@ -1,4 +1,4 @@
-name = "openscan-groq-ai-proxy"
+name = "openscan-worker-proxy"
 main = "src/index.ts"
 compatibility_date = "2024-12-01"
 
@@ -9,4 +9,9 @@ GROQ_MODEL = "groq/compound"
 # Secrets — set via `wrangler secret put <NAME>`
 # GROQ_API_KEY      — Groq AI API key for /ai/analyze
 # ETHERSCAN_API_KEY  — Etherscan V2 API key for /etherscan/verify
+# ALCHEMY_API_KEY   — Alchemy API key for /beacon/*, /btc/alchemy, /evm/alchemy/*
+# INFURA_API_KEY    — Infura API key for /evm/infura/*
+# DRPC_API_KEY      — dRPC API key for /evm/drpc/*, /btc/drpc
+# ONFINALITY_BTC_API_KEY — OnFinality API key for /btc/onfinality/*
+# ANKR_API_KEY      — Ankr API key for /evm/ankr/*, /btc/ankr
 

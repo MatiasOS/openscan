@@ -1,3 +1,4 @@
+import { OPENSCAN_WORKER_URL } from "../config/workerConfig";
 import { type MetadataRpcEndpoint, METADATA_VERSION } from "../services/MetadataService";
 import type { RpcUrlsContextType } from "../types";
 import { logger } from "./logger";
@@ -8,10 +9,61 @@ const METADATA_RPC_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
  * Hardcoded fallback defaults for networks that are never in the metadata service.
- * Localhost (eip155:31337) always points to the default Hardhat/Anvil port.
+ * Includes localhost, worker-proxied BTC, and worker-proxied EVM endpoints.
+ * Metadata service RPCs and user-configured RPCs take priority via getEffectiveRpcUrls().
  */
 const BUILTIN_RPC_DEFAULTS: RpcUrlsContextType = {
   "eip155:31337": ["http://localhost:8545"],
+  "bip122:000000000019d6689c085ae165831e93": [
+    `${OPENSCAN_WORKER_URL}/btc/alchemy`,
+    `${OPENSCAN_WORKER_URL}/btc/drpc`,
+    `${OPENSCAN_WORKER_URL}/btc/ankr`,
+    `${OPENSCAN_WORKER_URL}/btc/onfinality/bip122:000000000019d6689c085ae165831e93`,
+  ],
+  "bip122:000000000933ea01ad0ee984209779ba": [
+    `${OPENSCAN_WORKER_URL}/btc/onfinality/bip122:000000000933ea01ad0ee984209779ba`,
+  ],
+  "eip155:1": [
+    `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:1`,
+    `${OPENSCAN_WORKER_URL}/evm/infura/eip155:1`,
+    `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:1`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:1`,
+  ],
+  "eip155:42161": [
+    `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:42161`,
+    `${OPENSCAN_WORKER_URL}/evm/infura/eip155:42161`,
+    `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:42161`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:42161`,
+  ],
+  "eip155:10": [
+    `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:10`,
+    `${OPENSCAN_WORKER_URL}/evm/infura/eip155:10`,
+    `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:10`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:10`,
+  ],
+  "eip155:8453": [
+    `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:8453`,
+    `${OPENSCAN_WORKER_URL}/evm/infura/eip155:8453`,
+    `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:8453`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:8453`,
+  ],
+  "eip155:137": [
+    `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:137`,
+    `${OPENSCAN_WORKER_URL}/evm/infura/eip155:137`,
+    `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:137`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:137`,
+  ],
+  "eip155:56": [
+    `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:56`,
+    `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:56`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:56`,
+  ],
+  "eip155:43114": [
+    `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:43114`,
+    `${OPENSCAN_WORKER_URL}/evm/infura/eip155:43114`,
+    `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:43114`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:43114`,
+  ],
 };
 
 interface MetadataRpcCache {
