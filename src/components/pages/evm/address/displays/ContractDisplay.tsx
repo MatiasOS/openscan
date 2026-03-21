@@ -6,14 +6,12 @@ import { useContractVerification } from "../../../../../hooks/useContractVerific
 import { useDataService } from "../../../../../hooks/useDataService";
 import { useProxyInfo } from "../../../../../hooks/useProxyInfo";
 import type { KlerosTag } from "../../../../../services/KlerosService";
-import type { Address, ENSReverseResult, RPCMetadata, Transaction } from "../../../../../types";
+import type { Address, ENSReverseResult, RPCMetadata } from "../../../../../types";
 import AIAnalysisPanel from "../../../../common/AIAnalysis/AIAnalysisPanel";
-import { AddressHeader, TransactionHistory } from "../shared";
+import { AddressHeader } from "../shared";
 import ContractInfoCard from "../shared/ContractInfoCard";
 import ContractInfoCards from "../shared/ContractInfoCards";
 import { logger } from "../../../../../utils";
-import { isX402Facilitator as isKnownX402Facilitator } from "../../../../../config/x402Facilitators";
-import { detectX402Behavior } from "../../../../../utils/x402Detector";
 import { compactContractDataForAI } from "../../../../common/AIAnalysis/aiContext";
 import { formatNativeFromWei } from "../../../../../utils/unitFormatters";
 import type { ProxyInfo, ProxyType } from "../../../../../utils/proxyDetection";
@@ -103,7 +101,6 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
   // (e.g. Etherscan-only verified contracts)
   const dataService = useDataService(Number(networkId));
   const [implCode, setImplCode] = useState<string | undefined>(undefined);
-  const [isDetectedX402, setIsDetectedX402] = useState(false);
   useEffect(() => {
     const implAddr = proxyInfo?.implementationAddress;
     if (!implAddr || !dataService?.networkAdapter) {
@@ -208,7 +205,6 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
             ensName={ensName}
             reverseResult={reverseResult}
             isMainnet={isMainnet}
-            isDetectedX402={isDetectedX402}
           />
 
           {/* Contract Info Card (includes Contract Details) */}
