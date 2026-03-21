@@ -7,6 +7,8 @@ import AIAnalysisPanel from "../../../../common/AIAnalysis/AIAnalysisPanel";
 import { AddressHeader, TransactionHistory } from "../shared";
 import AccountInfoCards from "../shared/AccountInfoCards";
 import { formatNativeFromWei } from "../../../../../utils/unitFormatters";
+import { isX402Facilitator as isKnownX402Facilitator } from "../../../../../config/x402Facilitators";
+import { detectX402Behavior } from "../../../../../utils/x402Detector";
 
 interface AccountDisplayProps {
   address: Address;
@@ -39,10 +41,25 @@ const AccountDisplay: React.FC<AccountDisplayProps> = ({
   const networkCurrency = network?.currency ?? "ETH";
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isDetectedX402, setIsDetectedX402] = useState(false);
 
-  const handleTransactionsChange = useCallback((txs: Transaction[]) => {
-    setTransactions(txs);
-  }, []);
+  const isKnownFacilitator = isKnownX402Facilitator(Number(networkId), addressHash);
+
+  const handleTransactionsChange = useCallback(
+    (txs: Transaction[]) => {
+      setTransactions(txs);
+
+      if (isKnownFacilitator || isDetectedX402) return;
+
+      if (txs.length > 0) {
+        const detected = detectX402Behavior(txs, Number(networkId), addressHash);
+        if (detected) {
+          setIsDetectedX402(true);
+        }
+      }
+    },
+    [isKnownFacilitator, isDetectedX402, networkId, addressHash],
+  );
 
   const recentTxSummary = useMemo(() => {
     if (transactions.length === 0) return undefined;
@@ -98,6 +115,7 @@ const AccountDisplay: React.FC<AccountDisplayProps> = ({
             ensName={ensName}
             reverseResult={reverseResult}
             isMainnet={isMainnet}
+            isDetectedX402={isDetectedX402}
           />
 
           {/* Transaction History */}

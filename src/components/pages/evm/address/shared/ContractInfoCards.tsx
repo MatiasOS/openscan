@@ -15,6 +15,7 @@ interface ContractInfoCardsProps {
   reverseResult?: ENSReverseResult | null;
   isMainnet?: boolean;
   currency?: string;
+  isDetectedX402?: boolean;
 }
 
 const ContractInfoCards: React.FC<ContractInfoCardsProps> = ({
@@ -25,6 +26,7 @@ const ContractInfoCards: React.FC<ContractInfoCardsProps> = ({
   reverseResult,
   isMainnet = true,
   currency = "ETH",
+  isDetectedX402 = false,
 }) => {
   const { rpcUrls } = useContext(AppContext);
   const [nativeTokenPrice, setNativeTokenPrice] = useState<number | null>(null);
@@ -75,6 +77,7 @@ const ContractInfoCards: React.FC<ContractInfoCardsProps> = ({
         ownerAddress={addressHash}
         networkId={networkId}
         isMainnet={isMainnet}
+        isDetectedX402={isDetectedX402}
       />
     </div>
   );

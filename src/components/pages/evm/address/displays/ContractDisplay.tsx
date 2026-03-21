@@ -1,17 +1,19 @@
 import type React from "react";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { getNetworkById } from "../../../../../config/networks";
 import { AppContext } from "../../../../../context";
 import { useContractVerification } from "../../../../../hooks/useContractVerification";
 import { useDataService } from "../../../../../hooks/useDataService";
 import { useProxyInfo } from "../../../../../hooks/useProxyInfo";
 import type { KlerosTag } from "../../../../../services/KlerosService";
-import type { Address, ENSReverseResult, RPCMetadata } from "../../../../../types";
+import type { Address, ENSReverseResult, RPCMetadata, Transaction } from "../../../../../types";
 import AIAnalysisPanel from "../../../../common/AIAnalysis/AIAnalysisPanel";
-import { AddressHeader } from "../shared";
+import { AddressHeader, TransactionHistory } from "../shared";
 import ContractInfoCard from "../shared/ContractInfoCard";
 import ContractInfoCards from "../shared/ContractInfoCards";
 import { logger } from "../../../../../utils";
+import { isX402Facilitator as isKnownX402Facilitator } from "../../../../../config/x402Facilitators";
+import { detectX402Behavior } from "../../../../../utils/x402Detector";
 import { compactContractDataForAI } from "../../../../common/AIAnalysis/aiContext";
 import { formatNativeFromWei } from "../../../../../utils/unitFormatters";
 import type { ProxyInfo, ProxyType } from "../../../../../utils/proxyDetection";
@@ -101,6 +103,24 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
   // (e.g. Etherscan-only verified contracts)
   const dataService = useDataService(Number(networkId));
   const [implCode, setImplCode] = useState<string | undefined>(undefined);
+  const [isDetectedX402, setIsDetectedX402] = useState(false);
+
+  const isKnownFacilitator = isKnownX402Facilitator(Number(networkId), addressHash);
+
+  const handleTransactionsChange = useCallback(
+    (txs: Transaction[]) => {
+      if (isKnownFacilitator || isDetectedX402) return;
+
+      if (txs.length > 0) {
+        const detected = detectX402Behavior(txs, Number(networkId), addressHash);
+        if (detected) {
+          setIsDetectedX402(true);
+        }
+      }
+    },
+    [isKnownFacilitator, isDetectedX402, networkId, addressHash],
+  );
+
   useEffect(() => {
     const implAddr = proxyInfo?.implementationAddress;
     if (!implAddr || !dataService?.networkAdapter) {
@@ -205,6 +225,7 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
             ensName={ensName}
             reverseResult={reverseResult}
             isMainnet={isMainnet}
+            isDetectedX402={isDetectedX402}
           />
 
           {/* Contract Info Card (includes Contract Details) */}
@@ -222,6 +243,14 @@ const ContractDisplay: React.FC<ContractDisplayProps> = ({
             implIsVerified={implIsVerified}
             sourcifyImplName={sourcifyImplName}
             implCode={implCode}
+          />
+
+          {/* Transaction History - Added to enable x402 detection and history view for contracts */}
+          <TransactionHistory
+            networkId={networkId}
+            addressHash={addressHash}
+            txCount={Number(address.txCount)}
+            onTransactionsChange={handleTransactionsChange}
           />
         </div>
       </div>

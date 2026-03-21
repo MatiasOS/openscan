@@ -218,5 +218,9 @@
   "facilitatorList": "List",
   "facilitatorYes": "Yes",
   "facilitatorNo": "No",
-  "facilitatorVisitWebsite": "Visit Website"
+  "facilitatorVisitWebsite": "Visit Website",
+  "detectedFacilitator": "Detected x402 Facilitator",
+  "detectedFacilitatorDescription": "This address has been detected as an active x402 payment facilitator based on on-chain behavior. It appears to be processing EIP-3009/EIP-2612 authorizations for USDC or EURC payments.",
+  "facilitatorStatus": "Detection Status",
+  "activeBehaviorDetected": "Active x402 Behavior Detected"
 }

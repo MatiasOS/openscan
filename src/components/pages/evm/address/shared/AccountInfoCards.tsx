@@ -15,6 +15,7 @@ interface AccountInfoCardsProps {
   reverseResult?: ENSReverseResult | null;
   isMainnet?: boolean;
   currency?: string;
+  isDetectedX402?: boolean;
 }
 
 const AccountInfoCards: React.FC<AccountInfoCardsProps> = ({
@@ -25,6 +26,7 @@ const AccountInfoCards: React.FC<AccountInfoCardsProps> = ({
   reverseResult,
   isMainnet = true,
   currency = "ETH",
+  isDetectedX402 = false,
 }) => {
   const { rpcUrls } = useContext(AppContext);
   const [nativeTokenPrice, setNativeTokenPrice] = useState<number | null>(null);
@@ -76,6 +78,7 @@ const AccountInfoCards: React.FC<AccountInfoCardsProps> = ({
         ownerAddress={addressHash}
         networkId={networkId}
         isMainnet={isMainnet}
+        isDetectedX402={isDetectedX402}
       />
     </div>
   );

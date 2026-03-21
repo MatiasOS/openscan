@@ -871,7 +871,6 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
         <div className="tx-search-progress-info">
           <span className="tx-search-progress-text">
             Showing {transactionDetails.length} transaction
-            {t("showing", { count: transactionDetails.length })}
             {transactionDetails.length === 1 ? "" : "s"} from blocks{" "}
             {blockRange.oldest.toLocaleString()} to {blockRange.newest.toLocaleString()}
           </span>

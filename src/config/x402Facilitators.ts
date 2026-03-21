@@ -208,6 +208,21 @@ const X402_FACILITATORS: Record<number, Record<string, X402Facilitator>> = {
     },
   },
 
+  // ── Avalanche (43114) ─────────────────────────────────────────
+  43114: {
+    "0xc6699d2aada6c36dfea5c248dd70f9cb0235cb63": {
+      name: "PayAI Facilitator",
+      description:
+        "Accept x402 payments on all networks including Avalanche, Base, Polygon, Sei, Solana, and more! Get started in less than 1 minute. Supports all tokens. No API Keys required.",
+      logoUrl: "/logos/payai.svg",
+      websiteUrl: "https://facilitator.payai.network",
+      baseUrl: "https://facilitator.payai.network",
+      schemes: ["exact"],
+      assets: ["EIP-3009", "SPL", "Token-2022"],
+      supports: { verify: true, settle: true, supported: true, list: true },
+    },
+  },
+
   // ── Polygon (137) ────────────────────────────────────────────
   137: {
     "0x15e2e2da7539ef1f652aa3c1d6142a535aa3d7ea": {

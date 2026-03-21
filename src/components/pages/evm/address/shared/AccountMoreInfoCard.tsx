@@ -3,6 +3,7 @@ import type { ENSReverseResult } from "../../../../../types";
 import { useTranslation } from "react-i18next";
 import FieldLabel from "../../../../common/FieldLabel";
 import TokenHoldings from "./TokenHoldings";
+import DynamicX402FacilitatorCard from "./DynamicX402FacilitatorCard";
 
 interface AccountMoreInfoCardProps {
   ensName?: string | null;
@@ -10,6 +11,7 @@ interface AccountMoreInfoCardProps {
   ownerAddress: string;
   networkId: number;
   isMainnet?: boolean;
+  isDetectedX402?: boolean;
 }
 
 const AccountMoreInfoCard: React.FC<AccountMoreInfoCardProps> = ({
@@ -18,6 +20,7 @@ const AccountMoreInfoCard: React.FC<AccountMoreInfoCardProps> = ({
   ownerAddress,
   networkId,
   isMainnet = true,
+  isDetectedX402 = false,
 }) => {
   const { t } = useTranslation("address");
   const displayName = ensName || reverseResult?.ensName;
@@ -80,6 +83,12 @@ const AccountMoreInfoCard: React.FC<AccountMoreInfoCardProps> = ({
       <div className="account-card-token-holdings">
         <TokenHoldings ownerAddress={ownerAddress} networkId={networkId} defaultCollapsed compact />
       </div>
+
+      {isDetectedX402 && (
+        <div className="account-card-x402-facilitator" style={{ marginTop: "1rem" }}>
+          <DynamicX402FacilitatorCard />
+        </div>
+      )}
     </div>
   );
 };
