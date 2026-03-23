@@ -1,6 +1,7 @@
 import type React from "react";
 import { useTranslation } from "react-i18next";
 import type { X402Facilitator } from "../../../../../config/x402Facilitators";
+import FieldLabel from "../../../../common/FieldLabel";
 
 interface FacilitatorInfoCardProps {
   facilitator: X402Facilitator;
@@ -15,7 +16,12 @@ const FacilitatorInfoCard: React.FC<FacilitatorInfoCardProps> = ({ facilitator }
 
       {/* Name with logo */}
       <div className="account-card-row">
-        <span className="account-card-label">{t("facilitatorName")}:</span>
+        <FieldLabel
+          label={`${t("facilitatorName")}:`}
+          tooltipKey="address.facilitatorName"
+          visibleFor={["beginner", "intermediate"]}
+          className="account-card-label"
+        />
         <span className="account-card-value">
           <span className="facilitator-name-display">
             <img
@@ -54,25 +60,45 @@ const FacilitatorInfoCard: React.FC<FacilitatorInfoCardProps> = ({ facilitator }
 
       {/* Base URL */}
       <div className="account-card-row">
-        <span className="account-card-label">{t("facilitatorBaseUrl")}:</span>
+        <FieldLabel
+          label={`${t("facilitatorBaseUrl")}:`}
+          tooltipKey="address.facilitatorBaseUrl"
+          visibleFor={["beginner", "intermediate"]}
+          className="account-card-label"
+        />
         <span className="account-card-value tx-mono">{facilitator.baseUrl}</span>
       </div>
 
       {/* Schemes */}
       <div className="account-card-row">
-        <span className="account-card-label">{t("facilitatorSchemes")}:</span>
+        <FieldLabel
+          label={`${t("facilitatorSchemes")}:`}
+          tooltipKey="address.facilitatorSchemes"
+          visibleFor={["beginner", "intermediate"]}
+          className="account-card-label"
+        />
         <span className="account-card-value">{facilitator.schemes.join(", ")}</span>
       </div>
 
       {/* Assets */}
       <div className="account-card-row">
-        <span className="account-card-label">{t("facilitatorAssets")}:</span>
+        <FieldLabel
+          label={`${t("facilitatorAssets")}:`}
+          tooltipKey="address.facilitatorAssets"
+          visibleFor={["beginner", "intermediate"]}
+          className="account-card-label"
+        />
         <span className="account-card-value">{facilitator.assets.join(", ")}</span>
       </div>
 
       {/* Capabilities */}
       <div className="account-card-row">
-        <span className="account-card-label">{t("facilitatorCapabilities")}:</span>
+        <FieldLabel
+          label={`${t("facilitatorCapabilities")}:`}
+          tooltipKey="address.facilitatorCapabilities"
+          visibleFor={["beginner", "intermediate"]}
+          className="account-card-label"
+        />
         <span className="account-card-value">
           <span className="facilitator-capabilities">
             {facilitator.supports.verify && (

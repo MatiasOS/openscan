@@ -315,7 +315,7 @@ export function getAddressTypeLabel(type: AddressType): string {
     case "erc1155":
       return "ERC-1155 Multi-Token";
     case "x402Facilitator":
-      return "x402 Facilitator";
+      return "Account (EOA)";
     default:
       return "Unknown";
   }
@@ -337,7 +337,7 @@ export function getAddressTypeIcon(type: AddressType): string {
     case "erc1155":
       return "📦";
     case "x402Facilitator":
-      return "💳";
+      return "👤";
     default:
       return "❓";
   }
