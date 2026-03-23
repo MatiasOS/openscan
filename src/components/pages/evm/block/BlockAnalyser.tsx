@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useBeaconBlobs } from "../../../../hooks/useBeaconBlobs";
 import type { Block, BlockArbitrum } from "../../../../types";
 import BlobDataDisplay from "../../../common/BlobDataDisplay";
+import FieldLabel from "../../../common/FieldLabel";
 
 type BlockAnalyserTab = "moreDetails" | "transactions" | "withdrawals" | "blobData";
 
@@ -92,7 +93,12 @@ const BlockAnalyser: React.FC<BlockAnalyserProps> = ({ block, networkId, isSuper
         <button
           type="button"
           className="detail-panel-collapse-btn"
-          onClick={() => setCollapsed((c) => !c)}
+          onClick={() => {
+            setCollapsed((c) => {
+              if (c && activeTab === null) setActiveTab("moreDetails");
+              return !c;
+            });
+          }}
           aria-label={collapsed ? t("analyser.expand") : t("analyser.collapse")}
         >
           {collapsed ? `▸ ${t("analyser.expand")}` : `▾ ${t("analyser.collapse")}`}
@@ -105,7 +111,12 @@ const BlockAnalyser: React.FC<BlockAnalyserProps> = ({ block, networkId, isSuper
           {activeTab === "moreDetails" && (
             <div className="detail-panel-tab-content">
               <div className="detail-row">
-                <span className="detail-label">{t("analyser.parentHash")}</span>
+                <FieldLabel
+                  label={t("analyser.parentHash")}
+                  tooltipKey="block.parentHash"
+                  visibleFor={["beginner", "intermediate", "advanced"]}
+                  className="detail-label"
+                />
                 <span className="detail-value tx-mono">
                   {networkId &&
                   block.parentHash !==
@@ -119,39 +130,79 @@ const BlockAnalyser: React.FC<BlockAnalyserProps> = ({ block, networkId, isSuper
                 </span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">{t("analyser.stateRoot")}</span>
+                <FieldLabel
+                  label={t("analyser.stateRoot")}
+                  tooltipKey="block.stateRoot"
+                  visibleFor={["beginner", "intermediate", "advanced"]}
+                  className="detail-label"
+                />
                 <span className="detail-value tx-mono">{block.stateRoot}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">{t("analyser.transactionsRoot")}</span>
+                <FieldLabel
+                  label={t("analyser.transactionsRoot")}
+                  tooltipKey="block.transactionsRoot"
+                  visibleFor={["beginner", "intermediate", "advanced"]}
+                  className="detail-label"
+                />
                 <span className="detail-value tx-mono">{block.transactionsRoot}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">{t("analyser.receiptsRoot")}</span>
+                <FieldLabel
+                  label={t("analyser.receiptsRoot")}
+                  tooltipKey="block.receiptsRoot"
+                  visibleFor={["beginner", "intermediate", "advanced"]}
+                  className="detail-label"
+                />
                 <span className="detail-value tx-mono">{block.receiptsRoot}</span>
               </div>
               {block.withdrawalsRoot && (
                 <div className="detail-row">
-                  <span className="detail-label">{t("analyser.withdrawalsRoot")}</span>
+                  <FieldLabel
+                    label={t("analyser.withdrawalsRoot")}
+                    tooltipKey="block.withdrawalsRoot"
+                    visibleFor={["beginner", "intermediate", "advanced"]}
+                    className="detail-label"
+                  />
                   <span className="detail-value tx-mono">{block.withdrawalsRoot}</span>
                 </div>
               )}
               <div className="detail-row">
-                <span className="detail-label">{t("analyser.logsBloom")}</span>
+                <FieldLabel
+                  label={t("analyser.logsBloom")}
+                  tooltipKey="block.logsBloom"
+                  visibleFor={["beginner", "intermediate", "advanced"]}
+                  className="detail-label"
+                />
                 <div className="detail-value">
                   <code className="logs-bloom">{block.logsBloom}</code>
                 </div>
               </div>
               <div className="detail-row">
-                <span className="detail-label">{t("analyser.nonce")}</span>
+                <FieldLabel
+                  label={t("analyser.nonce")}
+                  tooltipKey="block.nonce"
+                  visibleFor={["beginner", "intermediate"]}
+                  className="detail-label"
+                />
                 <span className="detail-value">{block.nonce}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">{t("analyser.mixHash")}</span>
+                <FieldLabel
+                  label={t("analyser.mixHash")}
+                  tooltipKey="block.mixHash"
+                  visibleFor={["beginner", "intermediate", "advanced"]}
+                  className="detail-label"
+                />
                 <span className="detail-value tx-mono">{block.mixHash}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">{t("analyser.sha3Uncles")}</span>
+                <FieldLabel
+                  label={t("analyser.sha3Uncles")}
+                  tooltipKey="block.sha3Uncles"
+                  visibleFor={["beginner", "intermediate", "advanced"]}
+                  className="detail-label"
+                />
                 <span className="detail-value tx-mono">{block.sha3Uncles}</span>
               </div>
             </div>
