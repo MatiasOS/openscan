@@ -285,7 +285,13 @@ export interface Address {
 /**
  * Address type classification
  */
-export type AddressType = "account" | "contract" | "erc20" | "erc721" | "erc1155";
+export type AddressType =
+  | "account"
+  | "contract"
+  | "erc20"
+  | "erc721"
+  | "erc1155"
+  | "x402Facilitator";
 
 export type StorageAt = Record<string, string>;
 

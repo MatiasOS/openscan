@@ -1,3 +1,4 @@
+import { isX402Facilitator } from "../config/x402Facilitators";
 import { fetchToken } from "../services/MetadataService";
 import type { Address, AddressType } from "../types";
 
@@ -275,13 +276,18 @@ export async function fetchAddressWithType(
   // contracts from being misclassified as EOA when the secondary RPC call fails.
   const address = preloadedAddress ?? (await fetchAddressData(addressHash, rpcUrl));
 
-  // Step 2: Check for EIP-7702 delegation (EOA with delegated code)
+  // Step 2: Check x402 facilitator list (synchronous, before any code checks)
+  if (isX402Facilitator(chainId, addressHash)) {
+    return { address, addressType: "x402Facilitator" };
+  }
+
+  // Step 3: Check for EIP-7702 delegation (EOA with delegated code)
   if (isEIP7702Delegation(address.code)) {
     // It's an EOA with EIP-7702 delegation - still treat as account
     return { address, addressType: "account" };
   }
 
-  // Step 3: Determine address type based on code
+  // Step 4: Determine address type based on code
   if (!hasContractCode(address.code)) {
     // It's an EOA (no code)
     return { address, addressType: "account" };
@@ -308,6 +314,8 @@ export function getAddressTypeLabel(type: AddressType): string {
       return "ERC-721 NFT";
     case "erc1155":
       return "ERC-1155 Multi-Token";
+    case "x402Facilitator":
+      return "Account (EOA)";
     default:
       return "Unknown";
   }
@@ -328,6 +336,8 @@ export function getAddressTypeIcon(type: AddressType): string {
       return "🖼️";
     case "erc1155":
       return "📦";
+    case "x402Facilitator":
+      return "👤";
     default:
       return "❓";
   }

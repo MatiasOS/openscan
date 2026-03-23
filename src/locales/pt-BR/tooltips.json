@@ -88,7 +88,12 @@
     "contractBytecode": "O bytecode EVM compilado implantado neste endereço.",
     "sourceCode": "O código-fonte original em Solidity/Vyper, verificado para corresponder ao bytecode implantado.",
     "rawAbi": "A Interface Binária de Aplicação (ABI) define como interagir com as funções deste contrato.",
-    "functions": "Funções de contrato disponíveis que podem ser chamadas para ler dados ou modificar o estado."
+    "functions": "Funções de contrato disponíveis que podem ser chamadas para ler dados ou modificar o estado.",
+    "facilitatorName": "O nome registrado deste facilitador de pagamentos x402 — um serviço que verifica e liquida pagamentos cripto HTTP 402 em nome de provedores de API.",
+    "facilitatorBaseUrl": "O endpoint de API onde este facilitador expõe suas operações do protocolo x402 (verificar, liquidar, etc.).",
+    "facilitatorSchemes": "O esquema de pagamento que este facilitador suporta. 'exact' significa que o pagador envia o valor exato solicitado pelo servidor.",
+    "facilitatorAssets": "Os padrões de tokens aceitos para pagamento. EIP-3009 = transferências USDC/EURC sem gas, SPL = tokens Solana, Token-2022 = extensões de tokens Solana.",
+    "facilitatorCapabilities": "As operações do protocolo x402 que este facilitador suporta: Verify (validar pagamento), Settle (executar transferência on-chain), Supported (consultar tokens/redes aceitos), List (descobrir serviços disponíveis)."
   },
   "token": {
     "tokenStandard": "O padrão de interface do token (ex: ERC-20, ERC-721, ERC-1155) que define como este token se comporta.",

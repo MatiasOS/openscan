@@ -88,7 +88,12 @@
     "contractBytecode": "部署在此地址的编译后EVM字节码。",
     "sourceCode": "经验证与部署字节码匹配的原始Solidity/Vyper源代码。",
     "rawAbi": "应用程序二进制接口（ABI）定义了如何与此合约的函数进行交互。",
-    "functions": "可调用的合约函数，用于读取数据或修改状态。"
+    "functions": "可调用的合约函数，用于读取数据或修改状态。",
+    "facilitatorName": "此x402支付协调器的注册名称 — 一种代表API提供商验证和结算HTTP 402加密支付的服务。",
+    "facilitatorBaseUrl": "此协调器公开其x402协议操作（验证、结算等）的API端点。",
+    "facilitatorSchemes": "此协调器支持的支付方案。'exact'表示付款方发送服务器请求的精确金额。",
+    "facilitatorAssets": "接受的代币标准。EIP-3009 = 无Gas USDC/EURC转账，SPL = Solana代币，Token-2022 = Solana代币扩展。",
+    "facilitatorCapabilities": "此协调器支持的x402协议操作：Verify（验证支付）、Settle（执行链上转账）、Supported（查询支持的代币/网络）、List（发现可用服务）。"
   },
   "token": {
     "tokenStandard": "代币接口标准（如ERC-20、ERC-721、ERC-1155），定义了代币的行为方式。",
