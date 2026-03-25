@@ -1,4 +1,4 @@
-import type { EthLog } from "@openscan/network-connectors";
+import type { EthLog, SupportedChainId } from "@openscan/network-connectors";
 import type React from "react";
 
 // ==================== NETWORK TYPES ====================
@@ -7,6 +7,13 @@ import type React from "react";
  * Network type - EVM or Bitcoin
  */
 export type NetworkType = "evm" | "bitcoin";
+
+/**
+ * All EVM chain IDs supported by the app.
+ * Maps directly to the connector library's SupportedChainId.
+ * When adding a new EVM network, add its chain ID to network-connectors first.
+ */
+export type AppChainId = SupportedChainId;
 
 // ==================== CORE DOMAIN TYPES ====================
 
@@ -228,6 +235,7 @@ export interface BitcoinTransaction {
   vin: BitcoinTransactionInput[];
   vout: BitcoinTransactionOutput[];
   blockhash?: string;
+  blockheight?: number;
   confirmations?: number;
   blocktime?: number;
   time?: number;
@@ -277,7 +285,13 @@ export interface Address {
 /**
  * Address type classification
  */
-export type AddressType = "account" | "contract" | "erc20" | "erc721" | "erc1155";
+export type AddressType =
+  | "account"
+  | "contract"
+  | "erc20"
+  | "erc721"
+  | "erc1155"
+  | "x402Facilitator";
 
 export type StorageAt = Record<string, string>;
 
@@ -484,6 +498,11 @@ export type AIAnalysisType =
 export type PromptVersion = "stable" | "latest";
 
 /**
+ * Knowledge level for helper tooltip visibility
+ */
+export type KnowledgeLevel = "beginner" | "intermediate" | "advanced";
+
+/**
  * User settings for the application
  */
 export interface UserSettings {
@@ -495,6 +514,23 @@ export interface UserSettings {
   isSuperUser?: boolean;
   promptVersion?: PromptVersion;
   persistentCacheSizeMB?: number;
+  beaconUrls?: Record<string, string>;
+  knowledgeLevel?: KnowledgeLevel;
+  showHelperTooltips?: boolean;
+  workerProxyAi?: boolean;
+  workerProxyRpc?: boolean;
+}
+
+// ==================== BEACON/BLOB TYPES ====================
+
+/**
+ * A single blob sidecar from the Beacon API
+ */
+export interface BlobSidecar {
+  index: string;
+  blob: string;
+  kzg_commitment: string;
+  kzg_proof: string;
 }
 
 /**
@@ -506,9 +542,14 @@ export const DEFAULT_SETTINGS: UserSettings = {
   rpcStrategy: "fallback",
   maxParallelRequests: 3,
   apiKeys: {},
+  beaconUrls: {},
   isSuperUser: false,
   promptVersion: "stable",
   persistentCacheSizeMB: 10,
+  knowledgeLevel: "beginner",
+  showHelperTooltips: true,
+  workerProxyAi: true,
+  workerProxyRpc: true,
 };
 
 /**

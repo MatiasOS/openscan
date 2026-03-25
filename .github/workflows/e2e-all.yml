@@ -1,0 +1,17 @@
+name: E2E Tests - All
+
+on:
+  workflow_dispatch:
+
+jobs:
+  e2e-eth-mainnet:
+    uses: ./.github/workflows/e2e-eth-mainnet.yml
+    secrets: inherit
+
+  e2e-evm-networks:
+    uses: ./.github/workflows/e2e-evm-networks.yml
+    secrets: inherit
+
+  e2e-bitcoin:
+    uses: ./.github/workflows/e2e-bitcoin.yml
+    secrets: inherit

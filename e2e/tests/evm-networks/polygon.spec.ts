@@ -362,11 +362,11 @@ test.describe("Polygon Transaction Page", () => {
       await expect(page.locator("text=To:")).toBeVisible();
 
       // Verify gas information
-      await expect(page.getByText("Gas Price:", { exact: true })).toBeVisible();
+      await expect(page.locator(".tx-label", { hasText: "Gas Price:" })).toBeVisible();
       await expect(page.locator("text=Gas Limit")).toBeVisible();
 
-      // Verify has input data (NFT transfer)
-      await expect(page.locator("text=Input Data:")).toBeVisible();
+      // Verify has input data (shown as tab in TX Analyser)
+      await expect(page.locator("text=Input Data").first()).toBeVisible();
     }
   });
 
@@ -412,7 +412,7 @@ test.describe("Polygon Transaction Page", () => {
       await expect(page.locator("text=Status:")).toBeVisible();
       await expect(page.locator("text=Block:")).toBeVisible();
       await expect(page.locator("text=Gas Limit")).toBeVisible();
-      await expect(page.locator("text=Input Data:")).toBeVisible();
+      await expect(page.locator("text=Input Data").first()).toBeVisible();
     }
   });
 
@@ -443,7 +443,7 @@ test.describe("Polygon Transaction Page", () => {
       await expect(page.locator("text=Transaction Hash:")).toBeVisible();
       await expect(page.locator("text=Status:")).toBeVisible();
       await expect(page.locator("text=Gas Limit")).toBeVisible();
-      await expect(page.locator("text=Input Data:")).toBeVisible();
+      await expect(page.locator("text=Input Data").first()).toBeVisible();
     }
   });
 
@@ -455,12 +455,12 @@ test.describe("Polygon Transaction Page", () => {
 
     const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
-      await expect(page.locator("text=Other Attributes:")).toBeVisible();
-      await expect(page.locator("text=Nonce:")).toBeVisible();
-      await expect(page.locator("text=Position:")).toBeVisible();
+      await expect(page.locator(".tx-label", { hasText: "Nonce:" })).toBeVisible();
+      await expect(page.locator(".tx-label", { hasText: "Position:" })).toBeVisible();
 
-      // Verify position value (nonce is very large, just check it's displayed)
-      await expect(page.locator(`text=Position: ${tx.position}`)).toBeVisible();
+      // Verify position value
+      const posRow = page.locator(".tx-row", { hasText: "Position:" });
+      await expect(posRow.locator(".tx-value")).toContainText(String(tx.position));
     }
   });
 
@@ -472,10 +472,11 @@ test.describe("Polygon Transaction Page", () => {
 
     const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
-      await expect(page.locator("text=Nonce:")).toBeVisible();
-      await expect(page.locator("text=Position:")).toBeVisible();
+      await expect(page.locator(".tx-label", { hasText: "Nonce:" })).toBeVisible();
+      await expect(page.locator(".tx-label", { hasText: "Position:" })).toBeVisible();
 
-      await expect(page.locator(`text=Nonce: ${tx.nonce}`)).toBeVisible();
+      const nonceRow = page.locator(".tx-row", { hasText: "Nonce:" });
+      await expect(nonceRow.locator(".tx-value")).toContainText(String(tx.nonce));
     }
   });
 
@@ -487,11 +488,13 @@ test.describe("Polygon Transaction Page", () => {
 
     const loaded = await waitForTxContent(page, testInfo);
     if (loaded) {
-      await expect(page.locator("text=Nonce:")).toBeVisible();
-      await expect(page.locator("text=Position:")).toBeVisible();
+      await expect(page.locator(".tx-label", { hasText: "Nonce:" })).toBeVisible();
+      await expect(page.locator(".tx-label", { hasText: "Position:" })).toBeVisible();
 
-      await expect(page.locator(`text=Nonce: ${tx.nonce}`)).toBeVisible();
-      await expect(page.locator(`text=Position: ${tx.position}`)).toBeVisible();
+      const nonceRow = page.locator(".tx-row", { hasText: "Nonce:" });
+      await expect(nonceRow.locator(".tx-value")).toContainText(String(tx.nonce));
+      const posRow = page.locator(".tx-row", { hasText: "Position:" });
+      await expect(posRow.locator(".tx-value")).toContainText(String(tx.position));
     }
   });
 

@@ -149,6 +149,39 @@
       }
     }
   },
+  "workerProxy": {
+    "title": "Worker Proxy",
+    "description": "Control the OpenScan worker proxy used for AI analysis and RPC routing. Disabling these will require your own API keys or endpoints.",
+    "aiAnalysis": {
+      "label": "AI Analysis Proxy",
+      "description": "Enable the OpenScan AI analysis proxy. When disabled, the AI analysis panel will be hidden across all pages."
+    },
+    "rpcProxy": {
+      "label": "RPC Proxy",
+      "description": "Enable OpenScan worker proxy RPC endpoints. When disabled, only metadata and your personal RPC endpoints will be used."
+    }
+  },
+  "beaconApi": {
+    "title": "Beacon API",
+    "description": "Configure Beacon Chain API endpoints to view EIP-4844 blob data. Public endpoints are provided by default.",
+    "endpointLabel": "{{network}} Beacon API",
+    "endpointPlaceholder": "https://your-beacon-node.example.com"
+  },
+  "helperTooltips": {
+    "title": "Helper Tooltips",
+    "description": "Show contextual help for blockchain data fields.",
+    "enabled": {
+      "label": "Show Helper Tooltips",
+      "description": "Display helper icons next to field labels with brief explanations."
+    },
+    "knowledgeLevel": {
+      "label": "Knowledge Level",
+      "description": "Controls how many helper tooltips are shown. Beginner shows all tooltips. Intermediate hides basic fields. Advanced shows only complex and chain-specific tooltips.",
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    }
+  },
   "rpcEndpoints": {
     "title": "RPC Endpoints",
     "description": "Configure RPC URLs for each network. Click on a network to expand and configure its endpoints.",

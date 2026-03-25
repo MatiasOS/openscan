@@ -2,13 +2,22 @@ name: E2E Tests - Ethereum Mainnet
 
 on:
   pull_request:
-    branches: [dev]
+    branches: [main]
+  workflow_call:
   workflow_dispatch:
 
 jobs:
   e2e-mainnet:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        shard:
+          - name: shard-a
+            tests: "e2e/tests/eth-mainnet/block.spec.ts e2e/tests/eth-mainnet/blocks.spec.ts e2e/tests/eth-mainnet/transaction.spec.ts"
+          - name: shard-b
+            tests: "e2e/tests/eth-mainnet/txs.spec.ts e2e/tests/eth-mainnet/address.spec.ts e2e/tests/eth-mainnet/token.spec.ts"
 
     steps:
       - uses: actions/checkout@v4
@@ -27,8 +36,8 @@ jobs:
       - name: Build application
         run: ./scripts/build-production.sh
 
-      - name: Run Ethereum Mainnet E2E tests
-        run: bun run test:e2e:eth-mainnet
+      - name: Run Ethereum Mainnet E2E tests (${{ matrix.shard.name }})
+        run: bunx playwright test ${{ matrix.shard.tests }}
         env:
           CI: true
           INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
@@ -38,6 +47,6 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-report-mainnet
+          name: playwright-report-mainnet-${{ matrix.shard.name }}
           path: playwright-report/
           retention-days: 7

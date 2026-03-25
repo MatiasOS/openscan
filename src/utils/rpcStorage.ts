@@ -1,4 +1,5 @@
-import type { MetadataRpcEndpoint } from "../services/MetadataService";
+import { OPENSCAN_WORKER_URL } from "../config/workerConfig";
+import { type MetadataRpcEndpoint, METADATA_VERSION } from "../services/MetadataService";
 import type { RpcUrlsContextType } from "../types";
 import { logger } from "./logger";
 
@@ -8,14 +9,66 @@ const METADATA_RPC_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
  * Hardcoded fallback defaults for networks that are never in the metadata service.
- * Localhost (eip155:31337) always points to the default Hardhat/Anvil port.
+ * Includes localhost, worker-proxied BTC, and worker-proxied EVM endpoints.
+ * Metadata service RPCs and user-configured RPCs take priority via getEffectiveRpcUrls().
  */
 const BUILTIN_RPC_DEFAULTS: RpcUrlsContextType = {
   "eip155:31337": ["http://localhost:8545"],
+  "bip122:000000000019d6689c085ae165831e93": [
+    `${OPENSCAN_WORKER_URL}/btc/alchemy`,
+    `${OPENSCAN_WORKER_URL}/btc/drpc`,
+    `${OPENSCAN_WORKER_URL}/btc/ankr`,
+    `${OPENSCAN_WORKER_URL}/btc/onfinality/bip122:000000000019d6689c085ae165831e93`,
+  ],
+  "bip122:00000000da84f2bafbbc53dee25a72ae": [
+    `${OPENSCAN_WORKER_URL}/btc/onfinality/bip122:00000000da84f2bafbbc53dee25a72ae`,
+  ],
+  "eip155:1": [
+    `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:1`,
+    `${OPENSCAN_WORKER_URL}/evm/infura/eip155:1`,
+    `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:1`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:1`,
+  ],
+  "eip155:42161": [
+    `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:42161`,
+    `${OPENSCAN_WORKER_URL}/evm/infura/eip155:42161`,
+    `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:42161`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:42161`,
+  ],
+  "eip155:10": [
+    `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:10`,
+    `${OPENSCAN_WORKER_URL}/evm/infura/eip155:10`,
+    `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:10`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:10`,
+  ],
+  "eip155:8453": [
+    `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:8453`,
+    `${OPENSCAN_WORKER_URL}/evm/infura/eip155:8453`,
+    `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:8453`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:8453`,
+  ],
+  "eip155:137": [
+    `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:137`,
+    `${OPENSCAN_WORKER_URL}/evm/infura/eip155:137`,
+    `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:137`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:137`,
+  ],
+  "eip155:56": [
+    `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:56`,
+    `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:56`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:56`,
+  ],
+  "eip155:43114": [
+    `${OPENSCAN_WORKER_URL}/evm/alchemy/eip155:43114`,
+    `${OPENSCAN_WORKER_URL}/evm/infura/eip155:43114`,
+    `${OPENSCAN_WORKER_URL}/evm/drpc/eip155:43114`,
+    `${OPENSCAN_WORKER_URL}/evm/ankr/eip155:43114`,
+  ],
 };
 
 interface MetadataRpcCache {
   timestamp: number;
+  version?: string;
   rpcs: Record<string, MetadataRpcEndpoint[]>;
 }
 
@@ -40,7 +93,7 @@ export function loadMetadataRpcsFromStorage(): MetadataRpcCache | null {
  */
 export function saveMetadataRpcsToStorage(rpcs: Record<string, MetadataRpcEndpoint[]>): void {
   try {
-    const cache: MetadataRpcCache = { timestamp: Date.now(), rpcs };
+    const cache: MetadataRpcCache = { timestamp: Date.now(), version: METADATA_VERSION, rpcs };
     localStorage.setItem(METADATA_RPC_STORAGE_KEY, JSON.stringify(cache));
   } catch (err) {
     logger.warn("Failed to save metadata RPCs to storage", err);
@@ -53,6 +106,7 @@ export function saveMetadataRpcsToStorage(rpcs: Record<string, MetadataRpcEndpoi
 export function isMetadataRpcCacheFresh(): boolean {
   const cache = loadMetadataRpcsFromStorage();
   if (!cache) return false;
+  if (cache.version !== METADATA_VERSION) return false;
   return Date.now() - cache.timestamp < METADATA_RPC_TTL;
 }
 
@@ -135,19 +189,49 @@ export function saveRpcUrlsToStorage(map: RpcUrlsContextType): void {
  * Stored values override default for a network; missing networks fall back to defaults.
  * Keys are networkId strings (CAIP-2 format)
  */
-export function getEffectiveRpcUrls(): RpcUrlsContextType {
-  // Merge builtin defaults first, then metadata defaults, so stored user values win
-  const defaults = { ...BUILTIN_RPC_DEFAULTS, ...getDefaultRpcEndpoints() };
-  const stored = loadRpcUrlsFromStorage();
-  if (!stored) return defaults;
+/**
+ * Check whether a URL points to the OpenScan worker proxy.
+ */
+export function isWorkerProxyUrl(url: string): boolean {
+  return OPENSCAN_WORKER_URL.length > 0 && url.startsWith(OPENSCAN_WORKER_URL);
+}
 
-  // Merge: stored values override defaults
-  const merged: RpcUrlsContextType = { ...defaults };
-  for (const k of Object.keys(stored)) {
-    const val = stored[k];
-    if (!val || !Array.isArray(val) || val.length === 0) continue;
-    merged[k] = val;
+export function getEffectiveRpcUrls(options?: {
+  excludeWorkerProxy?: boolean;
+}): RpcUrlsContextType {
+  // Merge metadata and builtin worker URLs per-network (concatenate arrays, deduplicate)
+  const metadataDefaults = getDefaultRpcEndpoints();
+  const allNetworkIds = new Set([
+    ...Object.keys(metadataDefaults),
+    ...Object.keys(BUILTIN_RPC_DEFAULTS),
+  ]);
+  const defaults: RpcUrlsContextType = {};
+  for (const networkId of allNetworkIds) {
+    const metadataUrls = metadataDefaults[networkId] ?? [];
+    const builtinUrls = BUILTIN_RPC_DEFAULTS[networkId] ?? [];
+    defaults[networkId] = [...new Set([...metadataUrls, ...builtinUrls])];
   }
+  const stored = loadRpcUrlsFromStorage();
+
+  const merged: RpcUrlsContextType = { ...defaults };
+  if (stored) {
+    for (const k of Object.keys(stored)) {
+      const val = stored[k];
+      if (!val || !Array.isArray(val) || val.length === 0) continue;
+      // Merge stored URLs with defaults so builtin worker URLs are always present
+      const defaultUrls = defaults[k] ?? [];
+      merged[k] = [...new Set([...val, ...defaultUrls])];
+    }
+  }
+
+  if (options?.excludeWorkerProxy) {
+    const filtered: RpcUrlsContextType = {};
+    for (const [networkId, urls] of Object.entries(merged)) {
+      filtered[networkId] = urls.filter((url) => !isWorkerProxyUrl(url));
+    }
+    return filtered;
+  }
+
   return merged;
 }
 

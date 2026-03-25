@@ -3,6 +3,7 @@ import { useEffect, useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Markdown from "react-markdown";
 import { Link } from "react-router-dom";
+import { useSettings } from "../../../context/SettingsContext";
 import OpenScanCubeLoader from "../../LoadingLogo";
 import { useAIAnalysis } from "../../../hooks/useAIAnalysis";
 import type { AIAnalysisType } from "../../../types";
@@ -22,6 +23,7 @@ const AIAnalysisPanel: React.FC<AIAnalysisProps> = ({
   networkCurrency,
   cacheKey,
 }) => {
+  const { settings } = useSettings();
   const { t, i18n } = useTranslation("common");
   const [isOpen, setIsOpen] = useState(false);
   const panelId = useId();
@@ -40,8 +42,18 @@ const AIAnalysisPanel: React.FC<AIAnalysisProps> = ({
     }
   }, [result, error]);
 
+  const hasAiApiKeys = !!(
+    settings.apiKeys?.groq ||
+    settings.apiKeys?.openai ||
+    settings.apiKeys?.anthropic ||
+    settings.apiKeys?.perplexity ||
+    settings.apiKeys?.gemini
+  );
+  const aiProxyDisabledNoKeys = settings.workerProxyAi === false && !hasAiApiKeys;
+
   const handleAnalyze = () => {
     setIsOpen(true);
+    if (aiProxyDisabledNoKeys) return;
     void analyze();
   };
 
@@ -91,6 +103,17 @@ const AIAnalysisPanel: React.FC<AIAnalysisProps> = ({
         aria-hidden={!isOpen}
         style={{ display: isOpen ? "flex" : "none" }}
       >
+        {aiProxyDisabledNoKeys && (
+          <div className="ai-analysis-error">
+            <div className="ai-analysis-error-message">{t("aiAnalysis.errors.proxyDisabled")}</div>
+            <div className="ai-analysis-error-action">
+              <Link to="/settings" className="ai-analysis-settings-link">
+                {t("aiAnalysis.errors.goToSettings")}
+              </Link>
+            </div>
+          </div>
+        )}
+
         {loading && !result && (
           <div className="ai-analysis-loading">
             <OpenScanCubeLoader size={60} />

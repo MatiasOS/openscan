@@ -149,6 +149,39 @@
       }
     }
   },
+  "workerProxy": {
+    "title": "ワーカープロキシ",
+    "description": "AI分析とRPCルーティングに使用されるOpenScanワーカープロキシを制御します。無効にすると、独自のAPIキーまたはエンドポイントが必要です。",
+    "aiAnalysis": {
+      "label": "AI分析プロキシ",
+      "description": "OpenScan AI分析プロキシを有効にします。無効にすると、すべてのページでAI分析パネルが非表示になります。"
+    },
+    "rpcProxy": {
+      "label": "RPCプロキシ",
+      "description": "OpenScanワーカープロキシRPCエンドポイントを有効にします。無効にすると、メタデータと個人のRPCエンドポイントのみが使用されます。"
+    }
+  },
+  "beaconApi": {
+    "title": "Beacon API",
+    "description": "EIP-4844 Blob データを表示するための Beacon Chain API エンドポイントを設定します。デフォルトで公開エンドポイントが提供されます。",
+    "endpointLabel": "{{network}} Beacon API",
+    "endpointPlaceholder": "https://your-beacon-node.example.com"
+  },
+  "helperTooltips": {
+    "title": "ヘルパーツールチップ",
+    "description": "ブロックチェーンデータフィールドのコンテキストヘルプを表示します。",
+    "enabled": {
+      "label": "ヘルパーツールチップを表示",
+      "description": "フィールドラベルの横に簡単な説明付きのヘルプアイコンを表示します。"
+    },
+    "knowledgeLevel": {
+      "label": "知識レベル",
+      "description": "ヘルパーツールチップの表示数を制御します。初心者はすべて表示。中級者は基本フィールドを非表示。上級者は複雑なチェーン固有のツールチップのみ表示。",
+      "beginner": "初心者",
+      "intermediate": "中級者",
+      "advanced": "上級者"
+    }
+  },
   "rpcEndpoints": {
     "title": "RPCエンドポイント",
     "description": "各ネットワークのRPC URLを設定します。ネットワークをクリックして展開し、エンドポイントを設定してください。",

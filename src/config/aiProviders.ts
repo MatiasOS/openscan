@@ -1,4 +1,5 @@
 import type { AIProvider, AIProviderConfig } from "../types";
+import { OPENSCAN_WORKER_URL } from "./workerConfig";
 
 /**
  * Static configuration for supported AI providers.
@@ -9,9 +10,7 @@ export const AI_PROVIDERS: Record<AIProvider, AIProviderConfig> = {
   "openscan-groq": {
     id: "openscan-groq",
     name: "OpenScan Groq",
-    baseUrl:
-      process.env.REACT_APP_OPENSCAN_GROQ_AI_URL ??
-      "https://openscan-groq-ai-proxy.openscan.workers.dev",
+    baseUrl: OPENSCAN_WORKER_URL,
     defaultModel: "groq/compound",
     keyUrl: "",
   },

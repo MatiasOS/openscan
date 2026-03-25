@@ -26,7 +26,14 @@
     "disableSuperUser": "禁用超级用户模式",
     "enableSuperUser": "启用超级用户模式",
     "mempool": "内存池",
-    "txs": "交易"
+    "txs": "交易",
+    "tooltipsBeginner": "提示：初学者",
+    "tooltipsIntermediate": "提示：中级",
+    "tooltipsAdvanced": "提示：高级",
+    "tooltipsSwitched": "提示帮助级别已切换为{{level}}",
+    "tooltipsLevelBeginner": "初学者",
+    "tooltipsLevelIntermediate": "中级",
+    "tooltipsLevelAdvanced": "高级"
   },
   "footer": {
     "about": "关于",
@@ -267,7 +274,8 @@
       "parseError": "解析 AI 响应失败。请重试。",
       "generic": "分析失败。请重试。",
       "tryAgain": "重试",
-      "goToSettings": "前往设置"
+      "goToSettings": "前往设置",
+      "proxyDisabled": "OpenScan免费AI代理已禁用。请在设置 → 网络 → 工作代理中启用，或在设置 → 提供商中配置您自己的AI提供商API密钥。"
     }
   },
   "search": {

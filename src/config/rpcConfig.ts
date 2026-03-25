@@ -9,8 +9,5 @@ import type { RpcUrlsContextType } from "../types";
  */
 export function getRPCUrls(networkId: string, rpcUrlsMap: RpcUrlsContextType): string[] {
   const urls = rpcUrlsMap[networkId];
-  if (!urls || urls.length === 0) {
-    throw new Error(`No RPC endpoint configured for network ${networkId}`);
-  }
-  return urls;
+  return urls ?? [];
 }

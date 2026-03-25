@@ -49,6 +49,20 @@
   "blobCount": "Blob 数量：",
   "blobVersionedHashes": "Blob 版本哈希：",
   "blobTransaction": "Blob 交易 (EIP-4844)",
+  "blobData": {
+    "title": "Blob 数据",
+    "blobIndex": "Blob #{{index}}",
+    "effectiveSize": "{{bytes}} 字节（有效）",
+    "kzgCommitment": "KZG 承诺：",
+    "kzgProof": "KZG 证明：",
+    "showHex": "十六进制",
+    "showUtf8": "UTF-8",
+    "expand": "展开",
+    "collapse": "收起",
+    "loading": "正在加载 Blob 数据...",
+    "pruned": "Blob 数据已被修剪，信标节点不再提供。Blob 通常在约 18 天后被修剪。",
+    "noBeaconEndpoint": "请在设置中配置 Beacon API 端点以查看 Blob 数据。"
+  },
   "pending": "待处理",
   "logsAddress": "地址",
   "logsDecoded": "已解码",
@@ -173,6 +187,11 @@
     "expandAll": "全部展开",
     "collapseAll": "全部折叠",
     "expand": "展开",
-    "collapse": "折叠"
+    "collapse": "折叠",
+    "rawTrace": "原始追踪",
+    "rawTraceSteps": "{{count}} 操作码步骤",
+    "rawTracePrev": "上一页",
+    "rawTraceNext": "下一页",
+    "rawTracePage": "第 {{current}}/{{total}} 页 ({{from}}–{{to}} / {{totalSteps}})"
   }
 }

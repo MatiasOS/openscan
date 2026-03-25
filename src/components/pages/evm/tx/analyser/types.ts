@@ -1,7 +1,14 @@
 import type { DecodedInput } from "../../../../../utils/inputDecoder";
 import type { DataService } from "../../../../../services/DataService";
 
-export type AnalyserTab = "callTree" | "gasProfiler" | "stateChanges" | "events" | "inputData";
+export type AnalyserTab =
+  | "callTree"
+  | "gasProfiler"
+  | "stateChanges"
+  | "rawTrace"
+  | "events"
+  | "inputData"
+  | "blobData";
 
 export interface TxAnalyserProps {
   txHash: string;
@@ -15,6 +22,8 @@ export interface TxAnalyserProps {
   inputData?: string;
   decodedInputData?: DecodedInput | null;
   isSuperUser?: boolean;
+  blobVersionedHashes?: string[];
+  blockTimestamp?: number;
 }
 
 export const CALL_TYPE_COLORS: Record<string, string> = {

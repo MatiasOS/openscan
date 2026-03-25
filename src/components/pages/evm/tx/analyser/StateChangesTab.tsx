@@ -7,6 +7,8 @@ import type {
   PrestateTrace,
 } from "../../../../../services/adapters/NetworkAdapter";
 import type { ContractInfo } from "../../../../../utils/contractLookup";
+import HelperTooltip from "../../../../common/HelperTooltip";
+import { useSettings } from "../../../../../context/SettingsContext";
 import LongString from "../../../../common/LongString";
 
 function formatHexBalance(hex: string | undefined): string {
@@ -42,6 +44,8 @@ const StateChangesTab: React.FC<{
   contracts: Record<string, ContractInfo>;
 }> = ({ trace, networkId, networkCurrency, contracts }) => {
   const { t } = useTranslation("transaction");
+  const { t: tTooltips } = useTranslation("tooltips");
+  const { settings } = useSettings();
   const [expandedSet, setExpandedSet] = useState<Set<string>>(new Set());
 
   const allAddresses = Array.from(new Set([...Object.keys(trace.pre), ...Object.keys(trace.post)]));
@@ -62,8 +66,8 @@ const StateChangesTab: React.FC<{
 
   if (changedAddresses.length === 0) {
     return (
-      <div className="analyser-tab-content">
-        <div className="analyser-empty">{t("analyser.noChanges")}</div>
+      <div className="detail-panel-tab-content">
+        <div className="detail-panel-empty">{t("analyser.noChanges")}</div>
       </div>
     );
   }
@@ -81,16 +85,16 @@ const StateChangesTab: React.FC<{
   const collapseAll = () => setExpandedSet(new Set());
 
   return (
-    <div className="analyser-tab-content">
-      <div className="analyser-summary">
+    <div className="detail-panel-tab-content">
+      <div className="detail-panel-summary">
         <span>
           {changedAddresses.length} {t("analyser.stateChanges").toLowerCase()}
         </span>
-        <span className="analyser-expand-controls">
-          <button type="button" className="analyser-expand-btn" onClick={expandAll}>
+        <span className="detail-panel-expand-controls">
+          <button type="button" className="detail-panel-expand-btn" onClick={expandAll}>
             {t("analyser.expandAll")}
           </button>
-          <button type="button" className="analyser-expand-btn" onClick={collapseAll}>
+          <button type="button" className="detail-panel-expand-btn" onClick={collapseAll}>
             {t("analyser.collapseAll")}
           </button>
         </span>
@@ -139,6 +143,9 @@ const StateChangesTab: React.FC<{
                   <div className="state-change-row">
                     <span className="state-change-label">
                       {t("analyser.balanceChange")} ({networkCurrency})
+                      {settings.showHelperTooltips !== false && (
+                        <HelperTooltip content={tTooltips("transaction.balanceChange")} />
+                      )}
                     </span>
                     <span className="state-change-before">{formatHexBalance(pre.balance)}</span>
                     <span className="state-change-arrow">→</span>
@@ -153,7 +160,12 @@ const StateChangesTab: React.FC<{
 
                 {nonceDiff && (
                   <div className="state-change-row">
-                    <span className="state-change-label">{t("analyser.nonceChange")}</span>
+                    <span className="state-change-label">
+                      {t("analyser.nonceChange")}
+                      {settings.showHelperTooltips !== false && (
+                        <HelperTooltip content={tTooltips("transaction.nonceChange")} />
+                      )}
+                    </span>
                     <span className="state-change-before">{pre.nonce ?? "—"}</span>
                     <span className="state-change-arrow">→</span>
                     <span className="state-change-after">{post.nonce ?? "—"}</span>
@@ -165,7 +177,12 @@ const StateChangesTab: React.FC<{
 
                 {codeChanged && (
                   <div className="state-change-row">
-                    <span className="state-change-label">{t("analyser.codeDeployed")}</span>
+                    <span className="state-change-label">
+                      {t("analyser.codeDeployed")}
+                      {settings.showHelperTooltips !== false && (
+                        <HelperTooltip content={tTooltips("transaction.codeDeployed")} />
+                      )}
+                    </span>
                     <span className="state-change-after state-change-code">
                       {post.code ? `${post.code.slice(0, 20)}…` : "—"}
                     </span>
@@ -174,7 +191,12 @@ const StateChangesTab: React.FC<{
 
                 {storageKeys.map((slot) => (
                   <div key={slot} className="state-change-row state-change-row--storage">
-                    <span className="state-change-label">{t("analyser.storageChange")}</span>
+                    <span className="state-change-label">
+                      {t("analyser.storageChange")}
+                      {settings.showHelperTooltips !== false && (
+                        <HelperTooltip content={tTooltips("transaction.storageChange")} />
+                      )}
+                    </span>
                     <span className="state-change-slot">
                       <LongString value={slot} start={8} end={6} />
                     </span>

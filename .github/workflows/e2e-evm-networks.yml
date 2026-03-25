@@ -2,7 +2,8 @@ name: E2E Tests - EVM Networks
 
 on:
   pull_request:
-    branches: [dev]
+    branches: [main]
+  workflow_call:
   workflow_dispatch:
 
 jobs:
@@ -13,10 +14,16 @@ jobs:
       fail-fast: false
       matrix:
         shard:
-          - name: shard-a
-            tests: "e2e/tests/evm-networks/arbitrum.spec.ts e2e/tests/evm-networks/base.spec.ts e2e/tests/evm-networks/optimism.spec.ts"
-          - name: shard-b
-            tests: "e2e/tests/evm-networks/bsc.spec.ts e2e/tests/evm-networks/polygon.spec.ts"
+          - name: arbitrum
+            tests: "e2e/tests/evm-networks/arbitrum.spec.ts"
+          - name: base
+            tests: "e2e/tests/evm-networks/base.spec.ts"
+          - name: optimism
+            tests: "e2e/tests/evm-networks/optimism.spec.ts"
+          - name: bsc
+            tests: "e2e/tests/evm-networks/bsc.spec.ts"
+          - name: polygon
+            tests: "e2e/tests/evm-networks/polygon.spec.ts"
 
     steps:
       - uses: actions/checkout@v4

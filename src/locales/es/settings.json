@@ -149,6 +149,39 @@
       }
     }
   },
+  "workerProxy": {
+    "title": "Proxy Worker",
+    "description": "Controlá el proxy worker de OpenScan usado para análisis de IA y enrutamiento RPC. Desactivarlos requiere tus propias claves de API o endpoints.",
+    "aiAnalysis": {
+      "label": "Proxy de Análisis IA",
+      "description": "Habilitar el proxy de análisis IA de OpenScan. Cuando está desactivado, el panel de análisis IA se oculta en todas las páginas."
+    },
+    "rpcProxy": {
+      "label": "Proxy RPC",
+      "description": "Habilitar los endpoints RPC del proxy worker de OpenScan. Cuando está desactivado, solo se usarán los endpoints de metadatos y personales."
+    }
+  },
+  "beaconApi": {
+    "title": "Beacon API",
+    "description": "Configurá endpoints de Beacon Chain API para ver datos de blobs EIP-4844. Se proporcionan endpoints públicos por defecto.",
+    "endpointLabel": "Beacon API de {{network}}",
+    "endpointPlaceholder": "https://tu-nodo-beacon.ejemplo.com"
+  },
+  "helperTooltips": {
+    "title": "Tooltips de Ayuda",
+    "description": "Mostrar ayuda contextual para campos de datos de blockchain.",
+    "enabled": {
+      "label": "Mostrar Tooltips de Ayuda",
+      "description": "Mostrar íconos de ayuda junto a las etiquetas de campos con explicaciones breves."
+    },
+    "knowledgeLevel": {
+      "label": "Nivel de Conocimiento",
+      "description": "Controla cuántos tooltips de ayuda se muestran. Principiante muestra todos. Intermedio oculta campos básicos. Avanzado muestra solo tooltips complejos y específicos de la cadena.",
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado"
+    }
+  },
   "rpcEndpoints": {
     "title": "Endpoints RPC",
     "description": "Configurá las URLs RPC para cada red. Hacé click en una red para desplegar y configurar sus endpoints.",

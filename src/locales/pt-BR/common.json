@@ -26,7 +26,14 @@
     "disableSuperUser": "Desativar Modo Super Usuário",
     "enableSuperUser": "Ativar Modo Super Usuário",
     "mempool": "Mempool",
-    "txs": "Transações"
+    "txs": "Transações",
+    "tooltipsBeginner": "Dicas: Iniciante",
+    "tooltipsIntermediate": "Dicas: Intermediário",
+    "tooltipsAdvanced": "Dicas: Avançado",
+    "tooltipsSwitched": "Nível de dicas alterado para {{level}}",
+    "tooltipsLevelBeginner": "Iniciante",
+    "tooltipsLevelIntermediate": "Intermediário",
+    "tooltipsLevelAdvanced": "Avançado"
   },
   "footer": {
     "about": "Sobre",
@@ -285,7 +292,8 @@
       "parseError": "Falha ao analisar resposta da IA. Tente novamente.",
       "generic": "Análise falhou. Por favor, tente novamente.",
       "tryAgain": "Tentar Novamente",
-      "goToSettings": "Ir para Configurações"
+      "goToSettings": "Ir para Configurações",
+      "proxyDisabled": "O proxy de IA gratuito do OpenScan está desativado. Ative em Configurações → Rede → Proxy Worker, ou configure suas próprias chaves de API em Configurações → Provedores."
     }
   },
   "search": {

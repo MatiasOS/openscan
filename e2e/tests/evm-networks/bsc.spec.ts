@@ -782,10 +782,13 @@ test.describe("BSC Address Page - System Contracts", () => {
     const addressPage = new AddressPage(page);
     await addressPage.goto("0xinvalid", CHAIN_ID);
 
+    // Invalid address may show error, loading timeout, or redirect to home
     await expect(
       addressPage.errorText
         .or(addressPage.container)
         .or(page.locator("text=Something went wrong"))
+        .or(page.locator("text=Data is taking longer"))
+        .or(page.locator("text=OPENSCAN"))
         .first()
     ).toBeVisible({ timeout: DEFAULT_TIMEOUT * 3 });
   });

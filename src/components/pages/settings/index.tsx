@@ -2,7 +2,9 @@ import type React from "react";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import HelperTooltip from "../../common/HelperTooltip";
 import { MetaMaskIcon } from "../../common/MetaMaskIcon";
+import { BEACON_SUPPORTED_NETWORKS, DEFAULT_BEACON_URLS } from "../../../config/beaconConfig";
 import { getEnabledNetworks } from "../../../config/networks";
 import { AppContext, useNetworks } from "../../../context/AppContext";
 import { useSettings } from "../../../context/SettingsContext";
@@ -23,7 +25,11 @@ import { downloadConfigFile, exportConfig, importConfig } from "../../../utils/c
 import { logger } from "../../../utils/logger";
 import { getChainIdFromNetwork } from "../../../utils/networkResolver";
 import { clearPersistentCache, getPersistentCacheSize } from "../../../utils/persistentCache";
-import { clearMetadataRpcCache, getMetadataEndpointMap } from "../../../utils/rpcStorage";
+import {
+  clearMetadataRpcCache,
+  getEffectiveRpcUrls,
+  getMetadataEndpointMap,
+} from "../../../utils/rpcStorage";
 import { sortRpcsByQuality } from "../../../utils/rpcAutoSync";
 import { type RpcTestResult, testRpcEndpoint } from "../rpcs/useRpcLatencyTest";
 
@@ -85,8 +91,18 @@ const getAlchemyBtcUrl = (networkId: string, apiKey: string): string | null => {
 const isInfuraUrl = (url: string): boolean => url.includes("infura.io");
 const isAlchemyUrl = (url: string): boolean => url.includes("alchemy.com");
 
+const isWorkerAlchemyUrl = (url: string): boolean =>
+  url.includes("/evm/alchemy/") || url.includes("/btc/alchemy") || url.includes("/beacon/alchemy/");
+const isWorkerInfuraUrl = (url: string): boolean => url.includes("/evm/infura/");
+const isWorkerDrpcUrl = (url: string): boolean =>
+  url.includes("/evm/drpc/") || url.includes("/btc/drpc");
+const isWorkerAnkrUrl = (url: string): boolean =>
+  url.includes("/evm/ankr/") || url.includes("/btc/ankr");
+const isWorkerOnfinalityUrl = (url: string): boolean => url.includes("/btc/onfinality/");
+
 const Settings: React.FC = () => {
   const { t, i18n } = useTranslation("settings");
+  const { t: tTooltips } = useTranslation("tooltips");
   const location = useLocation();
   const navigate = useNavigate();
   const { rpcUrls, setRpcUrls } = useContext(AppContext);
@@ -603,6 +619,14 @@ const Settings: React.FC = () => {
 
   const getRpcTagClass = useCallback(
     (url: string): string => {
+      if (
+        isWorkerAlchemyUrl(url) ||
+        isWorkerInfuraUrl(url) ||
+        isWorkerDrpcUrl(url) ||
+        isWorkerAnkrUrl(url) ||
+        isWorkerOnfinalityUrl(url)
+      )
+        return "rpc-opensource";
       if (isInfuraUrl(url) || isAlchemyUrl(url)) return "rpc-tracking";
       const ep = metadataUrlMap.get(url);
       if (!ep) return "";
@@ -615,6 +639,11 @@ const Settings: React.FC = () => {
 
   const getRpcTagLabel = useCallback(
     (url: string): string => {
+      if (isWorkerAlchemyUrl(url)) return "OpenScan Alchemy";
+      if (isWorkerInfuraUrl(url)) return "OpenScan Infura";
+      if (isWorkerDrpcUrl(url)) return "OpenScan dRPC";
+      if (isWorkerAnkrUrl(url)) return "OpenScan Ankr";
+      if (isWorkerOnfinalityUrl(url)) return "OpenScan OnFinality";
       if (isInfuraUrl(url)) return "Infura Personal";
       if (isAlchemyUrl(url)) return "Alchemy Personal";
       const ep = metadataUrlMap.get(url);
@@ -910,6 +939,76 @@ const Settings: React.FC = () => {
                             {lang.name}
                           </option>
                         ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="settings-section no-margin">
+                    <h2 className="settings-section-title">💡 {t("helperTooltips.title")}</h2>
+                    <p className="settings-section-description">
+                      {t("helperTooltips.description")}
+                    </p>
+
+                    <div className="settings-item">
+                      <div>
+                        <div className="settings-item-label">
+                          {t("helperTooltips.enabled.label")}
+                        </div>
+                        <div className="settings-item-description">
+                          {t("helperTooltips.enabled.description")}
+                        </div>
+                      </div>
+                      <label className="settings-toggle">
+                        <input
+                          type="checkbox"
+                          checked={settings.showHelperTooltips !== false}
+                          onChange={(e) => updateSettings({ showHelperTooltips: e.target.checked })}
+                          className="settings-toggle-input"
+                        />
+                        <span
+                          className={`settings-toggle-slider ${settings.showHelperTooltips !== false ? "active" : ""}`}
+                        >
+                          <span
+                            className={`settings-toggle-knob ${settings.showHelperTooltips !== false ? "active" : ""}`}
+                          />
+                        </span>
+                      </label>
+                    </div>
+
+                    <div className="settings-item">
+                      <div>
+                        <div className="settings-item-label">
+                          {t("helperTooltips.knowledgeLevel.label")}
+                          {settings.showHelperTooltips !== false && (
+                            <HelperTooltip content={tTooltips("settings.knowledgeLevel")} />
+                          )}
+                        </div>
+                        <div className="settings-item-description">
+                          {t("helperTooltips.knowledgeLevel.description")}
+                        </div>
+                      </div>
+                      <select
+                        value={settings.knowledgeLevel ?? "beginner"}
+                        onChange={(e) =>
+                          updateSettings({
+                            knowledgeLevel: e.target.value as
+                              | "beginner"
+                              | "intermediate"
+                              | "advanced",
+                          })
+                        }
+                        className="settings-select"
+                        disabled={settings.showHelperTooltips === false}
+                      >
+                        <option value="beginner">
+                          {t("helperTooltips.knowledgeLevel.beginner")}
+                        </option>
+                        <option value="intermediate">
+                          {t("helperTooltips.knowledgeLevel.intermediate")}
+                        </option>
+                        <option value="advanced">
+                          {t("helperTooltips.knowledgeLevel.advanced")}
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -1223,6 +1322,66 @@ const Settings: React.FC = () => {
                 </div>
 
                 <div className="settings-section no-margin-bottom">
+                  <h2 className="settings-section-title">☁️ {t("workerProxy.title")}</h2>
+                  <p className="settings-section-description">{t("workerProxy.description")}</p>
+
+                  <div className="settings-item">
+                    <div>
+                      <div className="settings-item-label">{t("workerProxy.aiAnalysis.label")}</div>
+                      <div className="settings-item-description">
+                        {t("workerProxy.aiAnalysis.description")}
+                      </div>
+                    </div>
+                    <label className="settings-toggle">
+                      <input
+                        type="checkbox"
+                        checked={settings.workerProxyAi !== false}
+                        onChange={(e) => updateSettings({ workerProxyAi: e.target.checked })}
+                        className="settings-toggle-input"
+                      />
+                      <span
+                        className={`settings-toggle-slider ${settings.workerProxyAi !== false ? "active" : ""}`}
+                      >
+                        <span
+                          className={`settings-toggle-knob ${settings.workerProxyAi !== false ? "active" : ""}`}
+                        />
+                      </span>
+                    </label>
+                  </div>
+
+                  <div className="settings-item">
+                    <div>
+                      <div className="settings-item-label">{t("workerProxy.rpcProxy.label")}</div>
+                      <div className="settings-item-description">
+                        {t("workerProxy.rpcProxy.description")}
+                      </div>
+                    </div>
+                    <label className="settings-toggle">
+                      <input
+                        type="checkbox"
+                        checked={settings.workerProxyRpc !== false}
+                        onChange={(e) => {
+                          updateSettings({ workerProxyRpc: e.target.checked });
+                          setRpcUrls(
+                            getEffectiveRpcUrls({
+                              excludeWorkerProxy: !e.target.checked,
+                            }),
+                          );
+                        }}
+                        className="settings-toggle-input"
+                      />
+                      <span
+                        className={`settings-toggle-slider ${settings.workerProxyRpc !== false ? "active" : ""}`}
+                      >
+                        <span
+                          className={`settings-toggle-knob ${settings.workerProxyRpc !== false ? "active" : ""}`}
+                        />
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="settings-section no-margin-bottom">
                   <h2 className="settings-section-title">⚡ {t("rpcStrategy.title")}</h2>
                   <p className="settings-section-description">{t("rpcStrategy.description")}</p>
 
@@ -1283,6 +1442,36 @@ const Settings: React.FC = () => {
                     </div>
                   )}
                 </div>
+
+                {isSuperUser && (
+                  <div className="settings-section">
+                    <h2 className="settings-section-title">🔮 {t("beaconApi.title")}</h2>
+                    <p className="settings-section-description">{t("beaconApi.description")}</p>
+                    {Object.entries(BEACON_SUPPORTED_NETWORKS).map(([caip2Id, networkName]) => (
+                      <div key={caip2Id} className="settings-item">
+                        <div>
+                          <div className="settings-item-label">
+                            {t("beaconApi.endpointLabel", { network: networkName })}
+                          </div>
+                        </div>
+                        <input
+                          type="text"
+                          value={
+                            settings.beaconUrls?.[caip2Id] ?? DEFAULT_BEACON_URLS[caip2Id] ?? ""
+                          }
+                          onChange={(e) => {
+                            const current = settings.beaconUrls ?? {};
+                            updateSettings({
+                              beaconUrls: { ...current, [caip2Id]: e.target.value },
+                            });
+                          }}
+                          placeholder={t("beaconApi.endpointPlaceholder")}
+                          className="settings-input"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <div className="settings-section">
                   <div className="settings-section-title-row">

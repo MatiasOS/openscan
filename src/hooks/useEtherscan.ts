@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { OPENSCAN_WORKER_URL } from "../config/workerConfig";
 import { useSettings } from "../context/SettingsContext";
 import { logger } from "../utils/logger";
 import type { SourcifyContractDetails } from "./useSourcify";
@@ -35,6 +36,7 @@ interface StandardJsonSources {
 function parseSourceFiles(
   sourceCode: string,
   contractName: string,
+  compilerVersion?: string,
 ): { name: string; path: string; content: string }[] {
   if (!sourceCode) return [];
 
@@ -58,8 +60,9 @@ function parseSourceFiles(
     }
   }
 
-  // Plain Solidity source
-  const fileName = `${contractName || "Contract"}.sol`;
+  // Detect language from compiler version — Vyper compilers start with "vyper:"
+  const ext = compilerVersion?.toLowerCase().startsWith("vyper:") ? ".vy" : ".sol";
+  const fileName = `${contractName || "Contract"}${ext}`;
   return [{ name: fileName, path: fileName, content: sourceCode }];
 }
 
@@ -81,7 +84,7 @@ export function useEtherscan(
   const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
-    if (!enabled || !address || !networkId || !apiKey) {
+    if (!enabled || !address || !networkId) {
       setData(null);
       setIsVerified(false);
       setLoading(false);
@@ -93,15 +96,29 @@ export function useEtherscan(
     const fetchData = async () => {
       setLoading(true);
       try {
-        const params = new URLSearchParams({
-          chainid: String(networkId),
-          module: "contract",
-          action: "getsourcecode",
-          address,
-          apikey: apiKey,
-        });
-        const url = `${ETHERSCAN_V2_API}?${params.toString()}`;
-        const response = await fetch(url, { signal: controller.signal });
+        let response: Response;
+
+        if (apiKey) {
+          // Direct Etherscan call with user's key
+          const params = new URLSearchParams({
+            chainid: String(networkId),
+            module: "contract",
+            action: "getsourcecode",
+            address,
+            apikey: apiKey,
+          });
+          response = await fetch(`${ETHERSCAN_V2_API}?${params.toString()}`, {
+            signal: controller.signal,
+          });
+        } else {
+          // Proxy through OpenScan Worker (free, no key needed)
+          response = await fetch(`${OPENSCAN_WORKER_URL}/etherscan/verify`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ chainId: networkId, address }),
+            signal: controller.signal,
+          });
+        }
 
         if (!response.ok) {
           setData(null);
@@ -141,14 +158,20 @@ export function useEtherscan(
           abi = undefined;
         }
 
-        const files = parseSourceFiles(result.SourceCode, result.ContractName);
+        const files = parseSourceFiles(
+          result.SourceCode,
+          result.ContractName,
+          result.CompilerVersion,
+        );
         const evmVersion =
           result.EVMVersion && result.EVMVersion !== "Default" ? result.EVMVersion : undefined;
 
+        const isVyper = result.CompilerVersion?.toLowerCase().startsWith("vyper:");
         const contractDetails: SourcifyContractDetails = {
           name: result.ContractName || undefined,
           compilerVersion: result.CompilerVersion || undefined,
           evmVersion,
+          language: isVyper ? "Vyper" : "Solidity",
           abi,
           files,
           match: "perfect",

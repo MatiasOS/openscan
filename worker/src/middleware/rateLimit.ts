@@ -42,7 +42,7 @@ export async function rateLimitMiddleware(c: Context<{ Bindings: Env }>, next: N
   entry.timestamps = entry.timestamps.filter((ts) => now - ts < WINDOW_MS);
 
   if (entry.timestamps.length >= MAX_REQUESTS) {
-    const oldestInWindow = entry.timestamps[0]!;
+    const oldestInWindow = entry.timestamps[0] as number;
     const retryAfterSec = Math.ceil((WINDOW_MS - (now - oldestInWindow)) / 1000);
     c.header("Retry-After", String(retryAfterSec));
     return c.json({ error: "Rate limit exceeded. Try again later." }, 429);
