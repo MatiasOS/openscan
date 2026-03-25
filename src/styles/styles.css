@@ -5627,6 +5627,8 @@ code {
   position: relative;
   display: inline-block;
   width: 50px;
+  min-width: 50px;
+  flex-shrink: 0;
   height: 26px;
   cursor: pointer;
 }
