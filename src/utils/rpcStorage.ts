@@ -193,7 +193,7 @@ export function saveRpcUrlsToStorage(map: RpcUrlsContextType): void {
  * Check whether a URL points to the OpenScan worker proxy.
  */
 export function isWorkerProxyUrl(url: string): boolean {
-  return url.startsWith(OPENSCAN_WORKER_URL);
+  return OPENSCAN_WORKER_URL.length > 0 && url.startsWith(OPENSCAN_WORKER_URL);
 }
 
 export function getEffectiveRpcUrls(options?: {
