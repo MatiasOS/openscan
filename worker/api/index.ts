@@ -8,6 +8,11 @@
 import app from "../src/index";
 import type { Env } from "../src/types";
 
+// Vercel Edge runtime provides process.env but the worker tsconfig
+// only includes Cloudflare types — declare it locally to avoid adding
+// @types/node as a dependency.
+declare const process: { env: Record<string, string | undefined> };
+
 function getEnv(): Env {
   return {
     GROQ_API_KEY: process.env.GROQ_API_KEY ?? "",
