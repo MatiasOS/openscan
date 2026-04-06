@@ -1,20 +1,23 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
+import { getNetworkBySlug } from "../../../config/networks";
 import { useDataService } from "../../../hooks/useDataService";
-import { resolveNetwork } from "../../../utils/networkResolver";
-import { getAllNetworks } from "../../../config/networks";
 import type { SolanaAccount, SolanaSignatureInfo } from "../../../types";
-import { formatSol, shortenSolanaAddress } from "../../../utils/solanaUtils";
+import { shortenSolanaAddress } from "../../../utils/solanaUtils";
+import Breadcrumb from "../../common/Breadcrumb";
+import LoaderWithTimeout from "../../common/LoaderWithTimeout";
+import SolanaAccountDisplay from "./SolanaAccountDisplay";
 
 export default function SolanaAccountPage() {
   const { address } = useParams<{ address: string }>();
   const location = useLocation();
   const { t } = useTranslation("solana");
 
-  const pathSlug = location.pathname.split("/")[1] || "sol";
-  const network = resolveNetwork(pathSlug, getAllNetworks());
-  const dataService = useDataService(network ?? pathSlug);
+  const networkSlug = location.pathname.split("/")[1] || "sol";
+  const dataService = useDataService(networkSlug);
+  const networkConfig = getNetworkBySlug(networkSlug);
+  const networkLabel = networkConfig?.shortName || networkConfig?.name || networkSlug.toUpperCase();
 
   const [account, setAccount] = useState<SolanaAccount | null>(null);
   const [signatures, setSignatures] = useState<SolanaSignatureInfo[]>([]);
@@ -22,11 +25,15 @@ export default function SolanaAccountPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let cancelled = false;
+    if (!dataService || !dataService.isSolana() || !address) {
+      setLoading(false);
+      return;
+    }
 
-    async function fetchAccount() {
-      if (!dataService || !dataService.isSolana() || !address) return;
+    let cancelled = false;
+    const fetchAccount = async () => {
       setLoading(true);
+      setError(null);
       try {
         const adapter = dataService.getSolanaAdapter();
         const [accountResult, sigsResult] = await Promise.all([
@@ -36,14 +43,15 @@ export default function SolanaAccountPage() {
         if (!cancelled) {
           setAccount(accountResult.data);
           setSignatures(sigsResult);
-          setError(null);
         }
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to fetch account");
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Failed to fetch account");
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
-    }
+    };
 
     fetchAccount();
     return () => {
@@ -51,119 +59,63 @@ export default function SolanaAccountPage() {
     };
   }, [dataService, address]);
 
-  if (loading)
-    return (
-      <div className="container-wide">
-        <p>{t("common.loading")}</p>
-      </div>
-    );
-  if (error)
-    return (
-      <div className="container-wide">
-        <p className="error-text-center">{error}</p>
-      </div>
-    );
-  if (!account)
-    return (
-      <div className="container-wide">
-        <p>{t("account.title")}</p>
-      </div>
-    );
+  const breadcrumbItems = [
+    { label: "Home", to: "/" },
+    { label: networkLabel, to: `/${networkSlug}` },
+    { label: t("account.title") },
+    { label: address ? shortenSolanaAddress(address, 6, 6) : "" },
+  ];
 
-  return (
-    <div className="container-wide">
-      <div className="block-display-card">
-        <h1>{account.executable ? t("account.program") : t("account.wallet")}</h1>
-
-        <div className="data-section">
-          <div className="data-row">
-            <span className="data-label">{t("account.address")}:</span>
-            <span className="data-value">{account.address}</span>
-          </div>
-          <div className="data-row">
-            <span className="data-label">{t("account.balance")}:</span>
-            <span className="data-value">{formatSol(account.lamports)}</span>
-          </div>
-          <div className="data-row">
-            <span className="data-label">{t("account.owner")}:</span>
-            <span className="data-value">
-              <Link to={`/${pathSlug}/account/${account.owner}`}>{account.owner}</Link>
+  if (loading) {
+    return (
+      <div className="container-wide page-container-padded">
+        <Breadcrumb items={breadcrumbItems} />
+        <div className="page-card">
+          <div className="block-display-header">
+            <span className="block-label">{t("account.title")}</span>
+            <span className="tx-mono header-subtitle">
+              {address ? shortenSolanaAddress(address, 8, 8) : ""}
             </span>
           </div>
-          <div className="data-row">
-            <span className="data-label">{t("account.executable")}:</span>
-            <span className="data-value">
-              {account.executable ? t("account.yes") : t("account.no")}
-            </span>
-          </div>
-          <div className="data-row">
-            <span className="data-label">{t("account.dataSize")}:</span>
-            <span className="data-value">{account.space} bytes</span>
-          </div>
-          <div className="data-row">
-            <span className="data-label">{t("account.rentEpoch")}:</span>
-            <span className="data-value">{account.rentEpoch}</span>
+          <div className="card-content-loading">
+            <LoaderWithTimeout
+              text="Loading account data..."
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
-
-        {account.tokenAccounts && account.tokenAccounts.length > 0 ? (
-          <div className="data-section">
-            <h2>{t("account.tokenHoldings")}</h2>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>{t("token.mint")}</th>
-                  <th>{t("token.amount")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {account.tokenAccounts.map((holding) => (
-                  <tr key={holding.tokenAccount}>
-                    <td>
-                      <Link to={`/${pathSlug}/token/${holding.mint}`} title={holding.mint}>
-                        {shortenSolanaAddress(holding.mint, 8, 8)}
-                      </Link>
-                    </td>
-                    <td>{holding.amount.uiAmountString}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="data-section">
-            <p>{t("account.noTokens")}</p>
-          </div>
-        )}
-
-        {signatures.length > 0 && (
-          <div className="data-section">
-            <h2>{t("account.recentTransactions")}</h2>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>{t("transaction.signature")}</th>
-                  <th>{t("transaction.status")}</th>
-                  <th>{t("transaction.slot")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {signatures.map((sig) => (
-                  <tr key={sig.signature}>
-                    <td>
-                      <Link to={`/${pathSlug}/tx/${sig.signature}`} title={sig.signature}>
-                        {shortenSolanaAddress(sig.signature, 8, 6)}
-                      </Link>
-                    </td>
-                    <td>{sig.err ? t("transactions.failed") : t("transactions.success")}</td>
-                    <td>{sig.slot.toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container-wide page-container-padded">
+        <Breadcrumb items={breadcrumbItems} />
+        <div className="page-card">
+          <div className="block-display-header">
+            <span className="block-label">{t("account.title")}</span>
+          </div>
+          <div className="card-content">
+            <p className="text-error margin-0">Error: {error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container-wide page-container-padded">
+      <Breadcrumb items={breadcrumbItems} />
+      {account ? (
+        <SolanaAccountDisplay account={account} signatures={signatures} networkId={networkSlug} />
+      ) : (
+        <div className="page-card">
+          <div className="card-content">
+            <p className="text-muted margin-0">Account not found</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

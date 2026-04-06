@@ -1,31 +1,37 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
+import { getNetworkBySlug } from "../../../config/networks";
 import { useDataService } from "../../../hooks/useDataService";
-import { resolveNetwork } from "../../../utils/networkResolver";
-import { getAllNetworks } from "../../../config/networks";
-import type { SolanaBlock } from "../../../types";
-import { formatBlockTime, formatSol, formatSlotNumber } from "../../../utils/solanaUtils";
+import type { DataWithMetadata, SolanaBlock } from "../../../types";
+import Breadcrumb from "../../common/Breadcrumb";
+import LoaderWithTimeout from "../../common/LoaderWithTimeout";
+import SolanaSlotDisplay from "./SolanaSlotDisplay";
 
 export default function SolanaSlotPage() {
   const { filter } = useParams<{ filter: string }>();
   const location = useLocation();
   const { t } = useTranslation("solana");
 
-  const pathSlug = location.pathname.split("/")[1] || "sol";
-  const network = resolveNetwork(pathSlug, getAllNetworks());
-  const dataService = useDataService(network ?? pathSlug);
+  const networkSlug = location.pathname.split("/")[1] || "sol";
+  const dataService = useDataService(networkSlug);
+  const networkConfig = getNetworkBySlug(networkSlug);
+  const networkLabel = networkConfig?.shortName || networkConfig?.name || networkSlug.toUpperCase();
 
-  const [block, setBlock] = useState<SolanaBlock | null>(null);
+  const [blockResult, setBlockResult] = useState<DataWithMetadata<SolanaBlock> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let cancelled = false;
+    if (!dataService || !dataService.isSolana() || !filter) {
+      setLoading(false);
+      return;
+    }
 
-    async function fetchBlock() {
-      if (!dataService || !dataService.isSolana() || !filter) return;
+    let cancelled = false;
+    const fetchBlock = async () => {
       setLoading(true);
+      setError(null);
       try {
         const adapter = dataService.getSolanaAdapter();
         const slot = Number(filter);
@@ -33,10 +39,7 @@ export default function SolanaSlotPage() {
           throw new Error(`Invalid slot: ${filter}`);
         }
         const result = await adapter.getBlock(slot);
-        if (!cancelled) {
-          setBlock(result.data);
-          setError(null);
-        }
+        if (!cancelled) setBlockResult(result);
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : "Failed to fetch block");
@@ -44,7 +47,7 @@ export default function SolanaSlotPage() {
       } finally {
         if (!cancelled) setLoading(false);
       }
-    }
+    };
 
     fetchBlock();
     return () => {
@@ -52,100 +55,61 @@ export default function SolanaSlotPage() {
     };
   }, [dataService, filter]);
 
-  if (loading)
-    return (
-      <div className="container-wide">
-        <p>{t("common.loading")}</p>
-      </div>
-    );
-  if (error)
-    return (
-      <div className="container-wide">
-        <p className="error-text-center">{error}</p>
-      </div>
-    );
-  if (!block)
-    return (
-      <div className="container-wide">
-        <p>{t("blocks.noBlocks")}</p>
-      </div>
-    );
+  const breadcrumbItems = [
+    { label: "Home", to: "/" },
+    { label: networkLabel, to: `/${networkSlug}` },
+    { label: t("blocks.blocksTitle"), to: `/${networkSlug}/slots` },
+    { label: `${t("block.title")} #${filter}` },
+  ];
 
-  return (
-    <div className="container-wide">
-      <div className="block-display-card">
-        <h1>
-          {t("block.title")} #{formatSlotNumber(block.slot)}
-        </h1>
-
-        <div className="data-section">
-          <div className="data-row">
-            <span className="data-label">{t("block.blockHash")}:</span>
-            <span className="data-value">{block.blockhash}</span>
+  if (loading) {
+    return (
+      <div className="container-wide page-container-padded">
+        <Breadcrumb items={breadcrumbItems} />
+        <div className="page-card">
+          <div className="block-display-header">
+            <span className="block-label">{t("block.title")}</span>
+            <span className="tx-mono header-subtitle">#{filter}</span>
           </div>
-          <div className="data-row">
-            <span className="data-label">{t("block.previousBlockhash")}:</span>
-            <span className="data-value">{block.previousBlockhash}</span>
-          </div>
-          <div className="data-row">
-            <span className="data-label">{t("block.parentSlot")}:</span>
-            <span className="data-value">
-              <Link to={`/${pathSlug}/slot/${block.parentSlot}`}>
-                #{formatSlotNumber(block.parentSlot)}
-              </Link>
-            </span>
-          </div>
-          <div className="data-row">
-            <span className="data-label">{t("block.blockHeight")}:</span>
-            <span className="data-value">
-              {block.blockHeight !== null ? formatSlotNumber(block.blockHeight) : "—"}
-            </span>
-          </div>
-          <div className="data-row">
-            <span className="data-label">{t("block.blockTime")}:</span>
-            <span className="data-value">{formatBlockTime(block.blockTime)}</span>
-          </div>
-          <div className="data-row">
-            <span className="data-label">{t("block.transactionCount")}:</span>
-            <span className="data-value">{block.transactionCount}</span>
+          <div className="card-content-loading">
+            <LoaderWithTimeout
+              text="Loading block data..."
+              onRetry={() => window.location.reload()}
+            />
           </div>
         </div>
-
-        {block.rewards.length > 0 && (
-          <div className="data-section">
-            <h2>{t("block.rewards")}</h2>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>{t("block.rewardType")}</th>
-                  <th>{t("block.amount")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {block.rewards.map((reward) => (
-                  <tr key={reward.pubkey}>
-                    <td>{reward.rewardType ?? "—"}</td>
-                    <td>{formatSol(reward.lamports)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {block.signatures && block.signatures.length > 0 && (
-          <div className="data-section">
-            <h2>{t("block.transactions")}</h2>
-            <ul className="data-list">
-              {block.signatures.slice(0, 50).map((sig) => (
-                <li key={sig}>
-                  <Link to={`/${pathSlug}/tx/${sig}`}>{sig}</Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container-wide page-container-padded">
+        <Breadcrumb items={breadcrumbItems} />
+        <div className="page-card">
+          <div className="block-display-header">
+            <span className="block-label">{t("block.title")}</span>
+          </div>
+          <div className="card-content">
+            <p className="text-error margin-0">Error: {error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container-wide page-container-padded">
+      <Breadcrumb items={breadcrumbItems} />
+      {blockResult?.data ? (
+        <SolanaSlotDisplay block={blockResult.data} networkId={networkSlug} />
+      ) : (
+        <div className="page-card">
+          <div className="card-content">
+            <p className="text-muted margin-0">{t("blocks.noBlocks")}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
