@@ -57,12 +57,6 @@ const SolanaDashboardStats: React.FC<SolanaDashboardStatsProps> = ({
         </div>
       </div>
 
-      <div className="dashboard-stat-card">
-        <div className="dashboard-stat-label">{t("dashboard.version")}</div>
-        <div className="dashboard-stat-value">
-          {loading && !stats ? skeleton("80px") : (stats?.version ?? "—")}
-        </div>
-      </div>
     </div>
   );
 };
