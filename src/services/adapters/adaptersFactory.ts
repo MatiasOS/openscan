@@ -39,8 +39,7 @@ export class AdapterFactory {
       | ArbitrumClient
       | AvalancheClient
       | AztecClient
-      | HardhatClient
-      | unknown,
+      | HardhatClient,
   ): NetworkAdapter {
     switch (networkId) {
       case 1:

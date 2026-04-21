@@ -23,9 +23,16 @@ type EVMClientConfig = {
   type: "fallback" | "parallel" | "race";
 };
 
+type EVMTestnetClient =
+  | ArbitrumClient
+  | OptimismClient
+  | BaseClient
+  | PolygonClient
+  | EthereumClient;
+
 // EVM testnets not yet registered in @openscan/network-connectors ClientFactory.
 // Mapped to their L1 family's client since they share the same JSON-RPC surface.
-const EVM_TESTNET_CLIENTS: Record<number, (config: EVMClientConfig) => unknown> = {
+const EVM_TESTNET_CLIENTS: Record<number, (config: EVMClientConfig) => EVMTestnetClient> = {
   421614: (config) => new ArbitrumClient(config),
   11155420: (config) => new OptimismClient(config),
   84532: (config) => new BaseClient(config),
