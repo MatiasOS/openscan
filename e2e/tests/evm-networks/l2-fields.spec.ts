@@ -7,8 +7,6 @@ import {
   expectArbitrumTxL1Fields,
   expectOpStackTxL1Fee,
 } from "../../fixtures/assertionsL2";
-import { DEFAULT_TIMEOUT } from "../../helpers/wait";
-
 /**
  * L2-specific field assertions.
  *
@@ -31,10 +29,12 @@ import { DEFAULT_TIMEOUT } from "../../helpers/wait";
  * pre-committed to the repo).
  */
 
-// Pick the first Arbitrum EIP-1559 transaction in the fixture table.
-const ARB_TX_HASH = Object.keys(ARBITRUM.transactions)[1] ?? Object.keys(ARBITRUM.transactions)[0];
-// First Optimism tx fixture — `l1Fee` is already in the fixture payload so we
-// know the receipt carries the OP Stack breakdown.
+// First fixture tx for each chain; both Arbitrum tx fixtures are post-Nitro
+// so either exposes `l1BlockNumber` in the receipt. The first Optimism/Base
+// tx already carries `l1Fee` in the fixture payload (see the `l1Fee` key in
+// `e2e/fixtures/optimism.ts`), so we know the receipt has the OP-stack fee
+// breakdown populated upstream.
+const ARB_TX_HASH = Object.keys(ARBITRUM.transactions)[0];
 const OP_TX_HASH = Object.keys(OPTIMISM.transactions)[0];
 const BASE_TX_HASH = Object.keys(BASE.transactions)[0];
 
@@ -47,8 +47,7 @@ test.describe("Arbitrum L2 fields — transaction", () => {
     test.skip(!ARB_TX_HASH, "no Arbitrum tx fixture available");
     await page.goto(`/#/42161/tx/${ARB_TX_HASH}`);
     // Give the transaction + receipt fetches time to complete on a cold run.
-    await page.waitForLoadState("domcontentloaded", { timeout: DEFAULT_TIMEOUT });
-    await expectArbitrumTxL1Fields(page);
+await expectArbitrumTxL1Fields(page);
   });
 });
 
@@ -56,8 +55,7 @@ test.describe("Arbitrum L2 fields — block", () => {
   test("block exposes Send Count and Send Root", async ({ page }) => {
     test.skip(!ARB_BLOCK, "no Arbitrum block fixture available");
     await page.goto(`/#/42161/block/${ARB_BLOCK}`);
-    await page.waitForLoadState("domcontentloaded", { timeout: DEFAULT_TIMEOUT });
-    await expectArbitrumBlockFields(page);
+await expectArbitrumBlockFields(page);
   });
 });
 
@@ -65,8 +63,7 @@ test.describe("Optimism L2 fields — transaction", () => {
   test("post-Bedrock tx exposes L1 Fee breakdown", async ({ page }) => {
     test.skip(!OP_TX_HASH, "no Optimism tx fixture available");
     await page.goto(`/#/10/tx/${OP_TX_HASH}`);
-    await page.waitForLoadState("domcontentloaded", { timeout: DEFAULT_TIMEOUT });
-    await expectOpStackTxL1Fee(page);
+await expectOpStackTxL1Fee(page);
   });
 });
 
@@ -74,8 +71,7 @@ test.describe("Base L2 fields — transaction", () => {
   test("post-Bedrock tx exposes L1 Fee breakdown", async ({ page }) => {
     test.skip(!BASE_TX_HASH, "no Base tx fixture available");
     await page.goto(`/#/8453/tx/${BASE_TX_HASH}`);
-    await page.waitForLoadState("domcontentloaded", { timeout: DEFAULT_TIMEOUT });
-    await expectOpStackTxL1Fee(page);
+await expectOpStackTxL1Fee(page);
   });
 });
 
