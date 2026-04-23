@@ -26,3 +26,45 @@ export function toSafeExternalHref(url: unknown): string | null {
     return null;
   }
 }
+
+const SENSITIVE_PARAM_REGEX = /key|token|secret|auth|signature|apikey|api_key|access_token/i;
+
+/**
+ * Mask API keys and other high-entropy credentials embedded in a URL — both in
+ * query parameters (e.g. `?apiKey=...`) and in path segments (e.g. Alchemy's
+ * `/v2/<KEY>` or Infura's `/v3/<KEY>`).
+ *
+ * Returns the input unchanged if it does not parse as a URL.
+ */
+export function redactSensitiveUrl(rawUrl: string): string {
+  try {
+    const parsed = new URL(rawUrl);
+
+    for (const [key] of parsed.searchParams.entries()) {
+      if (SENSITIVE_PARAM_REGEX.test(key)) {
+        parsed.searchParams.set(key, "***");
+      }
+    }
+
+    const segments = parsed.pathname.split("/").map((segment) => {
+      if (!segment) return segment;
+      const looksLikeToken = segment.length >= 24 && /[A-Za-z]/.test(segment) && /\d/.test(segment);
+      return looksLikeToken ? "***" : segment;
+    });
+    parsed.pathname = segments.join("/");
+
+    return parsed.toString();
+  } catch {
+    return rawUrl;
+  }
+}
+
+const URL_IN_TEXT_REGEX = /https?:\/\/[^\s"'<>`]+/g;
+
+/**
+ * Redact every http(s) URL substring inside a free-form text value (log
+ * message, error message, stack frame).
+ */
+export function redactSensitiveUrlsInText(text: string): string {
+  return text.replace(URL_IN_TEXT_REGEX, (match) => redactSensitiveUrl(match));
+}
