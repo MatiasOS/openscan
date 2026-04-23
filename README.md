@@ -210,6 +210,20 @@ npm run test:e2e:debug
   RPCs to catch provider-side drift between PR cycles. Does not gate
   merges.
 
+**Adding a new spec:**
+
+1. A new production network → add a row to
+   `e2e/fixtures/networks.ts`; add the shard name to the matching CI
+   workflow.
+2. A cross-network feature (search, settings, …) → drop a spec into
+   `e2e/tests/shared/` and add a shard entry to
+   `.github/workflows/e2e-shared.yml`.
+3. A network-specific feature (per-chain deep dive) → add to
+   `e2e/tests/evm-networks/<chain>.spec.ts` (live) or a new file, and
+   extend the evm-networks workflow matrix.
+4. A hermetic / mocked test → drop it into `e2e/tests/shared/mocked/`;
+   Playwright's `mocked` project picks it up automatically.
+
 ## Configuration
 
 ### Git pre-commit
