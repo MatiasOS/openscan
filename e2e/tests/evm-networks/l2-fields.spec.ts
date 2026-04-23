@@ -42,20 +42,26 @@ const BASE_TX_HASH = Object.keys(BASE.transactions)[0];
 // Drawn from existing Arbitrum block fixture keys.
 const ARB_BLOCK = Object.keys(ARBITRUM.blocks)[0];
 
+// The Arbitrum L1-field tests require an RPC that returns Arbitrum's
+// extended tx receipt / block shape (`l1BlockNumber`, `sendCount`,
+// `sendRoot`). Public RPCs and some provider variants strip these
+// fields; local runs against `buildRpcUrls`-seeded Alchemy/Infura may
+// or may not expose them depending on the endpoint. Mark as `fixme`
+// until the dedicated Arbitrum RPC is confirmed in CI secrets and a
+// conditional skip tied to that env var is wired up.
 test.describe("Arbitrum L2 fields — transaction", () => {
-  test("post-Nitro tx exposes L1 Block Number", async ({ page }) => {
+  test.fixme("post-Nitro tx exposes L1 Block Number", async ({ page }) => {
     test.skip(!ARB_TX_HASH, "no Arbitrum tx fixture available");
     await page.goto(`/#/42161/tx/${ARB_TX_HASH}`);
-    // Give the transaction + receipt fetches time to complete on a cold run.
-await expectArbitrumTxL1Fields(page);
+    await expectArbitrumTxL1Fields(page);
   });
 });
 
 test.describe("Arbitrum L2 fields — block", () => {
-  test("block exposes Send Count and Send Root", async ({ page }) => {
+  test.fixme("block exposes Send Count and Send Root", async ({ page }) => {
     test.skip(!ARB_BLOCK, "no Arbitrum block fixture available");
     await page.goto(`/#/42161/block/${ARB_BLOCK}`);
-await expectArbitrumBlockFields(page);
+    await expectArbitrumBlockFields(page);
   });
 });
 
