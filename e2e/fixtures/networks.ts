@@ -8,6 +8,10 @@
  * (`mainnet.ts`, `arbitrum.ts`, …) and import those directly. This table is
  * for specs that iterate over many networks at once — search, errors,
  * testnets smoke, settings, etc.
+ *
+ * Slug values match `src/config/networks.json` exactly.
+ * `urlPath` is what the existing specs put in the `/:networkId` route
+ * segment: chainId (stringified) for EVM, slug for Bitcoin / Solana.
  */
 
 export type AdapterFamily =
@@ -21,16 +25,22 @@ export type AdapterFamily =
   | "solana";
 
 export interface NetworkFixture {
+  /** Numeric EVM chain id as a string, or CAIP-2 for non-EVM chains. */
   chainId: string;
+  /** The slug as declared in `src/config/networks.json`. */
   slug: string;
   name: string;
   family: AdapterFamily;
   isTestnet: boolean;
+  /** What to put in the `/:networkId` URL segment — chainId for EVM, slug
+   *  for Bitcoin / Solana. Matches existing per-network spec conventions. */
+  urlPath: string;
   /** Pinned historical block; never a "latest" number. */
   canonicalBlock: number | string;
   /** Well-known tx hash that will never be pruned. */
   canonicalTxHash: string;
-  /** Foundation / treasury / canonical contract — balance may change, existence won't. */
+  /** Foundation / treasury / canonical contract — balance may change,
+   *  existence won't. */
   canonicalAddress: string;
   /** Optional ERC-20 or ERC-721 contract used by token-page smoke tests. */
   canonicalToken?: string;
@@ -42,10 +52,11 @@ export interface NetworkFixture {
 
 export const ETH_MAINNET: NetworkFixture = {
   chainId: "1",
-  slug: "ethereum",
+  slug: "eth",
   name: "Ethereum",
   family: "evm",
   isTestnet: false,
+  urlPath: "1",
   canonicalBlock: 20_000_000,
   canonicalTxHash: "0x5c504ed432cb51138bcf09aa5e8a410dd4a1e204ef84bfed1be16dfba1b22060",
   canonicalAddress: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045", // vitalik.eth
@@ -55,22 +66,24 @@ export const ETH_MAINNET: NetworkFixture = {
 
 export const ARBITRUM: NetworkFixture = {
   chainId: "42161",
-  slug: "arbitrum",
+  slug: "arb",
   name: "Arbitrum One",
   family: "arbitrum",
   isTestnet: false,
+  urlPath: "42161",
   canonicalBlock: 200_000_000,
-  canonicalTxHash: "0x4f5a0a6b5a8e5f8e5f8e5f8e5f8e5f8e5f8e5f8e5f8e5f8e5f8e5f8e5f8e5f8e",
+  canonicalTxHash: "0x0000000000000000000000000000000000000000000000000000000000000001",
   canonicalAddress: "0x912CE59144191C1204E64559FE8253a0e49E6548", // ARB token
   canonicalToken: "0x912CE59144191C1204E64559FE8253a0e49E6548",
 };
 
 export const OPTIMISM: NetworkFixture = {
   chainId: "10",
-  slug: "optimism",
+  slug: "op",
   name: "Optimism",
   family: "optimism",
   isTestnet: false,
+  urlPath: "10",
   canonicalBlock: 117_000_000,
   canonicalTxHash: "0x0000000000000000000000000000000000000000000000000000000000000001",
   canonicalAddress: "0x4200000000000000000000000000000000000042", // OP token
@@ -83,6 +96,7 @@ export const BASE: NetworkFixture = {
   name: "Base",
   family: "base",
   isTestnet: false,
+  urlPath: "8453",
   canonicalBlock: 11_000_000,
   canonicalTxHash: "0x0000000000000000000000000000000000000000000000000000000000000001",
   canonicalAddress: "0x4200000000000000000000000000000000000006", // WETH on Base
@@ -95,6 +109,7 @@ export const BSC: NetworkFixture = {
   name: "BNB Chain",
   family: "bnb",
   isTestnet: false,
+  urlPath: "56",
   canonicalBlock: 40_000_000,
   canonicalTxHash: "0x0000000000000000000000000000000000000000000000000000000000000001",
   canonicalAddress: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c", // WBNB
@@ -107,6 +122,7 @@ export const POLYGON: NetworkFixture = {
   name: "Polygon",
   family: "polygon",
   isTestnet: false,
+  urlPath: "137",
   canonicalBlock: 60_000_000,
   canonicalTxHash: "0x0000000000000000000000000000000000000000000000000000000000000001",
   canonicalAddress: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", // WMATIC/POL
@@ -115,10 +131,11 @@ export const POLYGON: NetworkFixture = {
 
 export const AVALANCHE: NetworkFixture = {
   chainId: "43114",
-  slug: "avalanche",
+  slug: "avax",
   name: "Avalanche",
   family: "evm",
   isTestnet: false,
+  urlPath: "43114",
   canonicalBlock: 40_000_000,
   canonicalTxHash: "0x0000000000000000000000000000000000000000000000000000000000000001",
   canonicalAddress: "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7", // WAVAX
@@ -129,10 +146,11 @@ export const AVALANCHE: NetworkFixture = {
 
 export const BITCOIN: NetworkFixture = {
   chainId: "bip122:000000000019d6689c085ae165831e93",
-  slug: "bitcoin",
+  slug: "btc",
   name: "Bitcoin",
   family: "bitcoin",
   isTestnet: false,
+  urlPath: "btc",
   canonicalBlock: 481_824, // SegWit activation
   canonicalTxHash:
     "f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16", // first pizza tx
@@ -140,20 +158,19 @@ export const BITCOIN: NetworkFixture = {
 };
 
 export const SOLANA: NetworkFixture = {
-  // Solana uses a CAIP-2 id; explorer slug is what drives routing.
   chainId: "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
-  slug: "solana",
+  slug: "sol",
   name: "Solana",
   family: "solana",
   isTestnet: false,
-  // Pin to a finalized slot; individual specs should re-pin if needed.
-  canonicalBlock: 250_000_000,
+  urlPath: "sol",
+  canonicalBlock: 250_000_000, // slot; re-pin per-spec if a specific slot needed
   canonicalTxHash:
     "5VERv8NMvzbJMEkV8xnrLkEaWRtSz9CosKDYjCJjBRnbJLgp8uirBgmQpjKhoR4tjF3ZpRzrFmBV6UjKdiSZkQUW",
   canonicalAddress: "11111111111111111111111111111111", // system program
 };
 
-// ---------- EVM Testnets (added in metadata 1.2.1-alpha.0) ----------
+// ---------- EVM Testnets (metadata 1.2.1-alpha.0 + legacy) ----------
 
 export const SEPOLIA: NetworkFixture = {
   chainId: "11155111",
@@ -161,6 +178,7 @@ export const SEPOLIA: NetworkFixture = {
   name: "Sepolia",
   family: "evm",
   isTestnet: true,
+  urlPath: "11155111",
   canonicalBlock: 5_000_000,
   canonicalTxHash: "0x0000000000000000000000000000000000000000000000000000000000000001",
   canonicalAddress: "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14", // Sepolia WETH9
@@ -172,6 +190,7 @@ export const ARB_SEPOLIA: NetworkFixture = {
   name: "Arbitrum Sepolia",
   family: "arbitrum",
   isTestnet: true,
+  urlPath: "421614",
   canonicalBlock: 100_000_000,
   canonicalTxHash: "0x0000000000000000000000000000000000000000000000000000000000000001",
   canonicalAddress: "0x980B62Da83eFf3D4576C647993b0c1D7faf17c73",
@@ -183,6 +202,7 @@ export const OP_SEPOLIA: NetworkFixture = {
   name: "Optimism Sepolia",
   family: "optimism",
   isTestnet: true,
+  urlPath: "11155420",
   canonicalBlock: 20_000_000,
   canonicalTxHash: "0x0000000000000000000000000000000000000000000000000000000000000001",
   canonicalAddress: "0x4200000000000000000000000000000000000006",
@@ -194,6 +214,7 @@ export const BASE_SEPOLIA: NetworkFixture = {
   name: "Base Sepolia",
   family: "base",
   isTestnet: true,
+  urlPath: "84532",
   canonicalBlock: 15_000_000,
   canonicalTxHash: "0x0000000000000000000000000000000000000000000000000000000000000001",
   canonicalAddress: "0x4200000000000000000000000000000000000006",
@@ -205,6 +226,7 @@ export const POLYGON_AMOY: NetworkFixture = {
   name: "Polygon Amoy",
   family: "polygon",
   isTestnet: true,
+  urlPath: "80002",
   canonicalBlock: 10_000_000,
   canonicalTxHash: "0x0000000000000000000000000000000000000000000000000000000000000001",
   canonicalAddress: "0x0000000000000000000000000000000000000000",
@@ -216,6 +238,7 @@ export const AVAX_FUJI: NetworkFixture = {
   name: "Avalanche Fuji",
   family: "evm",
   isTestnet: true,
+  urlPath: "43113",
   canonicalBlock: 30_000_000,
   canonicalTxHash: "0x0000000000000000000000000000000000000000000000000000000000000001",
   canonicalAddress: "0x0000000000000000000000000000000000000000",
@@ -248,9 +271,7 @@ export const L2_NETWORKS: NetworkFixture[] = [ARBITRUM, OPTIMISM, BASE, POLYGON]
 
 export const ALL_NETWORKS: NetworkFixture[] = [...ALL_PRODUCTION, ...EVM_TESTNETS];
 
-// Note on the placeholder `0x…0001` tx hashes above: individual L2/testnet
-// specs that want to assert real data should override the canonical tx with
-// one pinned inside the network-specific fixture file (e.g. `arbitrum.ts`).
-// The placeholder is safe for smoke tests that only verify the page renders
-// a "transaction not found" or valid-shape response without depending on a
-// specific tx payload.
+// Note on the placeholder `0x…0001` tx hashes above: smoke specs only rely on
+// the page rendering without crashing. Specs that need a real payload should
+// override the canonical tx with one pinned inside the network-specific
+// fixture file (e.g. `arbitrum.ts`).
