@@ -1,5 +1,4 @@
 import { test, expect } from "../../fixtures/test";
-import { expectStillMounted } from "../../fixtures/assertions";
 import { DEFAULT_TIMEOUT } from "../../helpers/wait";
 
 /**
@@ -33,12 +32,8 @@ test.describe("Contract interaction UI", () => {
     });
   });
 
-  test("unverified contract address still renders", async ({ page }) => {
-    // A contract deployed but with no verified source — the address page
-    // should still render (header, balance, tx history) even without ABI.
-    // Pick an address we know has code but no public verification — use the
-    // zero-address fallback as a safe placeholder so the spec never rots.
-    await page.goto("/#/1/address/0x0000000000000000000000000000000000000000");
-    await expectStillMounted(page);
-  });
+  // Unverified-contract coverage (contract has code but no public source)
+  // deferred to phase 6 — picking a stably-unverified contract on mainnet
+  // is a research task, and the zero-address fallback in errors.spec.ts
+  // already covers the EOA (no-code) path.
 });
