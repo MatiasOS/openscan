@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         with:
           bun-version: latest
 
@@ -28,7 +28,7 @@ jobs:
 
       - name: Upload to Storacha
         id: upload
-        uses: storacha/add-to-web3@v4
+        uses: storacha/add-to-web3@892505d8e70c79336721485e5500155c17a728e0 # v4
         with:
           path_to_add: './dist'
           secret_key: ${{ secrets.STORACHA_PRINCIPAL }}
