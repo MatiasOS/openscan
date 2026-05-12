@@ -20,4 +20,5 @@ Detailed instructions are organized in the rules directory:
 @.claude/rules/code-style.md - Code style, formatting, and quality requirements
 @.claude/rules/workflow.md - Git workflow, branches, PRs, and issues
 @.claude/rules/patterns.md - Important coding patterns for this codebase
+@.claude/rules/testing.md - Vitest + Playwright testing model (projects, suites, mocking)
 @.claude/rules/i18n.md - Internationalization guidelines and best practices
