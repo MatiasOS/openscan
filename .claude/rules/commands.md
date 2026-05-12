@@ -16,6 +16,15 @@ npm run build:production
 # Staging build
 npm run build:staging
 
+# Development-mode build (sourcemaps, OPENSCAN_ENVIRONMENT=development)
+npm run build:development
+
+# Plain Vite build (no env wrapper)
+npm run build
+
+# Preview the built dist/ on http://localhost:3030
+npm run preview
+
 # Output: dist/
 ```
 
@@ -39,6 +48,9 @@ npm run lint
 
 # Fix linting issues automatically
 npm run lint:fix
+
+# Combined Biome check (format + lint, max 1024 diagnostics)
+npm run check
 ```
 
 ## Testing
@@ -86,6 +98,24 @@ mocking).
 npm run dev
 # Starts Hardhat node + OpenScan with sample contracts
 # Creates hardhat-test-artifacts.zip for importing ABIs
+```
+
+## Security Audit
+
+```bash
+# Run npm audit at moderate level
+# (audit.sh generates a temporary package-lock.json since this repo uses bun)
+npm run audit
+```
+
+Backed by [scripts/audit.sh](../../scripts/audit.sh).
+
+## Publishing
+
+```bash
+# Publish the built dist/ to npm under the @alpha tag
+# Uses dist-package.template.json for the published package metadata
+npm run publish:dist
 ```
 
 ## Individual Script Execution

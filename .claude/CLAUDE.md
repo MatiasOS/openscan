@@ -4,12 +4,16 @@ OpenScan is a trustless, open-source, standalone web-app and multi-chain blockch
 
 ## Quick Reference
 
-- **Package Manager**: Bun
+- **Package Manager**: Bun 1.1.0 (lockfile: `bun.lock`, pinned via the `packageManager` field in `package.json`). The repo's documented commands use `npm run` because they invoke `package.json` scripts — `bun run` works equivalently.
 - **Bundler**: Vite
 - **Dev Server**: `npm start` (http://localhost:3030)
 - **Type Check**: `npm run typecheck`
 - **Format**: `npm run format:fix`
 - **Lint**: `npm run lint:fix`
+- **Combined Biome check**: `npm run check`
+- **Test (unit)**: `npm run test:run`
+- **Test (e2e)**: `npm run test:e2e` (or `test:e2e:eth-mainnet` / `test:e2e:evm-networks` for focused runs)
+- **Local node + explorer**: `npm run dev`
 
 ## Modular Instructions
 

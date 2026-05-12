@@ -13,13 +13,18 @@ Typed RPC clients for blockchain communication:
 
 ### 2. Adapter Layer (`services/adapters/`)
 Abstract `NetworkAdapter` base class with chain-specific implementations:
-- `EVMAdapter` - Default EVM adapter (Ethereum, BSC, Polygon, Sepolia)
-- `ArbitrumAdapter` - Adds `l1BlockNumber`, `sendCount`, `sendRoot`
-- `OptimismAdapter` / `BaseAdapter` - Adds L1 fee breakdown (`l1Fee`, `l1GasPrice`, `l1GasUsed`)
+- `EVMAdapter` - Default EVM adapter (Ethereum mainnet 1, Sepolia 11155111, Avalanche 43114 + Fuji 43113)
+- `ArbitrumAdapter` - Arbitrum One (42161) + Sepolia (421614). Adds `l1BlockNumber`, `sendCount`, `sendRoot`
+- `OptimismAdapter` - Optimism (10) + Sepolia (11155420). Adds L1 fee breakdown (`l1Fee`, `l1GasPrice`, `l1GasUsed`)
+- `BaseAdapter` - Base (8453) + Sepolia (84532). Adds L1 fee breakdown
+- `BNBAdapter` - BSC mainnet (56) + testnet (97)
+- `PolygonAdapter` - Polygon (137) + Amoy testnet (80002)
 - `HardhatAdapter` - Localhost (31337) with trace support via struct log conversion
-- `BitcoinAdapter` - Bitcoin networks with UTXO model, mempool, and block explorer
+- `BitcoinAdapter` - Bitcoin networks (bip122:*) with UTXO model, mempool, and block explorer
+- `SolanaAdapter` - Solana networks
 - Each adapter implements: `getBlock`, `getTransaction`, `getAddress`, `getNetworkStats`, trace methods
-- `AdapterFactory` routes chain ID to the correct adapter
+- `AdapterFactory` routes chain ID to the correct adapter via three entry points:
+  `createAdapter` (EVM), `createBitcoinAdapter`, `createSolanaAdapter`
 
 ### 3. Service Layer (`DataService.ts`)
 Orchestrates data fetching with caching and metadata:
@@ -41,13 +46,18 @@ Global state management:
 
 ## Network-Specific Handling
 
-Chain ID detection in `AdapterFactory` determines which adapter to instantiate:
+Chain ID detection in `AdapterFactory` determines which adapter to instantiate
+(see [src/services/adapters/adaptersFactory.ts](../../src/services/adapters/adaptersFactory.ts)):
 
-- **Arbitrum** (42161): `ArbitrumAdapter` - adds `l1BlockNumber`, `sendCount`, `sendRoot`
-- **Bitcoin** (bip122:*): `BitcoinAdapter` - UTXO model, mempool transactions, block rewards
-- **OP Stack** (10, 8453): `OptimismAdapter` (10), `BaseAdapter` (8453) - adds L1 fee breakdown (`l1Fee`, `l1GasPrice`, `l1GasUsed`)
+- **Arbitrum** (42161, 421614): `ArbitrumAdapter` - adds `l1BlockNumber`, `sendCount`, `sendRoot`
+- **OP Stack — Optimism** (10, 11155420): `OptimismAdapter` - adds L1 fee breakdown (`l1Fee`, `l1GasPrice`, `l1GasUsed`)
+- **OP Stack — Base** (8453, 84532): `BaseAdapter` - adds L1 fee breakdown
+- **BSC** (56, 97): `BNBAdapter`
+- **Polygon** (137, 80002): `PolygonAdapter`
+- **Bitcoin** (bip122:*): `BitcoinAdapter` - UTXO model, mempool transactions, block rewards (constructed via `createBitcoinAdapter`)
+- **Solana**: `SolanaAdapter` (constructed via `createSolanaAdapter`)
 - **Hardhat** (31337): `HardhatAdapter` - uses `HardhatClient` from `@openscan/network-connectors`; trace support via struct log conversion (`buildCallTreeFromStructLogs`, `buildPrestateFromStructLogs` in `src/utils/structLogConverter.ts`) since Hardhat v3 does not support `callTracer`/`prestateTracer`
-- **Default**: `EVMAdapter` for Ethereum (1), BSC (56, 97), Polygon (137), Sepolia (11155111), Avalanche (43114)
+- **Default EVM**: `EVMAdapter` for Ethereum (1), Sepolia (11155111), Avalanche (43114, 43113)
 
 ## Key Type Definitions
 
@@ -68,3 +78,19 @@ Located in `src/types/index.ts`:
   - `OPENSCAN_COMMIT_HASH` - Git commit hash
   - `OPENSCAN_NETWORKS` - Comma-separated chain IDs to display
   - `OPENSCAN_ENVIRONMENT` - production/development
+
+## Companion Sub-Project: `worker/`
+
+Separate Hono-based RPC proxy at [worker/](../../worker/), deployable to
+Cloudflare Workers, Vercel Edge Functions, or Deno Deploy. Routes browser
+requests to upstream RPC providers (Alchemy, Infura, dRPC, Ankr, OnFinality),
+the Etherscan V2 verification API, the Beacon API for blob sidecars, and Groq
+for AI analysis. Includes CORS, rate limiting, and method allow-listing.
+
+- Single Hono app in `worker/src/index.ts` shared across all platforms; each
+  platform has a thin entry point (`api/index.ts` for Vercel,
+  `src/entry-deno.ts` for Deno, `wrangler.toml` for Cloudflare).
+- Has its own `package.json`, `tsconfig.json`, and `deno.json`. Linted by the
+  root `biome.json` config (worker sources are inside Biome's scope).
+- Frontend automatically falls over between Cloudflare and Vercel deployments
+  for redundancy.
