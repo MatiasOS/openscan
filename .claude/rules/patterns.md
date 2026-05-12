@@ -61,6 +61,22 @@ OpenScan includes special support for localhost development:
 - Use `--text-primary`, `--text-secondary`, `--text-tertiary` for text colors
 - Never hardcode `rgba(255, 255, 255, X)` - use CSS variables instead
 
+## Testing Patterns
+
+See [testing.md](testing.md) for the full model. Two patterns matter most when
+adding tests:
+
+- **Hermetic specs go under `e2e/tests/shared/mocked/`** — the `mocked`
+  Playwright project picks up only that subtree and uses `page.route` to
+  intercept RPC and worker traffic. Use this for any test that asserts on
+  RPC strategy (`fallback` / `parallel` / `race`), provider inconsistency
+  flags, or error/edge-case paths. These tests are deterministic and don't
+  flake.
+- **Live-RPC specs go under `e2e/tests/<network>/`** (e.g. `eth-mainnet/`,
+  `evm-networks/`, `bitcoin/`) — never under `shared/mocked/`, since the
+  default `chromium` project explicitly ignores that subtree. Live specs
+  are sharded per network in CI so flakes in one chain don't block others.
+
 ## Logger Utility
 
 Always use the logger utility instead of `console.*` methods for runtime logging.
