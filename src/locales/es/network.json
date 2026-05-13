@@ -39,6 +39,16 @@
   "aboutNetwork": "Acerca de {{name}}",
   "officialLinks": "Links Oficiales",
   "collapseProfile": "Contraer perfil",
+  "gasTendency": {
+    "title": "Tendencia del Gas",
+    "subtitle": "Tarifa base y gas usado en los últimos {{count}} bloques",
+    "baseFee": "Tarifa base (gwei)",
+    "gasUsed": "Gas usado",
+    "blockShort": "#{{number}}",
+    "tooltipBlock": "Bloque #{{number}}",
+    "tooltipBaseFee": "Tarifa base: {{value}} gwei",
+    "tooltipGasUsed": "Gas usado: {{value}}%"
+  },
   "gasTracker": {
     "title": "Gas Tracker",
     "loadingGasPrices": "Cargando precios de gas...",

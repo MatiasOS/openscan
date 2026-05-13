@@ -89,5 +89,15 @@
   "errors": {
     "failedToFetchBlock": "No se pudieron obtener los datos del bloque",
     "failedToFetchBlocks": "No se pudieron obtener los bloques"
+  },
+  "gasTendency": {
+    "title": "Tendencia del Gas",
+    "subtitle": "Tarifa base y gas usado en los últimos {{count}} bloques",
+    "baseFee": "Tarifa base (gwei)",
+    "gasUsed": "Gas usado",
+    "blockShort": "#{{number}}",
+    "tooltipBlock": "Bloque #{{number}}",
+    "tooltipBaseFee": "Tarifa base: {{value}} gwei",
+    "tooltipGasUsed": "Gas usado: {{value}}%"
   }
 }
