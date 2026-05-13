@@ -92,7 +92,6 @@
   },
   "gasTendency": {
     "title": "Tendencia del Gas",
-    "subtitle": "Tarifa base y gas usado en los últimos {{count}} bloques",
     "baseFee": "Tarifa base (gwei)",
     "gasUsed": "Gas usado",
     "blockShort": "#{{number}}",

@@ -41,7 +41,6 @@
   "collapseProfile": "プロフィールを折りたたむ",
   "gasTendency": {
     "title": "ガスの傾向",
-    "subtitle": "直近{{count}}ブロックのベース料金とガス使用量",
     "baseFee": "ベース料金 (gwei)",
     "gasUsed": "ガス使用量",
     "blockShort": "#{{number}}",

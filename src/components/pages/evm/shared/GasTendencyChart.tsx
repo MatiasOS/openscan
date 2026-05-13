@@ -5,7 +5,6 @@ import type { FeeHistory } from "../../../../types";
 interface Props {
   feeHistory: FeeHistory | null;
   isLoading: boolean;
-  blockCount: number;
 }
 
 const WEI_PER_GWEI = 1_000_000_000n;
@@ -25,7 +24,7 @@ const formatGwei = (gwei: number): string => {
   return gwei.toFixed(3);
 };
 
-const GasTendencyChart: React.FC<Props> = ({ feeHistory, isLoading, blockCount }) => {
+const GasTendencyChart: React.FC<Props> = ({ feeHistory, isLoading }) => {
   const { t } = useTranslation("network");
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
 
@@ -190,10 +189,6 @@ const GasTendencyChart: React.FC<Props> = ({ feeHistory, isLoading, blockCount }
         </span>
         <span>{t("gasTendency.blockShort", { number: newestBlock })}</span>
       </div>
-
-      {/* <div className="gas-tendency-chart-subtitle">
-        {t("gasTendency.subtitle", { count: blockCount })}
-      </div> */}
     </div>
   );
 };

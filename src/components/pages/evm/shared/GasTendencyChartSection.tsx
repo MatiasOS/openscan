@@ -32,7 +32,7 @@ const GasTendencyChartSection: React.FC<Props> = ({
       <header className="dashboard-table-header">
         <h2 className="dashboard-table-title">{t("gasTendency.title")}</h2>
       </header>
-      <GasTendencyChart feeHistory={feeHistory} isLoading={isLoading} blockCount={blockCount} />
+      <GasTendencyChart feeHistory={feeHistory} isLoading={isLoading} />
     </section>
   );
 };

@@ -41,7 +41,6 @@
   "collapseProfile": "折叠简介",
   "gasTendency": {
     "title": "Gas 趋势",
-    "subtitle": "最近 {{count}} 个区块的基础费用和 Gas 使用情况",
     "baseFee": "基础费用 (gwei)",
     "gasUsed": "Gas 使用量",
     "blockShort": "#{{number}}",

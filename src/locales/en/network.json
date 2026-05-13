@@ -41,7 +41,6 @@
   "collapseProfile": "Collapse profile",
   "gasTendency": {
     "title": "Gas Tendency",
-    "subtitle": "Base fee and gas used over the last {{count}} blocks",
     "baseFee": "Base fee (gwei)",
     "gasUsed": "Gas used",
     "blockShort": "#{{number}}",

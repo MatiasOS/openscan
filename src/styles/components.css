@@ -9023,11 +9023,6 @@ button.tx-section-header-toggle {
 	margin-left: 8px;
 }
 
-.gas-tendency-chart-subtitle {
-	font-size: 0.75rem;
-	color: var(--text-tertiary);
-}
-
 .gas-tendency-chart-loading {
 	min-height: 140px;
 }
